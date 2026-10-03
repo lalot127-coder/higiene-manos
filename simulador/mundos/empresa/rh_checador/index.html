@@ -1,0 +1,170 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Simulador · Oficina de RH: auditoría del checador</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script src="../../../motor/motor.js"></script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// Fuentes verificadas (02_fuentes_verificadas/registro_fuentes.md, consulta 03/10/2026). Curso: Jornada laboral de 40 h.
+const F = {
+  reg: 'LFT art. 132 fr. XXXIV (DOF 01/05/2026); Transitorio Quinto',
+  multa: 'LFT arts. 992 y 994 fr. IV Bis',
+  cal: 'LFT art. 59 y Transitorio Segundo (DOF 01/05/2026)',
+  ext: 'LFT arts. 66 y 68; Transitorio Cuarto',
+  diario: 'LFT arts. 60 y 61',
+  contrato: 'LFT art. 25 fr. V',
+  rit: 'LFT arts. 423 fr. I, 424 fr. II y 425',
+  salario: 'LFT Transitorio Séptimo; CPEUM Transitorio Cuarto (DOF 03/03/2026)',
+  jornada: 'LFT arts. 58 y 66',
+  prueba: 'LFT arts. 804 fr. III y 805',
+};
+const W = MotorSim.crearMundo(THREE, OrbitControls, { titulo: 'Oficina de RH: auditoría del checador', icono: '⏱️',
+  clave: 'jornada40_rh_checador', criterio: { pct: 80, sinCriticos: true }, fondo: 0xE6ECF2,
+  vistas: [[[0.6, 3.6, 6.4], [0.3, 0.9, -0.4]], [[-2.6, 2.2, 1.6], [-3.4, 1.3, -1.8]], [[2.6, 2.3, 1.8], [2.6, 1.0, -1.4]]] });
+const { caja, cil, esfera, capsula, tocable, letrero, scene, M } = W;
+
+// ------------------------------------------------------------------ oficina
+const piso = new THREE.Mesh(new THREE.PlaneGeometry(11, 8), M(0xC9C2B8)); piso.rotation.x = -Math.PI / 2; scene.add(piso);
+caja(11, 3, 0.1, 0xF4F1EC, 0, 1.5, -3.2); caja(0.1, 3, 8, 0xF4F1EC, -5.5, 1.5, 0); caja(0.1, 3, 8, 0xEDE8E1, 5.5, 1.5, 0);
+const rot = letrero('RECURSOS HUMANOS · MUEBLES DEL CENTRO', 3.6, 0.34, '#14284B'); rot.position.set(0, 2.6, -3.14); scene.add(rot);
+// escritorio, computadora y folder de nómina
+caja(2.2, 0.08, 0.95, 0x8A6A4A, 0, 0.78, -0.6); caja(0.08, 0.76, 0.85, 0x6E553C, -1.0, 0.38, -0.6); caja(0.08, 0.76, 0.85, 0x6E553C, 1.0, 0.38, -0.6);
+const pc = caja(0.75, 0.48, 0.05, 0x1B2633, -0.25, 1.15, -0.9); caja(0.08, 0.22, 0.08, 0x333333, -0.25, 0.9, -0.9);
+const pantalla = letrero('ASISTENCIA', 0.68, 0.18, '#1F6FB2'); pantalla.position.set(-0.25, 1.15, -0.87); scene.add(pantalla); tocable(pc, 'pc', 0.7);
+const nomina = caja(0.36, 0.05, 0.27, 0xE0A23C, 0.6, 0.84, -0.45); tocable(nomina, 'nomina', 0.45);
+const sNom = letrero('NÓMINA 2027', 0.36, 0.09, '#E0A23C', '#14284B'); sNom.rotation.x = -Math.PI / 2; sNom.position.set(0.6, 0.875, -0.45); scene.add(sNom);
+// reloj checador en la pared izquierda
+const checador = caja(0.45, 0.6, 0.18, 0x5B6B7C, -4.6, 1.45, -1.6); tocable(checador, 'checador', 0.7);
+const libreta = caja(0.32, 0.03, 0.22, 0xC62828, -4.6, 1.0, -1.35); tocable(libreta, 'checador', 0.4);
+caja(0.5, 0.06, 0.3, 0x8A6A4A, -4.6, 0.98, -1.4);
+const sChe = letrero('CHECADOR', 1.1, 0.24, '#5B6B7C'); sChe.position.set(-4.5, 2.0, -1.6); sChe.rotation.y = Math.PI / 2; scene.add(sChe);
+// archivero de contratos
+const archivero = caja(0.6, 1.3, 0.55, 0x7A8A99, 3.0, 0.65, -2.7); tocable(archivero, 'archivero', 0.9);
+[0.3, 0.7, 1.1].forEach(y => caja(0.5, 0.02, 0.01, 0xCFD8DF, 3.0, y, -2.42));
+const sArc = letrero('CONTRATOS', 0.7, 0.16, '#2F5D95'); sArc.position.set(3.0, 1.45, -2.4); scene.add(sArc);
+// pizarrón con el Reglamento Interior de Trabajo
+const pizarron = caja(1.5, 1.0, 0.04, 0xFFFFFF, -1.9, 1.75, -3.12); tocable(pizarron, 'rit', 0.8);
+const sRit = letrero('REGLAMENTO 2019', 1.4, 0.24, '#C62828'); sRit.position.set(-1.9, 2.05, -3.09); scene.add(sRit);
+const sRit2 = letrero('07:00-15:00 L-S', 1.4, 0.22, '#FFFFFF', '#1B2633'); sRit2.position.set(-1.9, 1.7, -3.09); scene.add(sRit2);
+// reloj de pared que marca 19:00 (escena del "se queda porque quiere")
+const sHora = letrero('19:00', 0.5, 0.2, '#14284B'); sHora.position.set(2.0, 2.4, -3.1); scene.add(sHora);
+// trabajadora en su escritorio después de su hora de salida
+caja(1.0, 0.06, 0.6, 0x8A6A4A, 3.2, 0.75, 0.9); caja(0.06, 0.72, 0.5, 0x6E553C, 2.75, 0.36, 0.9); caja(0.06, 0.72, 0.5, 0x6E553C, 3.65, 0.36, 0.9);
+const persona = new THREE.Group(); persona.position.set(3.2, 0, 1.55); scene.add(persona);
+const cuerpo = capsula(0.2, 0.55, 0x2F5D95); cuerpo.position.y = 0.85; persona.add(cuerpo); esfera(0.15, 0xE0B48F, 0, 1.38, 0, persona);
+tocable(cuerpo, 'persona', 0.7);
+const sPer = letrero('Laura · sale 17:00', 1.1, 0.22, '#E0A23C', '#14284B'); sPer.position.set(3.2, 1.85, 1.55); scene.add(sPer);
+// planta y detalles
+cil(0.18, 0.4, 0x8D6E63, -4.8, 0.2, 2.5); esfera(0.35, 0x2E7D32, -4.8, 0.65, 2.5);
+
+// ------------------------------------------------------------------ utilidades del caso
+const OBJ = { checador, pc, archivero, rit: pizarron, nomina, persona: cuerpo };
+// Pregunta con retroalimentación por opción y errores críticos (decisiones que violarían la ley).
+function elegir(titulo, ops, fuente, alAcertar, html = '') {
+  W.$('mCont').innerHTML = `<h2>${titulo}</h2>${html}<div id="ops"></div>`;
+  ops.forEach(o => { const b = document.createElement('button'); b.className = 'op'; b.textContent = o.t; b.onclick = () => {
+    W.$('modal').style.display = 'none';
+    if (o.ok) { W.bien(o.fb || 'Correcto.', fuente); alAcertar && alAcertar(); }
+    else { W.mal(o.fb || 'No es correcto.', fuente, !!o.critico); setTimeout(() => elegir(titulo, ops, fuente, alAcertar, html), 900); } };
+    W.$('ops').appendChild(b); });
+  W.$('modal').style.display = 'flex';
+  if (location.search.includes('qa')) window.__ops = ops;
+}
+// Paso: tocar el objeto indicado y responder.
+function paso(titulo, texto, clave, preguntaFn, fuente) {
+  return { titulo, texto, fuente, puntos: 10,
+    iniciar() { W.resaltar([OBJ[clave]]); },
+    tocar(o) { if (o.userData.tipo !== clave) { W.toast('info', 'Toca el objeto que brilla en azul.'); return; } W.resaltar([]); preguntaFn(); } };
+}
+const tabla = (filas) => `<table><tr><th>Día</th><th>Entrada</th><th>Salida</th><th>Horas</th></tr>${filas.map(f => `<tr><td>${f[0]}</td><td>${f[1]}</td><td>${f[2]}</td><td>${f[3]}</td></tr>`).join('')}</table><p class="ficticio">Registro [FICTICIO – ejercicio didáctico]</p>`;
+
+// ------------------------------------------------------------------ casos [FICTICIO – ejercicio didáctico]
+const COMUNES_INICIO = (txt) => ({ titulo: 'Inicio de la auditoría', texto: 'Muebles del Centro te pidió revisar si su jornada está lista.', sinPuntos: true,
+  iniciar() { W.aviso(`<h2>⏱️ Auditoría de jornada</h2><p>${txt}</p><p>Toca en la escena los objetos que brillan en azul y responde. Las decisiones que violarían la ley cuentan como <b>error crítico</b>.</p><p class="ficticio">[FICTICIO – ejercicio didáctico]</p>`, () => W.siguiente(), 'Comenzar'); } });
+
+const PASO_CHECADOR = paso('Control de asistencia', 'Toca el <b>control de asistencia</b> (pared izquierda).', 'checador', () =>
+  elegir('La asistencia se anota a mano en una libreta. ¿Qué dices?', [
+    { t: 'Está bien: cualquier registro sirve', fb: 'La LFT exige registrar de manera ELECTRÓNICA inicio y fin de la jornada.' },
+    { t: 'Es una brecha: el registro debe ser electrónico, con inicio y fin de jornada de cada persona', ok: true, fb: 'Correcto. Las disposiciones de la STPS (ámbito y excepciones) rigen desde el 01/01/2027.' },
+    { t: 'No importa: esa obligación es hasta 2030', fb: 'La obligación ya está en la LFT desde el 01/05/2026.' },
+  ], F.reg, () => W.siguiente()), F.reg);
+
+const PASO_SEMANA = paso('Registro semanal (2027)', 'Toca la <b>computadora</b> para revisar el registro de Pedro (producción, diurno).', 'pc', () =>
+  elegir('Semana de enero de 2027 · Pedro (diurno). ¿Cuántas horas extra hay?', [
+    { t: '0 h: todo es jornada ordinaria' , fb: 'En 2027 el máximo semanal es 46 h.' },
+    { t: '2 h: trabajó 48 h y el máximo de 2027 es 46 h', ok: true, fb: 'Correcto: esas 2 h son extra y se pagan dobles (dentro del tope de 9 h).' },
+    { t: '8 h: todo el sábado es extra', fb: 'Solo excede el máximo semanal por 2 h; ningún día rebasa 8 h.' },
+  ], F.cal + '; ' + F.ext, () => W.siguiente(),
+  tabla([['Lunes a viernes', '07:00', '15:00', '8 h c/u = 40 h'], ['Sábado', '07:00', '15:00', '8 h'], ['TOTAL', '', '', '48 h']])), F.cal);
+
+const PASO_NOCTURNO = paso('Turno nocturno', 'Toca la <b>computadora</b> otra vez: registro de Mario (turno nocturno).', 'pc', () =>
+  elegir('Mario entra a las 22:00 y sale a las 06:00, cinco noches. ¿Qué detectas?', [
+    { t: 'Nada: 8 h es la jornada normal', fb: 'De 20:00 a 06:00 es jornada nocturna y su tope diario es de 7 h.' },
+    { t: 'Excede 1 h diaria el tope nocturno (7 h): son 5 h extra a la semana', ok: true, fb: 'Correcto: ajusta el horario (p. ej., 22:00–05:00) o paga y registra esa hora como extra.' },
+    { t: 'Está bien porque el máximo semanal de 2027 es 46 h', fb: 'Se revisan las dos reglas: el tope DIARIO del turno también se debe respetar.' },
+  ], F.diario, () => W.siguiente(), tabla([['Lunes a viernes', '22:00', '06:00', '8 h nocturnas c/u'], ['TOTAL', '', '', '40 h']])), F.diario);
+
+const PASO_CONTRATO = paso('Contratos', 'Toca el <b>archivero de contratos</b>.', 'archivero', () =>
+  elegir('¿Qué debe decir el contrato individual sobre el horario?', [
+    { t: 'Nada: el horario lo decide el jefe cada semana', fb: 'El escrito de condiciones de trabajo debe contener la duración de la jornada.' },
+    { t: 'La duración de la jornada (actualizada para 2027 con adenda)', ok: true, fb: 'Correcto.' },
+    { t: 'Solo el salario', fb: 'También debe contener la duración de la jornada.' },
+  ], F.contrato, () => W.siguiente()), F.contrato);
+
+const PASO_RIT = paso('Reglamento Interior', 'Toca el <b>pizarrón del Reglamento Interior</b>.', 'rit', () =>
+  elegir('El RIT es de 2019 (L–S 07:00–15:00). Cambiarás a 46 h. ¿Desde cuándo surte efectos el RIT actualizado?', [
+    { t: 'Desde que se pega en el pizarrón', fb: 'El RIT surte efectos desde su depósito.' },
+    { t: 'Desde su depósito ante el Centro Federal de Conciliación y Registro Laboral', ok: true, fb: 'Correcto: se deposita dentro de los 8 días siguientes a su firma.' },
+    { t: 'No es necesario actualizarlo', fb: 'El RIT debe señalar las horas de entrada y salida.' },
+  ], F.rit, () => W.siguiente()), F.rit);
+
+const PASO_NOMINA = paso('Nómina', 'Toca el <b>folder de nómina 2027</b> (escritorio).', 'nomina', () =>
+  elegir('Dirección propone bajar 4% el sueldo "porque ahora se trabajarán 2 horas menos". ¿Qué respondes?', [
+    { t: 'De acuerdo: menos horas, menos sueldo', critico: true, fb: 'Prohibido: la reducción de jornada no implica bajar sueldos, salarios ni prestaciones.' },
+    { t: 'No: el salario se mantiene; lo que sube es el costo por hora', ok: true, fb: 'Correcto.' },
+    { t: 'Solo al personal de nuevo ingreso', critico: true, fb: 'Tampoco: en ningún caso la reducción implica disminuir sueldos.' },
+  ], F.salario, () => W.siguiente()), F.salario);
+
+const PASO_PERSONA = paso('"Se queda porque quiere"', 'Son las 19:00. Toca a <b>Laura</b>: su salida es a las 17:00 y sigue cerrando pedidos.', 'persona', () =>
+  elegir('Laura dice que se queda "porque quiere". ¿Qué haces?', [
+    { t: 'Nada: es su tiempo personal', critico: true, fb: 'Si trabaja para la empresa, está a disposición del patrón: es jornada o tiempo extra.' },
+    { t: 'Se registra y se paga como tiempo extra (o se reorganiza su carga para que salga a su hora)', ok: true, fb: 'Correcto; y si es diario, no es "circunstancia extraordinaria": rediseña la carga.' },
+    { t: 'Se borra del registro para no rebasar el tope', critico: true, fb: 'Jornada real ≠ registrada: sin registros fieles se presume cierto lo que afirme el trabajador.' },
+  ], F.jornada + '; ' + F.prueba, () => W.siguiente()), F.jornada);
+
+const PASO_MULTA = { titulo: 'Cierre de la auditoría', texto: 'Una última pregunta.', fuente: F.multa,
+  iniciar() { elegir('Si la empresa no lleva el registro electrónico, la multa es…', [
+    { t: '50 a 250 UMA, una sola vez' , fb: 'Ese rango es para topes diarios y descansos (art. 994 fr. I).' },
+    { t: '250 a 5,000 UMA por cada trabajador afectado (se duplica si reincide)', ok: true, fb: 'Correcto. UMA 2026 = $117.31.' },
+    { t: 'No hay multa, solo una recomendación', fb: 'Sí hay multa: art. 994 fr. IV Bis.' },
+  ], F.multa, () => W.siguiente()); } };
+
+// Caso 2: hospital 24/7 (guardias)
+const PASO_GUARDIAS = paso('Guardias de 12 h (2027)', 'Toca la <b>computadora</b>: registro de Jorge, enfermero de guardias.', 'pc', () =>
+  elegir('Jorge hace 4 guardias diurnas de 12 h por semana en 2027. ¿Es legal?', [
+    { t: 'Sí: 48 h y es sector salud', fb: 'Cada guardia son 8 h ordinarias + 4 extra: 16 h extra a la semana.' },
+    { t: 'No: son 16 h extra y el máximo es 13 (9 dobles + 4 triples)', ok: true, fb: 'Correcto: rediseña relevos (más personal o guardias de 8 h).' },
+    { t: 'Sí, si se pagan todas al triple', critico: true, fb: 'Pagar no legaliza rebasar el máximo de tiempo extraordinario.' },
+  ], F.ext, () => W.siguiente(), tabla([['Lun, Mié, Vie, Dom', '07:00', '19:00', '12 h c/u'], ['TOTAL', '', '', '48 h (32 ordinarias + 16 extra)']])), F.ext);
+
+const CASO1 = () => [COMUNES_INICIO('Fábrica de muebles, 60 personas, enero de 2027 (máximo semanal: 46 h).'),
+  PASO_CHECADOR, PASO_SEMANA, PASO_NOCTURNO, PASO_CONTRATO, PASO_RIT, PASO_NOMINA, PASO_PERSONA, PASO_MULTA];
+const CASO2 = () => [COMUNES_INICIO('Ahora revisas el área de servicios 24/7 (guardias y turnos nocturnos), enero de 2027.'),
+  PASO_CHECADOR, PASO_GUARDIAS, PASO_NOCTURNO, PASO_NOMINA, PASO_PERSONA, PASO_MULTA];
+
+W.inicio([{ id: 'c1', txt: '🏭 <b>Caso 1:</b> Muebles del Centro · auditoría completa de jornada (2027)' },
+  { id: 'c2', txt: '🏥 <b>Caso 2:</b> Servicios 24/7 · guardias de 12 h y turno nocturno (2027)' }],
+  id => id === 'c1' ? CASO1() : CASO2(),
+  'Basado en la LFT reformada (DOF 01/05/2026) y la reforma constitucional (DOF 03/03/2026). Casos ficticios con fines didácticos. Curso: Nueva Jornada Laboral de 40 Horas.');
+
+if (location.search.includes('qa')) window.__qa = { OBJ, tocar: W.tocar, estado: W.qa };
+</script>
+</body>
+</html>

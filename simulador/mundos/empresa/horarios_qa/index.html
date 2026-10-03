@@ -1,0 +1,117 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Simulador · Mesa de ayuda: preguntas sobre horarios</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script src="../../../motor/motor.js"></script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// Fuentes verificadas (02_fuentes_verificadas/registro_fuentes.md, consulta 03/10/2026). Curso: Jornada laboral de 40 h.
+const W = MotorSim.crearMundo(THREE, OrbitControls, { titulo: 'Mesa de ayuda: preguntas sobre horarios', icono: '❓',
+  clave: 'jornada40_horarios_qa', criterio: { pct: 80, sinCriticos: true }, fondo: 0xE8EEF5,
+  vistas: [[[0, 3.4, 5.6], [0, 1.0, -0.4]], [[0, 5.5, 1.5], [0, 0.6, -0.8]], [[-3.0, 2.2, 3.0], [-1.5, 1.0, -1.0]]] });
+const { caja, cil, esfera, capsula, tocable, letrero, scene, M } = W;
+
+// ------------------------------------------------------------------ sala
+const piso = new THREE.Mesh(new THREE.PlaneGeometry(12, 9), M(0xD5D9DE)); piso.rotation.x = -Math.PI / 2; scene.add(piso);
+caja(12, 3, 0.1, 0xF5F7FA, 0, 1.5, -3.4); caja(0.1, 3, 9, 0xF5F7FA, -6, 1.5, 0); caja(0.1, 3, 9, 0xF5F7FA, 6, 1.5, 0);
+const rot = letrero('MESA DE AYUDA · NUEVA JORNADA LABORAL', 3.8, 0.34, '#14284B'); rot.position.set(0, 2.65, -3.34); scene.add(rot);
+// pizarrón con el calendario (referencia visual de las dos reglas)
+const pz = caja(3.2, 1.25, 0.04, 0xFFFFFF, 0, 1.6, -3.32);
+const l1 = letrero('SEMANA: 48·46·44·42·40 h', 2.0, 0.32, '#FFFFFF', '#14284B'); l1.position.set(0, 2.0, -3.29); scene.add(l1);
+const l2 = letrero('DÍA: 8 · 7.5 · 7 h', 2.0, 0.32, '#FFFFFF', '#2F5D95'); l2.position.set(0, 1.62, -3.29); scene.add(l2);
+const l3 = letrero('EXTRA: 9→12 dobles + 4 triples', 2.0, 0.32, '#FFFFFF', '#C62828'); l3.position.set(0, 1.24, -3.29); scene.add(l3);
+// mostrador
+caja(3.4, 1.0, 0.6, 0x2F5D95, 0, 0.5, -1.6); caja(3.5, 0.06, 0.7, 0xE0A23C, 0, 1.03, -1.6);
+// personas trabajadoras en fila (cada una con su duda)
+const COLORES = [0xC62828, 0x2E7D32, 0x6A1FA0, 0xE0A23C, 0x1F6FB2, 0x8D6E63, 0x00838F, 0x5B6B7C];
+const PERS = {};
+function persona(id, nombre, x, z, color) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g);
+  const c = capsula(0.2, 0.6, color); c.position.y = 0.85; g.add(c); esfera(0.15, 0xE0B48F, 0, 1.42, 0, g);
+  const q = letrero('?', 0.28, 0.28, '#E0A23C', '#14284B'); q.position.set(0, 1.85, 0); g.add(q);
+  const n = letrero(nombre, 0.95, 0.17, '#14284B'); n.position.set(0, 2.12, 0); g.add(n);
+  tocable(c, id, 0.75); PERS[id] = { g, c, q }; return g;
+}
+
+// ------------------------------------------------------------------ preguntas [personas y situaciones FICTICIAS]
+// ops: {t, ok, critico, fb}. Las respuestas correctas siguen el texto vigente de la LFT y la Constitución.
+const Q = {
+  ana: { nombre: 'Ana · producción', p: '¿Ya en 2026 tengo que trabajar solo 40 horas?', f: 'LFT Transitorios Segundo y Tercero (DOF 01/05/2026)', ops: [
+    { t: 'Sí, desde mayo de 2026', fb: 'En 2026 el máximo sigue siendo 48 h.' },
+    { t: 'No: en 2026 el máximo es 48 h; baja a 46 h el 1 de enero de 2027 y llega a 40 h en 2030', ok: true, fb: 'Correcto: 2026 es el periodo para ajustar procesos.' },
+    { t: 'Solo si la empresa quiere', fb: 'Es obligatorio: está en la Constitución y en la LFT.' }] },
+  luis: { nombre: 'Luis · nocturno', p: 'Trabajo de 22:00 a 06:00. ¿Está bien mi horario?', f: 'LFT arts. 60 y 61', ops: [
+    { t: 'Sí, 8 horas es lo normal', fb: 'La jornada nocturna (20:00 a 06:00) tiene tope diario de 7 h.' },
+    { t: 'Excede 1 h diaria el tope nocturno de 7 h: esa hora es tiempo extra', ok: true, fb: 'Correcto: se ajusta el horario o se paga y registra como extra.' },
+    { t: 'Está bien porque el máximo semanal es mayor', fb: 'El tope DIARIO del turno también se revisa.' }] },
+  marta: { nombre: 'Marta · oficina', p: '¿Podemos pactar 4 días de 10 horas como jornada normal?', f: 'LFT arts. 58, 61 y 66', ops: [
+    { t: 'Sí, si suma 40 h a la semana', fb: 'El art. 61 conserva 8 h diarias en jornada diurna.' },
+    { t: 'No como jornada ordinaria: el tope diurno es 8 h; las 2 h diarias de más serían extra (lectura prudente)', ok: true, fb: 'Correcto: y el extra solo procede por circunstancias extraordinarias.' },
+    { t: 'Sí, con firma del trabajador', fb: 'La distribución de común acuerdo no elimina el tope diario.' }] },
+  pedro: { nombre: 'Pedro · almacén', p: 'Si trabajo menos horas, ¿me van a bajar el sueldo?', f: 'LFT Transitorio Séptimo; CPEUM Transitorio Cuarto', ops: [
+    { t: 'Sí, en proporción a las horas', critico: true, fb: 'Prohibido: en ningún caso la reducción implica bajar sueldos, salarios o prestaciones.' },
+    { t: 'No: el sueldo y las prestaciones se mantienen', ok: true, fb: 'Correcto: lo que sube es el costo por hora para la empresa.' },
+    { t: 'Depende del contrato', fb: 'La protección es general: aplica a todas las personas trabajadoras.' }] },
+  sofia: { nombre: 'Sofía · 17 años', p: 'Soy aprendiz de 17 años. ¿Puedo hacer horas extra el sábado?', f: 'CPEUM 123-A fr. XI; LFT arts. 5o fr. IV y 178', ops: [
+    { t: 'Sí, si tus padres firman', critico: true, fb: 'Está prohibido el tiempo extraordinario a menores de 18 años.' },
+    { t: 'No: a menores de 18 años está prohibido el tiempo extraordinario', ok: true, fb: 'Correcto. Si se viola, se paga al 200% adicional y hay multa (art. 995).' },
+    { t: 'Sí, máximo 4 horas', critico: true, fb: 'No hay excepción: prohibido para menores de 18.' }] },
+  jorge: { nombre: 'Jorge · hospital', p: 'En 2027 haré 4 guardias de 12 h por semana. ¿Está permitido?', f: 'LFT arts. 61, 66 y 68; Transitorio Cuarto', ops: [
+    { t: 'Sí, en hospitales no hay límite', fb: 'La LFT aplica: 12 h = 8 ordinarias + 4 extra.' },
+    { t: 'No: son 16 h extra y el máximo es 13 (9 dobles + 4 triples)', ok: true, fb: 'Correcto: hay que rediseñar relevos.' },
+    { t: 'Sí, si se pagan triples', critico: true, fb: 'Pagar no legaliza rebasar el máximo de tiempo extraordinario.' }] },
+  carla: { nombre: 'Carla · línea 2', p: 'Como en el comedor de la planta y no me dejan salir. ¿Cuenta como jornada?', f: 'LFT arts. 63 y 64', ops: [
+    { t: 'No, es tiempo de comida', fb: 'Si no puede salir del centro de trabajo, ese tiempo cuenta como jornada.' },
+    { t: 'Sí: si no puedes salir del centro de trabajo, ese tiempo es jornada efectiva', ok: true, fb: 'Correcto.' },
+    { t: 'Solo si dura más de 1 hora', fb: 'La regla no depende de la duración.' }] },
+  raul: { nombre: 'Raúl · mantenimiento', p: '¿Estoy obligado a quedarme horas extra si me lo piden?', f: 'LFT art. 68; STPS, Preguntas frecuentes (25/03/2026)', ops: [
+    { t: 'Sí, siempre', fb: 'No está obligado a trabajar más del tiempo permitido; la STPS señala que el extra es voluntario.' },
+    { t: 'No estás obligado a trabajar más de lo permitido; la STPS señala que el tiempo extra es voluntario', ok: true, fb: 'Correcto: se recomienda autorización previa y por escrito.' },
+    { t: 'Solo si pagan triple', fb: 'El pago no cambia el límite ni la voluntariedad.' }] },
+};
+const pos = [[-2.4, 0.3], [-0.8, 0.6], [0.8, 0.6], [2.4, 0.3], [-2.4, 1.8], [-0.8, 2.1], [0.8, 2.1], [2.4, 1.8]];
+Object.keys(Q).forEach((k, i) => persona(k, Q[k].nombre, pos[i][0], pos[i][1], COLORES[i]));
+
+function elegir(titulo, ops, fuente, alAcertar) {
+  const mezcladas = ops.map((o, i) => ({ o, r: (i * 7 + titulo.length) % 5 })).sort((a, b) => a.r - b.r).map(x => x.o);
+  W.$('mCont').innerHTML = `<h2>${titulo}</h2><div id="ops"></div><p class="ficticio">Persona y situación [FICTICIO – ejercicio didáctico]</p>`;
+  mezcladas.forEach(o => { const b = document.createElement('button'); b.className = 'op'; b.textContent = o.t; b.onclick = () => {
+    W.$('modal').style.display = 'none';
+    if (o.ok) { W.bien(o.fb || 'Correcto.', fuente); alAcertar && alAcertar(); }
+    else { W.mal(o.fb || 'No es correcto.', fuente, !!o.critico); setTimeout(() => elegir(titulo, ops, fuente, alAcertar), 900); } };
+    W.$('ops').appendChild(b); });
+  W.$('modal').style.display = 'flex';
+  if (location.search.includes('qa')) window.__ops = ops;
+}
+function pasoPersona(id) {
+  const q = Q[id];
+  return { titulo: q.nombre, texto: `Toca a <b>${q.nombre.split(' ·')[0]}</b> (brilla en azul) para escuchar su duda.`, fuente: q.f, puntos: 10,
+    iniciar() { W.resaltar([PERS[id].c]); },
+    tocar(o) { if (o.userData.tipo !== id) { W.toast('info', 'Atiende primero a la persona que brilla en azul.'); return; }
+      W.resaltar([]); elegir(`${q.nombre.split(' ·')[0]} pregunta: “${q.p}”`, q.ops, q.f, () => { PERS[id].q.visible = false; W.siguiente(); }); } };
+}
+const intro = txt => ({ titulo: 'Abre la mesa de ayuda', texto: 'Las personas trabajadoras tienen dudas sobre la nueva jornada.', sinPuntos: true,
+  iniciar() { Object.values(PERS).forEach(p => p.q.visible = true);
+    W.aviso(`<h2>❓ Mesa de ayuda</h2><p>${txt}</p><p>El pizarrón te recuerda las dos reglas: <b>máximo semanal del año</b> (igual para todos los turnos) y <b>tope diario</b> de cada turno.</p><p>Respuestas que violarían la ley cuentan como <b>error crítico</b>.</p><p class="ficticio">[FICTICIO – ejercicio didáctico]</p>`, () => W.siguiente(), 'Abrir la mesa'); } });
+const final = { titulo: 'Pregunta final', texto: 'Una última decisión.', fuente: 'LFT Transitorio Segundo (DOF 01/05/2026)',
+  iniciar() { elegir('¿Cuál es el máximo semanal ordinario en 2029, para cualquier turno?', [
+    { t: '44 horas', fb: '44 h es en 2028.' }, { t: '42 horas', ok: true, fb: 'Correcto: 48·46·44·42·40.' }, { t: '40 horas', fb: '40 h es en 2030.' }],
+    'LFT Transitorio Segundo (DOF 01/05/2026)', () => W.siguiente()); } };
+
+W.inicio([{ id: 'r1', txt: '🏭 <b>Ronda 1:</b> planta · Ana, Luis, Pedro, Sofía y Carla' },
+  { id: 'r2', txt: '🏢 <b>Ronda 2:</b> oficina y servicios · Marta, Jorge, Raúl, Ana y Pedro' }],
+  id => id === 'r1' ? [intro('Turno de planta: cinco personas esperan su respuesta.'), ...['ana', 'luis', 'pedro', 'sofia', 'carla'].map(pasoPersona), final]
+                    : [intro('Oficina y servicios 24/7: cinco personas esperan su respuesta.'), ...['marta', 'jorge', 'raul', 'ana', 'pedro'].map(pasoPersona), final],
+  'Basado en la LFT reformada (DOF 01/05/2026), la reforma constitucional (DOF 03/03/2026) y las Preguntas frecuentes de la STPS (25/03/2026). Personas y situaciones ficticias.');
+
+if (location.search.includes('qa')) window.__qa = { PERS, Q, tocar: W.tocar, estado: W.qa };
+</script>
+</body>
+</html>

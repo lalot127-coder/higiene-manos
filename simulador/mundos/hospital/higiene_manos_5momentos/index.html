@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Simulador · Los 5 momentos</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script src="../../../motor/motor.js"></script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+const crearMundo = cfg => MotorSim.crearMundo(THREE, OrbitControls, cfg);
+
+// Fuentes verificadas (02_fuentes_verificadas/registro_fuentes.md, consulta 03/10/2026)
+const F = {
+  mom: 'AESP 2023, AE5A (p. 46); 5 momentos OMS (texto AESP DOF 08/09/2017)',
+  nom1: 'NOM-045-SSA2-2005, 10.6.1.1',
+  nom3: 'NOM-045-SSA2-2005, 10.6.1.3; OMS, cartel "How to handwash" (2006)',
+  gel: 'NOM-045-SSA2-2005, 10.6.1.2-10.6.1.3; OMS (fricción 20-30 s)',
+};
+const W = crearMundo({ titulo: 'Los 5 momentos', icono: '🖐️', clave: 'higiene_manos_5momentos',
+  criterio: { pct: 80, sinCriticos: true },
+  vistas: [[[3.2, 3.0, 4.2], [0, 0.8, -0.8]], [[0, 4.6, 1.2], [0, 0.6, -1]], [[-1.2, 2.2, 2.6], [-2.2, 1, -2.4]]] });
+const { caja, cil, esfera, capsula, tocable, letrero, scene, mover, resaltar, M } = W;
+
+// ------------------------------------------------------------------ habitación
+const piso = new THREE.Mesh(new THREE.PlaneGeometry(10, 8), M(0xCFD8DF)); piso.rotation.x = -Math.PI / 2; scene.add(piso);
+caja(10, 3, 0.1, 0xF5F8FA, 0, 1.5, -3.2); caja(0.1, 3, 8, 0xF5F8FA, -5, 1.5, 0); caja(0.1, 3, 8, 0xF5F8FA, 4.2, 1.5, 0);
+const rotulo = letrero('HAB. 112 · ZONA DEL PACIENTE', 2.6, 0.32, '#3FA7C6'); rotulo.position.set(0, 2.45, -3.14); scene.add(rotulo);
+// zona del paciente marcada en el piso
+const zona = new THREE.Mesh(new THREE.RingGeometry(1.75, 1.82, 64), new THREE.MeshBasicMaterial({ color: 0x3FA7C6 }));
+zona.rotation.x = -Math.PI / 2; zona.position.set(0.2, 0.01, -1.3); zona.scale.set(1.15, 0.85, 1); scene.add(zona);
+
+// cama + paciente
+const cama = new THREE.Group(); cama.position.set(0, 0, -1.4); scene.add(cama);
+caja(2.1, 0.45, 1.0, 0x8FA3B6, 0, 0.38, 0, cama); caja(2.0, 0.18, 0.92, 0xFFFFFF, 0, 0.69, 0, cama); caja(0.08, 0.9, 1.0, 0x6E8296, -1.05, 0.75, 0, cama);
+const barandal = caja(1.2, 0.06, 0.04, 0xB0BEC5, 0.1, 0.95, 0.5, cama);
+const piel = 0xE0B48F, bata = 0x8FC3E8;
+const torso = capsula(0.17, 0.5, bata); torso.rotation.z = Math.PI / 2; torso.position.set(-0.25, 0.95, 0); cama.add(torso);
+esfera(0.13, piel, -0.78, 0.97, 0, cama);
+const piernas = capsula(0.11, 0.7, bata); piernas.rotation.z = Math.PI / 2; piernas.position.set(0.55, 0.93, 0); cama.add(piernas);
+const brazo = capsula(0.055, 0.42, piel); brazo.rotation.z = Math.PI / 2; brazo.position.set(-0.15, 0.97, 0.27); cama.add(brazo); tocable(brazo, 'paciente', 0.45);
+// bolsa colectora de orina (costado de la cama)
+const bolsa = caja(0.18, 0.26, 0.04, 0xF2D96B, 0.6, 0.42, 0.53, cama); tocable(bolsa, 'bolsa', 0.4);
+// buró, mesa puente con charola, porta suero
+const buro = caja(0.6, 0.85, 0.5, 0xB7C6D4, -1.7, 0.43, -2.2); tocable(buro, 'buro', 0.7);
+const mesa = caja(0.9, 0.05, 0.45, 0xD9E2EA, 1.0, 0.95, -0.55); cil(0.03, 0.92, 0x7A8A99, 1.35, 0.46, -0.55);
+const charola = caja(0.42, 0.05, 0.3, 0x3FA7C6, 0.95, 1.0, -0.55); tocable(charola, 'charola', 0.45);
+cil(0.02, 2.0, 0x9AA9B8, -1.25, 1.0, -0.75); const suero = caja(0.14, 0.24, 0.06, 0xDDEFFF, -1.25, 1.85, -0.75);
+// dispensador de alcohol gel en el punto de atención (poste junto a la cama)
+cil(0.025, 1.2, 0x7A8A99, 1.45, 0.6, 0.2); const gel = caja(0.16, 0.26, 0.12, 0x154F90, 1.45, 1.3, 0.2); tocable(gel, 'gel', 0.5);
+const sGel = letrero('ALCOHOL GEL', 0.62, 0.14); sGel.position.set(1.45, 1.55, 0.27); scene.add(sGel);
+// lavabo con jabón y toallas
+caja(0.9, 0.12, 0.55, 0xFFFFFF, -3.2, 0.9, -2.85); cil(0.28, 0.1, 0xE9EEF2, -3.2, 0.93, -2.85);
+const llave = cil(0.03, 0.25, 0xB0BEC5, -3.2, 1.08, -3.05); const lavabo = caja(0.9, 0.8, 0.5, 0xE2E8ED, -3.2, 0.4, -2.85); tocable(lavabo, 'lavabo', 0.9);
+caja(0.12, 0.2, 0.08, 0x3FA7C6, -2.7, 1.3, -3.12); caja(0.3, 0.3, 0.1, 0xF4F4F4, -3.75, 1.35, -3.12);
+const sLav = letrero('LAVABO · AGUA Y JABÓN', 1.2, 0.18); sLav.position.set(-3.2, 1.75, -3.13); scene.add(sLav);
+// puerta (salida)
+const puerta = caja(0.06, 2.1, 1.0, 0x9C7A5B, 4.15, 1.05, 1.6); tocable(puerta, 'puerta', 0.8);
+const sPu = letrero('SALIDA', 0.8, 0.2, '#0E3A6B'); sPu.position.set(4.1, 2.35, 1.6); sPu.rotation.y = -Math.PI / 2; scene.add(sPu);
+// manchas (caso apoyo): sábana con sangre
+const ropa = caja(0.5, 0.12, 0.35, 0xFFFFFF, 1.6, 0.06, -2.4); ropa.visible = false; tocable(ropa, 'ropa', 0.5);
+const mancha = new THREE.Mesh(new THREE.CircleGeometry(0.09, 20), new THREE.MeshBasicMaterial({ color: 0xA31515 })); mancha.rotation.x = -Math.PI / 2; mancha.position.set(0, 0.07, 0); ropa.add(mancha);
+
+const HIGIENE = [gel, lavabo];
+const nombres = { paciente: 'tocar al paciente', bolsa: 'la bolsa colectora', buro: 'el buró', charola: 'la charola', puerta: 'la salida', ropa: 'la ropa de cama' };
+
+// ------------------------------------------------------------------ tipos de paso
+// ANTES: higiene → ¿qué momento? → tocar el objetivo.   DESPUÉS: tocar el objetivo → higiene → ¿qué momento? (antes de salir)
+function higieneAnim(metodo) {
+  W.toast('info', metodo === 'gel' ? '🧴 Fricción con alcohol gel… 20-30 s hasta que las manos sequen' : '🚰 Lavado con agua y jabón… 40-60 s, secado con toalla desechable', metodo === 'gel' ? F.gel : F.nom1, 1800);
+}
+function preguntaMomento(n, despues) {
+  W.pregunta('¿Qué momento de higiene de manos acabas de cumplir?', ['Momento 1 · Antes de tocar al paciente', 'Momento 2 · Antes de una tarea limpia/aséptica',
+    'Momento 3 · Después del riesgo de exposición a líquidos corporales', 'Momento 4 · Después de tocar al paciente', 'Momento 5 · Después del contacto con el entorno del paciente'],
+    [n - 1], F.mom, despues, false, `Momento ${n}.`);
+}
+function pasoAntes({ titulo, texto, objetivo, n, metodo = 'cualquiera', anim }) {
+  let limpio = false;
+  return { titulo, texto, fuente: F.mom, puntos: 20,
+    iniciar() { W.resaltar([...HIGIENE, obj(objetivo)]); },
+    tocar(o) {
+      const t = o.userData.tipo;
+      if (t === objetivo && !limpio) { W.mal(`Ibas a ${nombres[objetivo] === 'tocar al paciente' ? 'tocar al paciente' : 'realizar la tarea'} sin higiene de manos: omitiste el momento ${n}.`, F.mom, true); return; }
+      if ((t === 'gel' || t === 'lavabo') && !limpio) {
+        if (metodo === 'lavabo' && t === 'gel') { W.mal('Aquí corresponde agua y jabón.', F.nom3); return; }
+        limpio = true; higieneAnim(t); W.resaltar([]);
+        setTimeout(() => preguntaMomento(n, () => { W.resaltar([obj(objetivo)]); W.$('pTxt').innerHTML = `Ahora sí: toca <b>${nombres[objetivo]}</b>.`; }), 1900);
+        return;
+      }
+      if (t === objetivo && limpio) { W.resaltar([]); anim && anim(); W.bien('Tarea realizada con manos limpias.', F.mom); W.siguiente(); }
+    } };
+}
+function pasoDespues({ titulo, texto, objetivo, n, metodo = 'cualquiera', anim, retroMetodo }) {
+  let hecho = false, limpio = false;
+  return { titulo, texto, fuente: F.mom,
+    iniciar() { W.resaltar([obj(objetivo)]); },
+    tocar(o) {
+      const t = o.userData.tipo;
+      if (!hecho) { if (t === objetivo) { hecho = true; anim && anim(); W.toast('info', 'Tarea terminada. ¿Qué sigue antes de irte?'); W.$('pTxt').innerHTML = 'Terminaste. Antes de ir a otra tarea o salir…'; W.resaltar([gel, lavabo, puerta]); } return; }
+      if (t === 'puerta' && !limpio) { W.mal(`Saliste sin higiene de manos: omitiste el momento ${n}.`, F.mom, true); return; }
+      if ((t === 'gel' || t === 'lavabo') && !limpio) {
+        if (metodo === 'lavabo' && t === 'gel') { W.mal(retroMetodo || 'Aquí corresponde agua y jabón.', F.nom3); return; }
+        limpio = true; higieneAnim(t); W.resaltar([]);
+        setTimeout(() => preguntaMomento(n, () => W.siguiente()), 1900);
+      }
+    } };
+}
+const OBJ = { paciente: brazo, bolsa, buro, charola, puerta, ropa };
+const obj = k => OBJ[k];
+const brillo = (o) => { o.material.color.set(0x2E7D32); setTimeout(() => o.material.color.set(o === charola ? 0x3FA7C6 : o === bolsa ? 0xF2D96B : o === buro ? 0xB7C6D4 : piel), 900); };
+
+// ------------------------------------------------------------------ casos [FICTICIO – ejercicio didáctico]
+const ENFERMERIA = () => [
+  { titulo: 'Inicio de turno', texto: 'Paciente de la Hab. 112. Vas a tomarle la presión arterial.', sinPuntos: true,
+    iniciar() { W.aviso('<h2>🩺 Caso: enfermería</h2><p>Tu paciente de la habitación 112 necesita: toma de presión, canalización de una vena, vaciar la bolsa colectora y acomodar su buró.</p><p>Toca en la escena: el <b>alcohol gel</b> (poste junto a la cama), el <b>lavabo</b> o el objeto de la tarea.</p><p class="ficticio">[FICTICIO – ejercicio didáctico]</p>', () => W.siguiente(), 'Comenzar'); } },
+  pasoAntes({ titulo: 'Tomar la presión arterial', texto: 'Vas a tocar al paciente para tomarle la presión. ¿Qué haces primero?', objetivo: 'paciente', n: 1, anim: () => brillo(brazo) }),
+  pasoDespues({ titulo: 'Terminaste la toma de presión', texto: 'Toca el <b>brazo del paciente</b> para terminar la toma de presión.', objetivo: 'paciente', n: 4 }),
+  pasoAntes({ titulo: 'Canalizar una vena periférica', texto: 'Vas a tomar la charola con el material estéril para canalizar. ¿Qué haces primero?', objetivo: 'charola', n: 2, anim: () => brillo(charola) }),
+  pasoDespues({ titulo: 'Vaciar la bolsa colectora', texto: 'Toca la <b>bolsa colectora</b> para vaciarla. (Al hacerlo te salpica orina en la mano.)', objetivo: 'bolsa', n: 3, metodo: 'lavabo',
+    retroMetodo: 'Te salpicó orina: con líquidos corporales en las manos, agua y jabón (no alcohol gel).' }),
+  pasoDespues({ titulo: 'Acomodar el buró', texto: 'Toca el <b>buró</b> para acomodarlo. No vas a tocar al paciente.', objetivo: 'buro', n: 5 }),
+  { titulo: 'Pregunta final', texto: 'Una última decisión.', fuente: F.gel,
+    iniciar() { W.pregunta('Entre un paciente y otro, sin suciedad visible en tus manos, lo más práctico es:', ['Alcohol gel, 20-30 s hasta que sequen', 'Solo cambiarme de guantes', 'Enjuagar con agua 5 s', 'Nada, ya me lavé al iniciar el turno'], [0], F.gel, () => W.siguiente(), false, 'Alcohol con emolientes > 60% cuando no hay sangre ni líquidos.'); } },
+];
+const APOYO = () => [
+  { titulo: 'Inicio', texto: 'Vas a apoyar con el paciente de la Hab. 112.', sinPuntos: true,
+    iniciar() { ropa.visible = true; W.aviso('<h2>🧹 Caso: personal de apoyo</h2><p>Camillería e intendencia también cumplen los 5 momentos. Vas a ayudar a acomodar al paciente, limpiar su entorno y retirar ropa de cama con sangre.</p><p class="ficticio">[FICTICIO – ejercicio didáctico]</p>', () => W.siguiente(), 'Comenzar'); } },
+  pasoAntes({ titulo: 'Ayudar a acomodar al paciente', texto: 'Vas a tomar al paciente del brazo para acomodarlo. ¿Qué haces primero?', objetivo: 'paciente', n: 1, anim: () => brillo(brazo) }),
+  pasoDespues({ titulo: 'Terminaste de acomodarlo', texto: 'Toca el <b>brazo del paciente</b> para terminar de acomodarlo.', objetivo: 'paciente', n: 4 }),
+  pasoDespues({ titulo: 'Limpiar el buró', texto: 'Toca el <b>buró</b> para limpiarlo. No tocarás al paciente.', objetivo: 'buro', n: 5 }),
+  pasoDespues({ titulo: 'Retirar ropa de cama con sangre', texto: 'Toca la <b>ropa de cama manchada</b> (en el piso) para retirarla.', objetivo: 'ropa', n: 3, metodo: 'lavabo',
+    retroMetodo: 'Hubo riesgo de contacto con sangre: agua y jabón (no alcohol gel).', anim: () => { ropa.visible = false; } }),
+  { titulo: 'Pregunta final', texto: 'Una última decisión.', fuente: 'NOM-045-SSA2-2005, 8.2',
+    iniciar() { W.pregunta('¿El personal de intendencia y camillería debe capacitarse y aplicar la higiene de manos?', ['No, solo enfermería y medicina', 'Sí: la capacitación involucra a todo el personal de salud y de apoyo', 'Solo si el paciente lo pide'], [1], 'NOM-045-SSA2-2005, 8.2', () => W.siguiente(), false, 'Todo el personal de salud y de apoyo.'); } },
+];
+
+W.inicio([{ id: 'enf', txt: '🩺 <b>Caso 1:</b> Enfermería · presión, canalización, bolsa colectora y buró' },
+  { id: 'apo', txt: '🧹 <b>Caso 2:</b> Personal de apoyo · acomodar, limpiar y retirar ropa con sangre' }],
+  id => { ropa.visible = false; return id === 'enf' ? ENFERMERIA() : APOYO(); },
+  'Basado en: Acciones Esenciales para la Seguridad del Paciente 2023 (AE 5A), los 5 momentos de la OMS y la NOM-045-SSA2-2005 (10.6.1). Casos ficticios con fines didácticos.');
+
+if (location.search.includes('qa')) window.__qa = { gel, lavabo, brazo, bolsa, buro, charola, puerta, ropa, tocar: W.tocar, estado: W.qa };
+</script>
+</body>
+</html>

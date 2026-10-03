@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Simulador · Traslado seguro del paciente</title>
+<style>
+  :root{--navy:#0B2545;--azul:#13457A;--medio:#1F6FB2;--cielo:#5FA8D3;--hielo:#EAF2FA;--texto:#1B2633;--tenue:#5B6B7C;
+        --bien:#2E7D32;--mal:#C62828;--cian:#00B4D8}
+  *{box-sizing:border-box} html,body{margin:0;height:100%;overflow:hidden;background:#cfdde9;font-family:Calibri,"Segoe UI",system-ui,sans-serif;color:var(--texto)}
+  canvas{display:block;touch-action:none}
+  #barra{position:fixed;top:0;left:0;right:0;display:flex;gap:10px;align-items:center;padding:10px 14px;background:rgba(11,37,69,.96);color:#fff;z-index:12;flex-wrap:wrap}
+  #barra .salir{background:#C62828;color:#fff}
+  #barra b{font-size:1.05rem} #barra .chip{background:var(--azul);border-radius:999px;padding:5px 12px;font-weight:700}
+  #barra .der{margin-left:auto;display:flex;gap:8px}
+  #panel{position:fixed;left:12px;bottom:12px;width:min(460px,calc(100vw - 24px));background:rgba(255,255,255,.96);border-radius:16px;
+         padding:14px 16px;z-index:3;box-shadow:0 6px 24px rgba(11,37,69,.25);max-height:46vh;overflow:auto}
+  #panel .paso{color:var(--medio);font-weight:700;font-size:.9rem}
+  #panel h2{margin:.15rem 0 .4rem;color:var(--navy);font-size:1.25rem}
+  #panel p{margin:.2rem 0 .5rem;font-size:1.02rem}
+  #panel small{display:block;color:var(--tenue);font-style:italic}
+  #acciones{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  button{font-family:inherit} .prim{background:var(--medio);color:#fff;border:0;border-radius:12px;padding:11px 18px;font-size:1.02rem;font-weight:700;cursor:pointer}
+  .sec{background:var(--hielo);color:var(--navy);border:0;border-radius:12px;padding:11px 18px;font-size:1.02rem;cursor:pointer}
+  .peq{padding:7px 12px;font-size:.92rem}
+  #toast{position:fixed;top:64px;left:50%;transform:translateX(-50%);max-width:min(640px,92vw);padding:12px 16px;border-radius:14px;color:#fff;z-index:10;display:none;
+         box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:1.02rem}
+  #toast.ok{background:var(--bien)} #toast.no{background:var(--mal)} #toast.info{background:var(--azul)} #toast small{display:block;opacity:.9;font-style:italic;margin-top:3px}
+  .modal{position:fixed;inset:0;background:rgba(11,37,69,.7);display:none;align-items:center;justify-content:center;padding:70px 14px 14px;z-index:8}
+  .tarjeta{background:#fff;border-radius:18px;max-width:660px;width:100%;padding:20px;max-height:92vh;overflow:auto}
+  .tarjeta h2{color:var(--navy);margin-top:0}
+  .op{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:var(--hielo);border:2px solid transparent;border-radius:12px;padding:12px;margin:7px 0;font-size:1.02rem;cursor:pointer;color:var(--texto)}
+  .op.marcada{border-color:var(--medio);background:#DCEBF8}
+  input[type=text]{font-size:1.05rem;padding:10px;border-radius:10px;border:1px solid var(--cielo);width:100%;margin:6px 0 12px}
+  .casos{display:grid;gap:10px;margin:10px 0}
+  .caso{border:2px solid var(--hielo);border-radius:14px;padding:12px;cursor:pointer;background:#fff;text-align:left;font-size:1rem}
+  .caso.sel{border-color:var(--medio);background:#F3F8FD}
+  .orden{background:#F3F8FD;border-radius:12px;padding:12px;font-size:1.02rem;line-height:1.45}
+  table{width:100%;border-collapse:collapse;font-size:.95rem} td,th{padding:6px;border-bottom:1px solid var(--hielo);text-align:left;vertical-align:top}
+  .ficticio{font-size:.8rem;color:var(--tenue)}
+  @media print{#barra,#panel,canvas,#toast{display:none!important}.modal{position:static;background:none}.tarjeta{max-height:none}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="barra">
+  <img src="../../../recursos/logo_CERS.jpeg" alt="CERS" style="height:34px;border-radius:7px;background:#fff;padding:2px"><b>🏥 Hospital · Camilleros</b><span class="chip" id="cPaso">Paso 0/0</span><span class="chip" id="cPts">0 pts</span><span class="chip" id="cTiempo">0:00</span>
+  <div class="der"><button class="sec peq" id="bVista">🎥 Vista</button><button class="sec peq" id="bReini">↺ Reiniciar</button><button class="sec peq salir" id="bSalir">✖ Salir</button></div>
+</div>
+<div id="panel"><div class="paso" id="pNum"></div><h2 id="pTit">Cargando…</h2><p id="pTxt"></p><small id="pFuente"></small><div id="acciones"></div></div>
+<div id="toast"></div>
+<div class="modal" id="modal"><div class="tarjeta" id="mCont"></div></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ------------------------------------------------------------------ escena
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+document.body.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xDCE8F2);
+const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.05, 60);
+const VISTAS = [[[2.4,3.3,4.6],[-1.6,0.6,-0.4]], [[-2,4.8,1.6],[-2,0.6,-0.4]], [[5.2,2.6,3.4],[1.5,0.6,0]]];
+let vista = 0;
+camera.position.set(...VISTAS[0][0]);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(...VISTAS[0][1]); controls.enableDamping = true; controls.maxPolarAngle = Math.PI*0.48;
+controls.minDistance = 1.5; controls.maxDistance = 11; controls.update();
+document.getElementById('bVista').onclick = () => { vista=(vista+1)%VISTAS.length; mover(camera.position, new THREE.Vector3(...VISTAS[vista][0]), 700); mover(controls.target, new THREE.Vector3(...VISTAS[vista][1]), 700); };
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.1));
+const sol = new THREE.DirectionalLight(0xffffff, 1.4); sol.position.set(3,6,4); scene.add(sol);
+
+const M = (c, extra={}) => new THREE.MeshStandardMaterial({color:c, roughness:.65, metalness:.05, ...extra});
+function caja(w,h,d,c,x,y,z,padre=scene){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c)); m.position.set(x,y,z); padre.add(m); return m;}
+function cil(r,h,c,x,y,z,padre=scene){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,20),M(c)); m.position.set(x,y,z); padre.add(m); return m;}
+function capsula(r,l,c){return new THREE.Mesh(new THREE.CapsuleGeometry(r,l,6,14),M(c));}
+// Zona táctil invisible más grande que el objeto (dedos en tablet). Al tocarla se actúa sobre el objeto real.
+function zona(obj, t=0.34){const z=new THREE.Mesh(new THREE.BoxGeometry(t,t,t), new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+  z.userData={tipo:obj.userData.tipo, ref:obj}; obj.add(z); return obj;}
+function letrero(texto, w=1.6, h=0.4, fondo='#0B2545', color='#fff'){
+  const cv=document.createElement('canvas'); cv.width=512; cv.height=Math.round(512*h/w); const g=cv.getContext('2d');
+  g.fillStyle=fondo; g.fillRect(0,0,cv.width,cv.height); g.fillStyle=color; g.font=`bold ${Math.round(cv.height*0.5)}px Calibri, sans-serif`;
+  g.textAlign='center'; g.textBaseline='middle'; g.fillText(texto, cv.width/2, cv.height/2);
+  const tx=new THREE.CanvasTexture(cv); tx.colorSpace=THREE.SRGBColorSpace;
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h), new THREE.MeshBasicMaterial({map:tx, side:THREE.DoubleSide})); return m;
+}
+
+// Habitación
+const piso = new THREE.Mesh(new THREE.PlaneGeometry(14,9), M(0xC9D3DC)); piso.rotation.x=-Math.PI/2; scene.add(piso);
+caja(14,3,0.1,0xF4F7FA,0,1.5,-4.5); caja(0.1,3,9,0xF4F7FA,-7,1.5,0);
+caja(0.1,3,3.6,0xF4F7FA,6,1.5,-2.7); caja(0.1,3,3.6,0xF4F7FA,6,1.5,2.7); caja(0.1,0.8,1.8,0xF4F7FA,6,2.6,0);
+const sRX = letrero('RAYOS X', 1.4, 0.35); sRX.position.set(5.94,2.45,0); sRX.rotation.y=-Math.PI/2; scene.add(sRX);
+const sHab = letrero('HAB. 204', 1.2, 0.3, '#1F6FB2'); sHab.position.set(-2,2.3,-4.44); scene.add(sHab);
+caja(0.6,0.9,0.5,0xB7C6D4,-4.2,0.45,-1.4); // buró
+
+// Cama
+const cama = new THREE.Group(); cama.position.set(-2,0,-1.2); scene.add(cama);
+caja(2.1,0.45,1.0,0x8FA3B6,0,0.38,0,cama); caja(2.0,0.18,0.92,0xFFFFFF,0,0.69,0,cama); caja(0.08,0.9,1.0,0x6E8296,-1.05,0.75,0,cama);
+const barCama = [caja(1.2,0.06,0.04,0xB0BEC5,0.1,0.95,-0.5,cama), caja(1.2,0.06,0.04,0xB0BEC5,0.1,0.95,0.5,cama)];
+
+// Camilla
+const camilla = new THREE.Group(); camilla.position.set(-2,0,0.25); scene.add(camilla);
+caja(2.0,0.08,0.7,0x9AA9B8,0,0.62,0,camilla); caja(1.95,0.12,0.64,0x1F6FB2,0,0.72,0,camilla);
+[[-0.85,-0.28],[0.85,-0.28],[-0.85,0.28],[0.85,0.28]].forEach(([x,z])=>{cil(0.025,0.5,0x7A8A99,x,0.33,z,camilla); const r=cil(0.07,0.04,0x2B2B2B,x,0.08,z,camilla); r.rotation.x=Math.PI/2;});
+const frenos = [[-0.85,-0.42],[0.85,-0.42],[-0.85,0.42],[0.85,0.42]].map(([x,z])=>{const f=caja(0.2,0.08,0.16,0xC62828,x,0.22,z,camilla); f.userData={tipo:'freno',puesto:false}; return zona(f,0.38);});
+const barCam = [-0.36,0.36].map(z=>{const b=caja(1.3,0.07,0.05,0xB0BEC5,0.05,0.62,z,camilla); b.userData={tipo:'barandal',arriba:false}; return b;});
+
+// Silla de ruedas
+const silla = new THREE.Group(); silla.position.set(-2,0,0.55); silla.rotation.y=Math.PI; scene.add(silla);
+caja(0.5,0.06,0.5,0x1F6FB2,0,0.5,0,silla); caja(0.5,0.55,0.06,0x1F6FB2,0,0.8,0.25,silla);
+[-0.29,0.29].forEach(x=>{const r=new THREE.Mesh(new THREE.TorusGeometry(0.28,0.025,10,28),M(0x333333)); r.position.set(x,0.3,0.05); r.rotation.y=Math.PI/2; silla.add(r);});
+const frenosSilla=[-0.36,0.36].map(x=>{const f=caja(0.09,0.16,0.09,0xC62828,x,0.55,-0.12,silla); f.userData={tipo:'frenoSilla',puesto:false}; return zona(f,0.26);});
+const descansapies=[-0.12,0.12].map(x=>{const d=caja(0.16,0.03,0.14,0x7A8A99,x,0.1,-0.38,silla); d.userData={tipo:'pie',ok:false}; return zona(d,0.22);});
+const descansabrazos=[-0.28,0.28].map(x=>{const d=caja(0.05,0.04,0.42,0x7A8A99,x,0.72,0.02,silla); d.userData={tipo:'brazo',ok:false}; return zona(d,0.2);});
+
+// Paciente (articulado)
+const pac = new THREE.Group(); scene.add(pac);
+const piel=0xE0B48F, bata=0x8FC3E8;
+const torso=capsula(0.17,0.5,bata), cabeza=new THREE.Mesh(new THREE.SphereGeometry(0.13,20,16),M(piel)), muslos=capsula(0.11,0.35,bata), piernas=capsula(0.09,0.4,piel), brazo=capsula(0.05,0.42,piel);
+const pulsera=new THREE.Mesh(new THREE.TorusGeometry(0.075,0.03,10,24),M(0xFFFFFF,{emissive:0x000000}));
+pulsera.userData={tipo:'pulsera'};
+// zona táctil amplia (invisible) alrededor de la pulsera, para dedos en tablet
+const zonaPulsera=new THREE.Mesh(new THREE.SphereGeometry(0.2,12,8), new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+zonaPulsera.userData={tipo:'pulsera'}; pulsera.add(zonaPulsera);
+[torso,cabeza,muslos,piernas,brazo,pulsera].forEach(p=>pac.add(p));
+function pose(tipo){
+  if(tipo==='acostado'){torso.rotation.set(0,0,Math.PI/2); torso.position.set(-0.25,0,0); cabeza.position.set(-0.78,0.02,0);
+    muslos.rotation.set(0,0,Math.PI/2); muslos.position.set(0.3,-0.02,0); piernas.rotation.set(0,0,Math.PI/2); piernas.position.set(0.78,-0.03,0);
+    brazo.rotation.set(0,0,Math.PI/2); brazo.position.set(-0.15,0.02,0.24); pulsera.rotation.set(0,Math.PI/2,0); pulsera.position.set(0.1,0.02,0.24);}
+  else{torso.rotation.set(0,0,0); torso.position.set(0,0.35,0.05); cabeza.position.set(0,0.75,0.05);
+    muslos.rotation.set(Math.PI/2,0,0); muslos.position.set(0,0.05,-0.2); piernas.rotation.set(0,0,0); piernas.position.set(0,-0.22,-0.42);
+    brazo.rotation.set(0.5,0,0); brazo.position.set(0.22,0.25,-0.05); pulsera.rotation.set(Math.PI/2,0,0); pulsera.position.set(0.22,0.1,-0.17);}
+}
+
+// Personal
+function persona(c, x, z, nombre){const g=new THREE.Group(); const b=capsula(0.2,0.9,c); b.position.y=0.75; g.add(b);
+  const h=new THREE.Mesh(new THREE.SphereGeometry(0.14,16,12),M(piel)); h.position.y=1.42; g.add(h);
+  const s=letrero(nombre,0.9,0.2,'#13457A'); s.position.y=1.8; g.add(s); g.position.set(x,0,z); scene.add(g); return g;}
+const enf = persona(0x2E8B8B,-4.3,0.9,'Enfermería'), cam2 = persona(0x1F6FB2,-4.3,-0.6,'Camillero 2');
+const familiar = persona(0x9C7A5B, 2.5, 1.6, 'Familiar'); familiar.visible=false;
+const tecnico = persona(0x5E6B7A, 5.3, 1.4, 'Personal del servicio'); tecnico.visible=false;
+
+// ------------------------------------------------------------------ animación y toques
+const tweens=[];
+function mover(v, destino, ms){return new Promise(res=>tweens.push({v, de:v.clone(), a:destino.clone?destino.clone():destino, t0:performance.now(), ms, res}));}
+const reloj=new THREE.Clock(); let objetivos=[];
+renderer.setAnimationLoop(()=>{
+  const ahora=performance.now();
+  for(let i=tweens.length-1;i>=0;i--){const tw=tweens[i]; const k=Math.min(1,(ahora-tw.t0)/tw.ms); const e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+    tw.v.lerpVectors(tw.de, tw.a, e); if(k>=1){tweens.splice(i,1); tw.res();}}
+  const pulso=(Math.sin(reloj.getElapsedTime()*5)+1)/2;
+  objetivos.forEach(o=>o.material.emissive && o.material.emissive.setRGB(0, 0.25*pulso, 0.35*pulso));
+  objetivos.forEach(o=>o.scale.setScalar(1+0.15*pulso));
+  controls.update(); renderer.render(scene,camera);
+});
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight);});
+function resaltar(lista){objetivos.forEach(o=>{o.material.emissive&&o.material.emissive.setRGB(0,0,0); o.scale.setScalar(1);}); objetivos=lista;}
+const ray=new THREE.Raycaster(), ptr=new THREE.Vector2(); let abajo=null;
+renderer.domElement.addEventListener('pointerdown',e=>abajo=[e.clientX,e.clientY]);
+renderer.domElement.addEventListener('pointerup',e=>{
+  if(!abajo||Math.hypot(e.clientX-abajo[0],e.clientY-abajo[1])>10) return;
+  ptr.set(e.clientX/innerWidth*2-1, -(e.clientY/innerHeight)*2+1); ray.setFromCamera(ptr,camera);
+  const hit=ray.intersectObjects(scene.children,true).find(h=>h.object.userData.tipo && h.object.visible!==false);
+  if(hit && paso && paso.tocar) paso.tocar(hit.object.userData.ref || hit.object);
+});
+
+// ------------------------------------------------------------------ estado del juego
+const $=s=>document.getElementById(s);
+let S={nombre:'',caso:'camilla',pts:0,errores:[],criticos:0,t0:0}, paso=null, nPaso=0, pasos=[];
+function toast(tipo, txt, fuente='', ms){const t=$('toast'); t.className=tipo; t.innerHTML=txt+(fuente?`<small>${fuente}</small>`:''); t.style.display='block';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.style.display='none', ms||(tipo==='no'?5200:2600));}
+function bien(txt,f){S.pts+=10; toast('ok','✅ '+txt,f); marcador();}
+function mal(txt,f,critico=false){S.pts-=5; if(critico) S.criticos++; S.errores.push({paso:nPaso+1,txt,f,critico}); toast('no',(critico?'⛔ ERROR CRÍTICO: ':'❌ ')+txt,f); marcador();}
+function marcador(){$('cPts').textContent=Math.max(0,S.pts)+' pts'; $('cPaso').textContent=`Paso ${Math.min(nPaso+1,pasos.length)}/${pasos.length}`;}
+setInterval(()=>{if(S.t0){const s=Math.floor((Date.now()-S.t0)/1000); $('cTiempo').textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}},1000);
+function botones(lista){const a=$('acciones'); a.innerHTML=''; lista.forEach(([txt,fn,cls])=>{const b=document.createElement('button'); b.className=cls||'prim'; b.textContent=txt; b.onclick=fn; a.appendChild(b);});}
+function mostrar(){paso=pasos[nPaso]; marcador(); $('pNum').textContent=`PASO ${nPaso+1} DE ${pasos.length}`; $('pTit').textContent=paso.titulo; $('pTxt').innerHTML=paso.texto; $('pFuente').textContent=paso.fuente?'Fuente: '+paso.fuente:''; botones([]); resaltar([]); paso.iniciar&&paso.iniciar();}
+function siguiente(){nPaso++; if(nPaso>=pasos.length) return reporte(); setTimeout(mostrar,400);}
+function pregunta(titulo, ops, correctas, fuente, alAcertar, multiple=false, retro=''){
+  const sel=new Set();
+  $('mCont').innerHTML=`<h2>${titulo}</h2><div id="ops"></div><br><button class="prim" id="mOk">${multiple?'Confirmar':'Elegir'}</button>`;
+  ops.forEach((o,k)=>{const b=document.createElement('button'); b.className='op'; b.textContent=o; b.onclick=()=>{ if(!multiple){sel.clear(); document.querySelectorAll('.op').forEach(x=>x.classList.remove('marcada'));}
+    sel.has(k)?(sel.delete(k),b.classList.remove('marcada')):(sel.add(k),b.classList.add('marcada'));}; $('ops').appendChild(b);});
+  $('modal').style.display='flex';
+  $('mOk').onclick=()=>{ if(!sel.size) return; const ok=[...sel].sort().join()===[...correctas].sort().join(); $('modal').style.display='none';
+    if(ok){bien(retro||'Correcto.',fuente); alAcertar&&alAcertar();} else {mal('Respuesta incorrecta. '+(retro||''),fuente); setTimeout(()=>pregunta(titulo,ops,correctas,fuente,alAcertar,multiple,retro),600);} };
+}
+
+// ------------------------------------------------------------------ pasos
+const PAC={nombre:'LÓPEZ HERNÁNDEZ MARÍA', fnac:'12/03/1958', cama:'204', peso:'68 kg'};
+const F={ind:'Procedimiento para Camillería HGO Jalisco DOM-P149-HM1_001, act. 14 (equipo según indicación médica)',
+  id:'AESP 2023, AE 1A (p. 23) y AE 1 (p. 25)', caidas:'AESP 2023, AE 6B (pp. 48-49)', nom036:'NOM-036-1-STPS-2018, 8.3 b) 2) y 3)',
+  bit:'Procedimiento para Camillería HGO Jalisco, act. 8 y 22 (bitácora y firma de recibido)', manos:'OMS 2009, 5 momentos; NOM-045-SSA2-2005, 10.6.1'};
+function frenosPuestos(lista){return lista.every(f=>f.userData.puesto);}
+function alternarFreno(f){f.userData.puesto=!f.userData.puesto; f.material.color.set(f.userData.puesto?0x2E7D32:0xC62828);}
+function alternarBarandal(b){b.userData.arriba=!b.userData.arriba; mover(b.position,new THREE.Vector3(b.position.x,b.userData.arriba?0.95:0.62,b.position.z),300);}
+function enCamilla(){camilla.add(pac); pac.position.set(0,0.95,0); pose('acostado');}
+
+function pasosComunesInicio(destino, equipo){
+  return [
+    {titulo:'Recibe la indicación', fuente:F.ind,
+     texto:`Te llaman de la Hab. ${PAC.cama}. Lee la orden y elige el equipo.`,
+     iniciar(){ $('mCont').innerHTML=`<h2>📋 Orden de traslado</h2><div class="orden"><b>Paciente:</b> ${PAC.nombre}<br><b>Fecha de nacimiento:</b> ${PAC.fnac}<br><b>Cama:</b> ${PAC.cama} · <b>Destino:</b> ${destino}<br><b>Equipo indicado:</b> ${equipo}</div><p class="ficticio">[Caso ficticio con fines didácticos]</p><button class="prim" id="mOk">Entendido</button>`;
+        $('modal').style.display='flex'; $('mOk').onclick=()=>{ $('modal').style.display='none';
+          pregunta('¿Qué equipo llevas?',['Silla de ruedas','Camilla','Tabla rígida','El que esté más cerca'], [equipo.includes('camilla')?1:0], F.ind, siguiente, false, 'El equipo se lleva conforme a la indicación médica.'); }; }},
+    {titulo:'Identifica a la paciente', fuente:F.id,
+     texto:'Toca la <b>pulsera de identificación</b> de la paciente.',
+     iniciar(){ resaltar([pulsera]); },
+     tocar(o){ if(o.userData.tipo!=='pulsera') return; resaltar([]);
+       pregunta(`Pulsera: ${PAC.nombre} · ${PAC.fnac} · Cama ${PAC.cama}. ¿Con qué datos confirmas su identidad? (elige todos los correctos)`,
+         ['Nombre completo','Fecha de nacimiento','Número de cama','Diagnóstico','Número de habitación'], [0,1], F.id, siguiente, true,
+         'Dos identificadores: nombre completo y fecha de nacimiento. Nunca cama, habitación ni diagnóstico.'); }},
+    {titulo:'Preséntate y explica', fuente:F.caidas, texto:'Antes de moverla, la paciente y su familia deben saber qué vas a hacer.',
+     iniciar(){ pregunta('¿Qué le dices a la paciente?',
+       ['“Buenos días, señora María. Soy camillero; la voy a llevar a '+destino+'. La moveremos entre varios, despacio y sin movimientos bruscos.”',
+        '“Vámonos rápido, que hay más pacientes.”','Nada; la muevo directamente.','“Ahorita le explica la enfermera.”'], [0], F.caidas, siguiente, false,
+        'Explicar el proceso y evitar cambios bruscos de postura previene caídas.'); }},
+  ];
+}
+function pasosComunesFin(destino){
+  return [
+    {titulo:'Llegada: verifica identidad', fuente:F.id, texto:`Llegaste a ${destino}. El técnico va a realizar el estudio.`,
+     iniciar(){ tecnico.visible=true; pregunta('Antes de entregarla para el estudio:', ['Confirmo nombre completo y fecha de nacimiento con el técnico y la paciente','La entrego; ya la identifiqué en el cuarto','Digo el número de cama'], [0], F.id, siguiente, false,
+       'La identificación se verifica justo antes de estudios de gabinete y de cada traslado.'); }},
+    {titulo:'Registra el traslado', fuente:F.bit, texto:'Llena la bitácora de traslados.',
+     iniciar(){ pregunta('¿Qué registras en la bitácora? (elige todos los correctos)', ['Nombre del paciente','Número de cama','Hora','Servicio de origen/destino','Firma de recibido','Diagnóstico','Tu opinión del paciente'], [0,1,2,3,4], F.bit, siguiente, true,
+       'Ejemplo institucional: nombre, número de cama, hora y servicio; se recaba firma de recibido. (En la bitácora sí va la cama; para identificar, no.)'); }},
+    {titulo:'Higiene de manos', fuente:F.manos, texto:'Terminaste el contacto con la paciente y su entorno.',
+     iniciar(){ pregunta('¿Qué haces ahora?', ['Higiene de manos (después del contacto con el paciente y su entorno)','Voy directo al siguiente traslado','Me limpio en el uniforme'], [0], F.manos, siguiente, false, 'Momentos 4 y 5 de la OMS.'); }},
+  ];
+}
+
+const CASO_CAMILLA = () => [
+  ...pasosComunesInicio('Rayos X', 'camilla'),
+  {titulo:'Prepara la camilla', fuente:F.caidas, texto:'Pon los <b>4 frenos</b> de la camilla (rojo = suelto, verde = puesto) y luego toca <b>Listo</b>.',
+   iniciar(){ resaltar([...frenos]); botones([['Listo ✓',()=>{ if(!frenosPuestos(frenos)) return mal('La camilla tiene frenos sueltos: podría desplazarse durante la transferencia.',F.caidas,true); bien('Frenos puestos.',F.caidas); siguiente(); }]]); },
+   tocar(o){ if(o.userData.tipo==='freno'){alternarFreno(o); resaltar(frenos.filter(f=>!f.userData.puesto));} }},
+  {titulo:'¿Cómo la pasarás?', fuente:F.nom036, texto:`La paciente pesa ${PAC.peso}.`,
+   iniciar(){ pregunta('¿Cómo harás la transferencia cama → camilla?', ['Yo solo, la jalo de la sábana','En equipo coordinado, con sábana de transferencia, a la cuenta de tres','Que la paciente se pase sola','Entre dos, levantándola de axilas y pies'], [1], F.nom036, siguiente, false,
+     `${PAC.peso} supera por mucho cualquier límite individual (máx. 25 kg): trabajo en equipo y equipo auxiliar. (La NOM regula cargas; se usa como referencia.)`); }},
+  {titulo:'A la cuenta de tres', fuente:F.nom036, texto:'Tu equipo está listo. Coordina por voz.',
+   iniciar(){ botones([['🗣️ “A la cuenta de tres: 1, 2, 3”', async ()=>{ botones([]); scene.attach(pac);
+      await mover(pac.position, new THREE.Vector3(pac.position.x,1.2,pac.position.z), 500);
+      await mover(pac.position, new THREE.Vector3(-2,1.2,0.25), 900); enCamilla(); bien('Transferencia coordinada.',F.nom036); siguiente(); }]]); }},
+  {titulo:'Barandales arriba', fuente:F.caidas, texto:'La paciente ya está en la camilla. Toca los <b>2 barandales</b> para elevarlos y luego <b>Listo</b>.',
+   iniciar(){ resaltar([...barCam]); botones([['Listo ✓',()=>{ if(!barCam.every(b=>b.userData.arriba)) return mal('Barandal abajo: en cama o camilla los barandales van siempre levantados.',F.caidas,true); bien('Barandales elevados.',F.caidas); siguiente(); }]]); },
+   tocar(o){ if(o.userData.tipo==='barandal'){alternarBarandal(o); resaltar(barCam.filter(b=>!b.userData.arriba));} }},
+  {titulo:'Inicia el traslado', fuente:F.caidas, texto:'Quita los frenos (toca los 4) y presiona <b>Iniciar traslado</b>.',
+   iniciar(){ resaltar([...frenos]); botones([['🚀 Iniciar traslado', async ()=>{ if(frenos.some(f=>f.userData.puesto)) return toast('info','La camilla no avanza: aún tiene frenos puestos.');
+      botones([]); resaltar([]); vista=2; mover(camera.position,new THREE.Vector3(...VISTAS[2][0]),900); mover(controls.target,new THREE.Vector3(...VISTAS[2][1]),900);
+      bien('Frenos liberados; traslado en marcha.',F.caidas); await mover(camilla.position,new THREE.Vector3(1.6,0,0.25),2200); siguiente(); }]]); },
+   tocar(o){ if(o.userData.tipo==='freno'&&o.userData.puesto){alternarFreno(o); resaltar(frenos.filter(f=>f.userData.puesto));} }},
+  {titulo:'Imprevisto en el pasillo', fuente:F.caidas, texto:'Un familiar se acerca.',
+   iniciar(){ familiar.visible=true; pregunta('El familiar te pide bajar un barandal “para tomarle la mano”. ¿Qué haces?',
+     ['Bajo el barandal un momento','Mantengo los barandales arriba y le explico que es para evitar caídas; puede tomarle la mano por encima','Lo ignoro y sigo'], [1], F.caidas,
+     async ()=>{ familiar.visible=false; await mover(camilla.position,new THREE.Vector3(5.0,0,0.2),1800); siguiente(); }, false, 'Se informa al familiar que los barandales permanecen elevados.'); }},
+  ...pasosComunesFin('Rayos X'),
+];
+
+const CASO_SILLA = () => [
+  ...pasosComunesInicio('Laboratorio (toma de muestra)', 'silla de ruedas'),
+  {titulo:'Revisa la silla', fuente:F.caidas, texto:'Pon los <b>2 frenos</b>, verifica los <b>descansabrazos</b> y los <b>descansapiés</b> (tócalos) y luego <b>Listo</b>.',
+   iniciar(){ resaltar([...frenosSilla,...descansapies,...descansabrazos]); botones([['Listo ✓',()=>{
+      if(!frenosPuestos(frenosSilla)) return mal('Silla sin frenos: puede desplazarse cuando la paciente se siente.',F.caidas,true);
+      if(![...descansapies,...descansabrazos].every(d=>d.userData.ok)) return mal('Falta verificar descansabrazos o descansapiés.',F.caidas);
+      bien('Silla revisada y frenada.',F.caidas); siguiente(); }]]); },
+   tocar(o){ const t=o.userData.tipo; if(t==='frenoSilla') alternarFreno(o); if(t==='pie'||t==='brazo'){o.userData.ok=true; o.material.color.set(0x2E7D32);}
+     resaltar([...frenosSilla.filter(f=>!f.userData.puesto),...descansapies.filter(d=>!d.userData.ok),...descansabrazos.filter(d=>!d.userData.ok)]); }},
+  {titulo:'Incorporar a la paciente', fuente:F.caidas, texto:'Lleva varios días en cama.',
+   iniciar(){ pregunta('¿Cómo la pasas de la cama a la silla?', ['La siento de golpe para ganar tiempo','La incorporo por etapas, sin cambios bruscos, explicándole cada paso y con apoyo de enfermería','Le pido que se levante sola y camine a la silla'], [1], F.caidas,
+     async ()=>{ scene.attach(pac); await mover(pac.position,new THREE.Vector3(-2,1.1,0.1),900); silla.add(pac); pac.position.set(0,0.62,0.05); pose('sentado'); siguiente(); }, false,
+     'Evitar cambios bruscos de postura, sobre todo si ha permanecido mucho tiempo acostada.'); }},
+  {titulo:'Inicia el traslado', fuente:F.caidas, texto:'Quita los 2 frenos (tócalos) y presiona <b>Iniciar traslado</b>.',
+   iniciar(){ resaltar([...frenosSilla]); botones([['🚀 Iniciar traslado', async ()=>{ if(frenosSilla.some(f=>f.userData.puesto)) return toast('info','La silla no avanza: aún tiene frenos puestos.');
+      botones([]); resaltar([]); vista=2; mover(camera.position,new THREE.Vector3(...VISTAS[2][0]),900); mover(controls.target,new THREE.Vector3(...VISTAS[2][1]),900);
+      silla.rotation.y=-Math.PI/2; bien('Frenos liberados; traslado en marcha.',F.caidas); await mover(silla.position,new THREE.Vector3(5.0,0,0.2),3000); siguiente(); }]]); },
+   tocar(o){ if(o.userData.tipo==='frenoSilla'&&o.userData.puesto){alternarFreno(o); resaltar(frenosSilla.filter(f=>f.userData.puesto));} }},
+  ...pasosComunesFin('Laboratorio'),
+];
+
+// ------------------------------------------------------------------ inicio, reporte y resultados
+function preparar(caso){
+  S.caso=caso; nPaso=0; S.t0=Date.now();
+  sRX.material.map.dispose(); const nuevo=letrero(caso==='camilla'?'RAYOS X':'LABORATORIO',1.4,0.35); sRX.material.map=nuevo.material.map;
+  camilla.visible = caso==='camilla'; silla.visible = caso==='silla';
+  cama.add(pac); pac.position.set(0,0.95,0); pose('acostado');
+  pasos = caso==='camilla'?CASO_CAMILLA():CASO_SILLA(); mostrar();
+}
+function leer(){try{return JSON.parse(localStorage.getItem('sim_camilleros')||'[]')}catch(e){return []}}
+function reporte(){
+  S.pts=Math.max(0,S.pts); const s=Math.floor((Date.now()-S.t0)/1000), max=pasos.length*10, pct=Math.round(S.pts/max*100);
+  const aprobado = pct>=80 && S.criticos===0;
+  const reg={nombre:S.nombre,caso:S.caso,fecha:new Date().toLocaleString('es-MX'),puntos:S.pts,porcentaje:pct,criticos:S.criticos,errores:S.errores.length,segundos:s,resultado:aprobado?'Aprobado':'Repasar'};
+  try{const a=leer(); a.push(reg); localStorage.setItem('sim_camilleros',JSON.stringify(a));}catch(e){}
+  $('mCont').innerHTML=`<h2>${aprobado?'🏆 Traslado seguro completado':'💪 Hay que repasar'}</h2>
+   <p><b>${S.nombre}</b> · Caso: ${S.caso==='camilla'?'Cama → camilla → Rayos X':'Cama → silla de ruedas → Laboratorio'}<br>
+   Puntaje: <b>${S.pts}/${max} (${pct}%)</b> · Errores críticos: <b>${S.criticos}</b> · Tiempo: ${Math.floor(s/60)} min ${s%60} s<br>
+   Criterio: aprobar con 80% o más y sin errores críticos.</p>
+   ${S.errores.length?'<table><tr><th>Paso</th><th>Qué pasó</th><th>Fuente</th></tr>'+S.errores.map(e=>`<tr><td>${e.paso}</td><td>${e.critico?'⛔ ':''}${e.txt}</td><td>${e.f}</td></tr>`).join('')+'</table>':'<p>Sin errores. 👏</p>'}
+   <br><button class="prim" onclick="location.reload()">Siguiente participante</button> <button class="sec" onclick="print()">Imprimir</button> <button class="sec" id="bGrupo">Resultados del grupo</button>`;
+  $('modal').style.display='flex'; $('bGrupo').onclick=grupo;
+}
+function grupo(){
+  const a=leer();
+  $('mCont').innerHTML=`<h2>Resultados del grupo (${a.length})</h2><table><tr><th>Nombre</th><th>Caso</th><th>%</th><th>Críticos</th><th>Resultado</th></tr>
+   ${a.map(r=>`<tr><td>${r.nombre}</td><td>${r.caso}</td><td>${r.porcentaje}%</td><td>${r.criticos}</td><td>${r.resultado}</td></tr>`).join('')||'<tr><td colspan=5>Sin registros</td></tr>'}</table><br>
+   <button class="prim" id="bCsv">Descargar CSV</button> <button class="sec" onclick="location.reload()">Cerrar</button> <button class="sec" id="bBorrar">Borrar</button>`;
+  $('modal').style.display='flex';
+  $('bCsv').onclick=()=>{const t='Nombre,Caso,Fecha,Puntos,Porcentaje,Criticos,Errores,Segundos,Resultado\n'+a.map(r=>[r.nombre,r.caso,r.fecha,r.puntos,r.porcentaje,r.criticos,r.errores,r.segundos,r.resultado].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const b=new Blob(['﻿'+t],{type:'text/csv'}); const l=document.createElement('a'); l.href=URL.createObjectURL(b); l.download='resultados_simulador_camilleros.csv'; l.click();};
+  $('bBorrar').onclick=()=>{ if(confirm('¿Borrar resultados de este dispositivo?')){localStorage.removeItem('sim_camilleros'); grupo();} };
+}
+let casoSel='camilla';
+$('mCont').innerHTML=`<h2>🏥 Simulador: traslado seguro del paciente</h2>
+  <p>Gira la vista arrastrando con un dedo, acerca con dos dedos. Toca los objetos que brillan en azul. Sigue el panel de instrucciones.</p>
+  <input type="text" id="nom" placeholder="Nombre completo del participante" autocomplete="off">
+  <div class="casos"><button class="caso sel" data-c="camilla">🛏️ <b>Caso 1:</b> Cama → camilla → Rayos X</button>
+  <button class="caso" data-c="silla">♿ <b>Caso 2:</b> Cama → silla de ruedas → Laboratorio</button></div>
+  <button class="prim" id="bIni">Comenzar</button> <button class="sec" id="bRes">Resultados del grupo</button> <button class="sec" onclick="location.href='../../../index.html?mundo=hospital'">⬅ Regresar al campus</button>
+  <p class="ficticio">Basado en: Acciones Esenciales para la Seguridad del Paciente 2023 (AE 1 y 6B), NOM-036-1-STPS-2018, OMS 2009, procedimiento de camillería HGO Jalisco. Casos ficticios con fines didácticos.</p>`;
+$('modal').style.display='flex';
+document.querySelectorAll('.caso').forEach(b=>b.onclick=()=>{document.querySelectorAll('.caso').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); casoSel=b.dataset.c;});
+$('bIni').onclick=()=>{S.nombre=$('nom').value.trim()||'Participante'; $('modal').style.display='none'; preparar(casoSel);};
+$('bRes').onclick=grupo;
+const enPartida=()=>S.t0&&nPaso<pasos.length;
+$('bSalir').onclick=()=>{ if(!enPartida()||confirm('¿Salir del simulador? La partida en curso se cancelará y no se registrará.')) location.href='../../../index.html?mundo=hospital'; };
+$('bReini').onclick=()=>{ if(!enPartida()||confirm('¿Reiniciar? La partida en curso se cancelará.')) location.reload(); };
+cama.add(pac); pac.position.set(0,0.95,0); pose('acostado');
+// Modo de prueba para control de calidad (solo con ?qa en la dirección)
+if(location.search.includes('qa')) window.__qa={frenos,barCam,frenosSilla,descansapies,descansabrazos,pulsera,
+  tocar:o=>paso&&paso.tocar&&paso.tocar(o), estado:()=>({paso:nPaso,titulo:paso&&paso.titulo,pts:S.pts,criticos:S.criticos,errores:S.errores.length})};
+</script>
+</body>
+</html>
