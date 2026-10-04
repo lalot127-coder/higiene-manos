@@ -8,84 +8,161 @@
 :root{--navy:#0E3A6B;--azul:#154F90;--cian:#3FA7C6;--cielo:#8CCDE0;--hielo:#E8F5F9;--texto:#1B2633;--tenue:#5B6B7C}
 *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;font-family:Calibri,"Segoe UI",system-ui,sans-serif;background:#cfe3ee;color:var(--texto);-webkit-user-select:none;user-select:none}
 canvas{display:block;touch-action:none}
-#barra{position:fixed;top:0;left:0;right:0;display:flex;gap:10px;align-items:center;padding:8px 12px;background:rgba(14,58,107,.95);color:#fff;z-index:6}
-#barra img{height:40px;border-radius:8px;background:#fff;padding:2px}#barra b{font-size:1.05rem;line-height:1.1}#barra small{display:block;color:var(--cielo);font-size:.78rem}
-#barra .der{margin-left:auto;display:flex;gap:6px}
-button{font-family:inherit;cursor:pointer}.sec{background:var(--hielo);color:var(--navy);border:0;border-radius:12px;padding:8px 12px;font-size:.95rem;font-weight:700}
+#barra{position:fixed;top:0;left:0;right:0;display:flex;gap:8px;align-items:center;padding:7px 10px;background:rgba(14,58,107,.95);color:#fff;z-index:6}
+#barra .logos{display:flex;gap:5px}#barra .logos img{height:38px;border-radius:7px;background:#fff;padding:2px}
+#barra b{font-size:1.02rem;line-height:1.1}#barra small{display:block;color:var(--cielo);font-size:.76rem}
+#barra .der{margin-left:auto;display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+button{font-family:inherit;cursor:pointer}.sec{background:var(--hielo);color:var(--navy);border:0;border-radius:11px;padding:7px 10px;font-size:.92rem;font-weight:700;white-space:nowrap}
+.sec.rojo{background:#C62828;color:#fff}.sec.verde{background:#2E7D32;color:#fff}
 .etq{position:fixed;left:0;top:0;transform:translate(-50%,-100%);z-index:4;pointer-events:auto;text-align:center;cursor:pointer;white-space:nowrap}
-.etq.edif{background:#fff;color:var(--navy);border-radius:999px;padding:7px 14px;font-weight:800;font-size:1.05rem;box-shadow:0 4px 14px rgba(14,58,107,.3);border:3px solid var(--azul)}
+.etq.edif{background:#fff;color:var(--navy);border-radius:999px;padding:6px 13px;font-weight:800;font-size:1rem;box-shadow:0 4px 14px rgba(14,58,107,.3);border:3px solid var(--c,#154F90)}
+.etq.jug{pointer-events:none;background:rgba(14,58,107,.88);color:#fff;border-radius:999px;padding:2px 9px;font-size:.8rem;font-weight:700}
 .etq.puerta{white-space:normal;width:var(--w,110px);background:#fff;border-radius:12px;padding:6px 6px 7px;box-shadow:0 4px 14px rgba(14,58,107,.3);border:2px solid var(--azul);font-size:var(--fs,.9rem);line-height:1.12;color:var(--navy);font-weight:800}
 .etq.puerta .i{font-size:1.5em;display:block;line-height:1.1}.etq.puerta .t{display:block;margin-top:3px;font-size:.72em;font-weight:800;border-radius:999px;padding:1px 6px;color:#fff;background:var(--azul)}
 .etq.puerta.juego{border-color:var(--cian)}.etq.puerta.juego .t{background:var(--cian)}
 .etq.puerta.pronto{opacity:.6;border-color:#9AA9B8}.etq.puerta.pronto .t{background:#9AA9B8}
-#dentro{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:6;display:none;flex-direction:column;align-items:center;gap:6px;width:min(560px,calc(100vw - 24px))}
-#dentro .tit{background:rgba(255,255,255,.96);color:var(--navy);border-radius:14px;padding:8px 14px;font-weight:800;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.etq.puerta.candado{border-color:#E0A82E;background:#FFFBEF}.etq.puerta.candado .t{background:#B7791F}
+#dentro{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:6;display:none;flex-direction:column;align-items:center;gap:6px;width:min(560px,calc(100vw - 20px))}
+#dentro .tit{background:rgba(255,255,255,.96);color:var(--navy);border-radius:14px;padding:8px 14px;font-weight:800;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.15);width:100%}
 #dentro .tit small{display:block;color:var(--tenue);font-weight:600}
-#bSalirEdif{background:#C62828;color:#fff;border:0;border-radius:14px;padding:14px 20px;font-size:1.1rem;font-weight:800;width:100%;box-shadow:0 4px 14px rgba(0,0,0,.2)}
-#ayuda{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;background:rgba(255,255,255,.96);border-radius:14px;padding:10px 16px;box-shadow:0 4px 14px rgba(0,0,0,.15);color:var(--navy);font-weight:700;text-align:center;width:min(520px,calc(100vw - 24px))}
+#dentro .fila{display:flex;gap:6px;width:100%}
+#bSalirEdif{flex:1;background:#C62828;color:#fff;border:0;border-radius:14px;padding:13px 16px;font-size:1.05rem;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+#bCompEdif{background:#fff;color:var(--navy);border:0;border-radius:14px;padding:13px 14px;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+#ayuda{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:5;background:rgba(255,255,255,.96);border-radius:14px;padding:10px 16px;box-shadow:0 4px 14px rgba(0,0,0,.15);color:var(--navy);font-weight:700;text-align:center;width:min(560px,calc(100vw - 24px))}
 #ayuda small{display:block;color:var(--tenue);font-weight:500}
-#aviso{position:fixed;top:66px;left:50%;transform:translateX(-50%);background:var(--azul);color:#fff;padding:10px 16px;border-radius:14px;z-index:7;display:none;max-width:92vw;text-align:center}
+#aviso{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:var(--azul);color:#fff;padding:10px 16px;border-radius:14px;z-index:7;display:none;max-width:92vw;text-align:center}
 #fundido{position:fixed;inset:0;background:#0E3A6B;opacity:0;pointer-events:none;transition:opacity .45s;z-index:9}
-@media (max-width:600px){#barra small{display:none}.etq.edif{font-size:.92rem;padding:6px 11px}}
+.modal{position:fixed;inset:0;background:rgba(14,58,107,.72);display:none;align-items:center;justify-content:center;z-index:20;padding:14px}
+.caja{background:#fff;border-radius:18px;padding:18px;max-width:560px;width:100%;max-height:92vh;overflow:auto;color:var(--texto);-webkit-user-select:text;user-select:text}
+.caja h2{margin:.1rem 0 .4rem;color:var(--navy)}.caja .fuente{font-size:.86rem;color:var(--tenue);font-style:italic}
+.caja img.senal{width:150px;display:block;margin:6px auto}.prim{background:var(--azul);color:#fff;border:0;border-radius:12px;padding:11px 18px;font-size:1.02rem;font-weight:800}
+/* pantalla de inicio */
+#inicio{position:fixed;inset:0;z-index:30;background:linear-gradient(160deg,#0E3A6B,#154F90 55%,#3FA7C6);display:none;overflow:auto;padding:14px}
+#inicio .marco{max-width:980px;margin:0 auto;background:#fff;border-radius:22px;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+#inicio .logos{display:flex;gap:10px;align-items:center;flex-wrap:wrap}#inicio .logos img{height:64px;border-radius:10px}
+#inicio h1{color:var(--navy);margin:.4rem 0 .2rem;font-size:1.7rem;line-height:1.1}#inicio p{margin:.3rem 0;color:var(--tenue)}
+#prev{width:100%;height:330px;border-radius:16px;background:linear-gradient(#E8F5F9,#cfe3ee);display:block}
+#inicio .acc{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#inicio .estado{font-size:.88rem;background:var(--hielo);border-radius:10px;padding:8px 10px;margin-top:10px;color:var(--navy)}
+#inicio input[type=text]{font-size:1.05rem;padding:10px;border-radius:10px;border:1px solid var(--cielo);width:100%}
+#editorAv{max-height:none}
+@media (max-width:760px){#inicio .marco{grid-template-columns:1fr}#prev{height:250px}#barra small,.txt{display:none}#barra .logos img{height:32px}.sec{padding:7px 9px}}
+@media (max-width:420px){#barra b{font-size:.9rem}}
 </style>
+<script src="motor/avatar.js"></script>
+<script src="motor/senales.js"></script>
+<script src="motor/compartir.js"></script>
+<script src="motor/acceso.js"></script>
+<script src="motor/sala_en_linea.js"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body>
-<div id="barra"><img src="recursos/logo_CERS.jpeg" alt="CERS"><div><b>Campus de Simulación SST</b><small>Aprende haciendo · computadora, tablet y celular</small></div>
-<div class="der"><button class="sec" id="bInicio">🏠 Plaza</button><button class="sec" id="bAyuda">❔ Ayuda</button></div></div>
-<div id="ayuda">Toca el piso para caminar o toca un edificio para entrar<small>En computadora también puedes usar las flechas o W A S D · arrastra para girar la vista</small></div>
-<div id="dentro"><div class="tit" id="dTit"></div><button id="bSalirEdif">⬅ Salir del edificio y seguir explorando</button></div>
+<div id="barra"><div class="logos"><img src="recursos/logo_CERS.jpeg" alt="CERS"></div>
+<div><b>Campus de Simulación SST</b><small>Aprende haciendo · computadora, tablet, celular y visor</small></div>
+<div class="der"><button class="sec" id="bAtras" title="Regresar al lugar anterior">⬅<span class="txt"> Atrás</span></button><button class="sec" id="bReiniciar" title="Volver al inicio del campus">↺<span class="txt"> Inicio</span></button>
+<button class="sec" id="bAvatar" title="Cambiar mi avatar">👤<span class="txt"> Avatar</span></button><button class="sec" id="bJug" title="Jugadores en el campus">👥 <span id="nJug">1</span></button>
+<button class="sec" id="bComp" title="Compartir">🔗<span class="txt"> Compartir</span></button><button class="sec" id="bInfo" title="Información, contacto y guía de uso">ℹ️<span class="txt"> Info</span></button><button class="sec" id="bAyuda" title="Ayuda">❔</button><button class="sec rojo" id="bSalir" title="Salir del campus">🚪<span class="txt"> Salir</span></button></div></div>
+<div id="ayuda">Toca el piso para caminar o toca un edificio para entrar<small>También: flechas o W A S D en computadora · arrastra para girar la vista · toca las señales para saber qué significan</small></div>
+<div id="dentro"><div class="tit" id="dTit"></div><div class="fila"><button id="bCompEdif">🔗 Compartir</button><button id="bSalirEdif">⬅ Salir del edificio</button></div></div>
 <div id="etiquetas"></div><div id="aviso"></div><div id="fundido"></div>
+<div class="modal" id="modal"><div class="caja" id="mCont"></div></div>
+<div id="inicio"><div class="marco">
+  <div><div class="logos"><img src="recursos/logo_CERS.jpeg" alt="CERS"></div>
+    <h1>Campus de Simulación en Seguridad y Salud en el Trabajo</h1>
+    <p>Elige tu nombre y arma tu avatar. Recorre los edificios: simuladores 3D, biblioteca normativa y cafetería con juegos.</p>
+    <canvas id="prev"></canvas>
+    <div class="acc"><button class="prim" id="bEntrar">Entrar al campus ▶</button><button class="sec" id="bAleatorio">🎲 Avatar al azar</button><button class="sec" id="bCodigo">🔑 Tengo un código</button><button class="sec" id="bInfo2">ℹ️ Información</button></div>
+    <div class="estado" id="accEstado">Revisando tu acceso…</div>
+    <div class="estado" id="mpEstado">Buscando el servidor de aula para jugar en grupo…</div></div>
+  <div id="editorAv"></div>
+</div></div>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+document.head.insertAdjacentHTML('beforeend', `<style>${Avatar.CSS}</style>`);
 
 // ============================================================================ CONFIGURACIÓN DEL MUNDO
 // Para agregar un sub-mundo: añadir una entrada en "modulos" del área. tipo: '3d' | 'juego'; estado: 'pronto' si aún no existe.
+// ang = posición del edificio alrededor de la plaza (grados; 0 = entrada al sur). senales = señales del poste de su fachada.
 const AREAS = [
-  { id: 'hospital', nombre: 'Hospital', icono: '🏥', color: 0x154F90, pos: [-12, 0, -5], desc: 'Movilización de pacientes, higiene de manos, control de infecciones y RPBI',
+  { id: 'cafeteria', nombre: 'Cafetería', icono: '☕', color: 0xB8662E, ang: 60, desc: 'Juegos para repasar: memorama, adivina quién, serpientes y escaleras, ruleta', senales: ['salida', 'no_fumar'],
+    modulos: [
+      { titulo: 'Memorama de señales', icono: '🧩', tipo: 'juego', url: 'mundos/cafeteria/memorama.html' },
+      { titulo: 'Adivina quién: las NOM', icono: '🕵️', tipo: 'juego', url: 'mundos/cafeteria/adivina_nom.html' },
+      { titulo: 'Serpientes y escaleras', icono: '🎲', tipo: 'juego', url: 'mundos/cafeteria/serpientes_escaleras.html' },
+      { titulo: 'Ruleta de preguntas', icono: '🎡', tipo: 'juego', url: 'mundos/cafeteria/ruleta.html' },
+    ] },
+  { id: 'hospital', nombre: 'Hospital', icono: '🏥', color: 0x154F90, ang: 100, desc: 'Movilización de pacientes, higiene de manos, control de infecciones, RPBI y primeros auxilios (RCP, DEA, atragantamiento y hemorragias)', senales: ['salida', 'primeros'],
     modulos: [
       { titulo: 'Camilleros: traslado seguro', icono: '🛏️', tipo: '3d', url: 'mundos/hospital/camilleros/index.html' },
       { titulo: 'Los 5 momentos', icono: '🖐️', tipo: '3d', url: 'mundos/hospital/higiene_manos_5momentos/index.html' },
       { titulo: 'Lavado de manos correcto', icono: '🧼', tipo: '3d', url: 'mundos/hospital/higiene_manos_tecnica/index.html' },
-      { titulo: 'Manos que salvan', icono: '🎮', tipo: 'juego', url: '../03_cursos/2026-10-30_lavado_de_manos_sante/05_recursos_digitales/juego_higiene_manos.html' },
+      { titulo: 'Manos que salvan', icono: '🎮', tipo: 'juego', url: 'mundos/hospital/juegos/juego_higiene_manos.html' },
       { titulo: '¿Camilla, silla o tabla?', icono: '🎮', tipo: 'juego', url: '../03_cursos/2026-10-06_formacion_camilleros/05_recursos_digitales/juego_decision_traslado.html' },
       { titulo: 'Clasifica el RPBI', icono: '🎮', tipo: 'juego', url: '../03_cursos/2026-10-06_formacion_camilleros/05_recursos_digitales/juego_rpbi.html' },
+      { titulo: 'RCP y DEA: adulto y lactante', icono: '💓', tipo: '3d', url: 'mundos/hospital/rcp_dea/index.html' },
+      { titulo: 'Ritmo y profundidad (RCP por edad)', icono: '🎮', tipo: 'juego', url: '../03_cursos/BASE_primeros_auxilios_5h/05_recursos_digitales/juego_rcp_ritmo_profundidad.html' },
+      { titulo: 'Atragantamiento y hemorragia', icono: '🚨', tipo: '3d', url: 'mundos/hospital/atragantamiento_hemorragia/index.html' },
+      { titulo: '¡Se está atragantando!', icono: '😮‍💨', tipo: 'juego', url: '../03_cursos/BASE_primeros_auxilios_5h/05_recursos_digitales/juego_atragantamiento.html' },
+      { titulo: 'Escape room: Emergencia en la plaza', icono: '🔐', tipo: 'juego', url: '../03_cursos/BASE_primeros_auxilios_5h/05_recursos_digitales/juego_escape_room.html' },
+      { titulo: 'Memorama: sí se hace / no se hace', icono: '🧩', tipo: 'juego', url: '../03_cursos/BASE_primeros_auxilios_5h/05_recursos_digitales/juego_memorama_si_no.html' },
+      { titulo: 'Maratón de primeros auxilios', icono: '🏁', tipo: 'juego', url: '../03_cursos/BASE_primeros_auxilios_5h/05_recursos_digitales/juego_maraton_equipos.html' },
+      { titulo: '¿Qué lleva mi botiquín?', icono: '🧰', tipo: 'juego', url: '../03_cursos/BASE_primeros_auxilios_5h/05_recursos_digitales/juego_botiquin.html' },
       { titulo: 'RPBI 3D: ruta de recolección', icono: '♻️', tipo: '3d', estado: 'pronto' },
     ] },
-  { id: 'industria', nombre: 'Industria', icono: '🏭', color: 0x5B6B7C, pos: [12, 0, -5], desc: 'Mundos por norma STPS',
+  { id: 'industria', nombre: 'Industria', icono: '🏭', color: 0x5B6B7C, ang: 140, desc: 'Mundos por norma STPS', senales: ['salida', 'casco', 'auditiva'],
     modulos: [
       { titulo: 'NOM-004-STPS Maquinaria', icono: '⚙️', tipo: '3d', estado: 'pronto' },
       { titulo: 'NOM-009-STPS Alturas', icono: '🪜', tipo: '3d', estado: 'pronto' },
       { titulo: 'NOM-036-1-STPS Cargas', icono: '📦', tipo: '3d', estado: 'pronto' },
     ] },
-  { id: 'proteccion', nombre: 'Protección civil', icono: '🚨', color: 0xE07A1F, pos: [0, 0, -17], desc: 'Evacuación, brigadas y extintores',
-    modulos: [{ titulo: 'Evacuación hospitalaria', icono: '🚪', tipo: '3d', estado: 'pronto' }] },
-  { id: 'empresa', nombre: 'Empresa · RH', icono: '🏢', color: 0x14284B, pos: [12, 0, -17], desc: 'Jornada laboral de 40 horas: auditoría, horarios y cumplimiento',
+  { id: 'proteccion', nombre: 'Protección civil', icono: '🚨', color: 0xE07A1F, ang: 180, desc: 'Extintores (NOM-002-STPS-2010), evacuación y punto de reunión · con modo de realidad virtual y mixta', senales: ['salida', 'alarma', 'telefono'],
+    modulos: [
+      { titulo: 'Uso de extintores: fuego real virtual', icono: '🧯', tipo: '3d', url: 'mundos/proteccion/extintores/index.html' },
+      { titulo: 'Evacuación al punto de reunión', icono: '🏃', tipo: '3d', url: 'mundos/proteccion/evacuacion/index.html' },
+      { titulo: 'Evacuación hospitalaria', icono: '🚪', tipo: '3d', estado: 'pronto' }] },
+  { id: 'laboral', nombre: 'Laboral STPS', icono: '⚖️', color: 0x1F4E79, ang: 220, desc: 'Inspecciones de la STPS: recepción del inspector, la visita y el acta', senales: ['salida', 'informacion'],
+    modulos: [
+      { titulo: 'Recepción del inspector', icono: '🛎️', tipo: '3d', url: 'mundos/laboral/recepcion_inspector/index.html' },
+      { titulo: 'La visita de inspección', icono: '📋', tipo: '3d', url: 'mundos/laboral/visita_inspeccion/index.html' },
+      { titulo: 'Día D: ¿lo haces o no?', icono: '🎮', tipo: 'juego', url: '../03_cursos/BASE_auditorias_stps_2h/05_recursos_digitales/juego_dia_d.html' },
+    ] },
+  { id: 'empresa', nombre: 'Empresa · RH', icono: '🏢', color: 0x14284B, ang: 260, desc: 'Jornada laboral de 40 horas: auditoría, horarios y cumplimiento', senales: ['salida', 'no_fumar'],
     modulos: [
       { titulo: 'Oficina de RH: auditoría del checador', icono: '⏱️', tipo: '3d', url: 'mundos/empresa/rh_checador/index.html' },
       { titulo: 'Mesa de ayuda: preguntas sobre horarios', icono: '❓', tipo: '3d', url: 'mundos/empresa/horarios_qa/index.html' },
       { titulo: '¿Cumple o no cumple?', icono: '🎮', tipo: 'juego', url: '../03_cursos/BASE_jornada_40_horas_2h/05_recursos_digitales/juego_cumple_o_no.html' },
-      { titulo: 'Manual digital: jornada 40 h', icono: '📱', tipo: 'juego', url: '../03_cursos/BASE_jornada_40_horas_2h/05_recursos_digitales/manual_digital.html' },
+    ] },
+  { id: 'biblioteca', nombre: 'Biblioteca', icono: '📚', color: 0x5D4037, ang: 300, desc: 'Leyes, reglamentos, NOM y tratados por dependencia, con liga oficial y referencia APA', senales: ['salida', 'accesible'],
+    modulos: [
+      { titulo: 'Sala de lectura', icono: '📖', tipo: '3d', url: 'mundos/biblioteca/index.html' },
+      { titulo: 'Reto: encuentra la norma', icono: '🔎', tipo: '3d', url: 'mundos/biblioteca/index.html?reto' },
     ] },
 ];
 const POR_PISO = 4, ANCHO_PUERTA = 1.15, PASO_PUERTA = 1.75, ALTO_PISO = 2.7;
-const INICIO = new THREE.Vector3(0, 0, 2.5);
-const LIM = { x: 9.3, zMin: -13.5, zMax: 9 };   // zona caminable de la plaza
+const R_EDIF = 27, R_CAMINA = 23.6, R_PLAZA = 13;
+const INICIO = new THREE.Vector3(0, 0, 17);
 const QA = location.search.includes('qa');
+const P = new URLSearchParams(location.search);
+if (!QA) INICIO.x += (Math.random() - 0.5) * 4;   // para que en multijugador no aparezcan todos encimados
+const rad = THREE.MathUtils.degToRad, polar = (a, r) => new THREE.Vector3(Math.sin(rad(a)) * r, 0, Math.cos(rad(a)) * r);
 
 // ============================================================================ ESCENA
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight);
 document.body.prepend(renderer.domElement);
-const scene = new THREE.Scene(); scene.background = new THREE.Color(0xCFE3EE); scene.fog = new THREE.Fog(0xCFE3EE, 45, 85);
-const camera = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 150);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xBFE0F0); scene.fog = new THREE.Fog(0xBFE0F0, 60, 120);
+const camera = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 220);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.46; controls.minDistance = 5; controls.maxDistance = 30; controls.enablePan = false;
+controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.46; controls.minDistance = 4; controls.maxDistance = 38; controls.enablePan = false;
 scene.add(new THREE.HemisphereLight(0xffffff, 0x88a0b0, 1.2));
-const sol = new THREE.DirectionalLight(0xffffff, 1.3); sol.position.set(8, 14, 10); scene.add(sol);
-const M = (c, x = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: .7, metalness: .05, ...x });
+const sol = new THREE.DirectionalLight(0xffffff, 1.3); sol.position.set(10, 18, 12); scene.add(sol);
+const MATS = {}; const M = (c, x) => x ? new THREE.MeshStandardMaterial({ color: c, roughness: .7, metalness: .05, ...x }) : (MATS[c] || (MATS[c] = new THREE.MeshStandardMaterial({ color: c, roughness: .7, metalness: .05 })));
 const caja = (w, h, d, c, x, y, z, p = scene) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c)); m.position.set(x, y, z); p.add(m); return m; };
+const cil = (r, h, c, x, y, z, p = scene, rt) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(rt ?? r, r, h, 20), M(c)); m.position.set(x, y, z); p.add(m); return m; };
+const tex = src => { const t = new THREE.TextureLoader().load(src); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; };
 function cartel(texto, w, h, fondo = '#154F90', color = '#fff', tam = 0.55) {
   const cv = document.createElement('canvas'); cv.width = 1024; cv.height = Math.round(1024 * h / w); const g = cv.getContext('2d');
   g.fillStyle = fondo; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = color; g.font = `bold ${Math.round(cv.height * tam)}px Calibri, Segoe UI, sans-serif`;
@@ -93,82 +170,195 @@ function cartel(texto, w, h, fondo = '#154F90', color = '#fff', tam = 0.55) {
   const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 4;
   return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tx, side: THREE.DoubleSide }));
 }
-// Suelo, plaza y caminos
-const suelo = new THREE.Mesh(new THREE.CircleGeometry(60, 64), M(0xB9CFC0)); suelo.rotation.x = -Math.PI / 2; suelo.userData.piso = true; scene.add(suelo);
-const plaza = new THREE.Mesh(new THREE.PlaneGeometry(LIM.x * 2 + 1, LIM.zMax - LIM.zMin + 1), M(0xE6ECF0));
-plaza.rotation.x = -Math.PI / 2; plaza.position.set(0, 0.01, (LIM.zMax + LIM.zMin) / 2); plaza.userData.piso = true; scene.add(plaza);
-for (let x = -LIM.x; x <= LIM.x; x += 2.4) { const l = new THREE.Mesh(new THREE.PlaneGeometry(0.05, LIM.zMax - LIM.zMin), M(0xD3DCE2)); l.rotation.x = -Math.PI / 2; l.position.set(x, 0.015, (LIM.zMax + LIM.zMin) / 2); scene.add(l); }
-// Portal de entrada y tótem con logo CERS
-const logoTx = new THREE.TextureLoader().load('recursos/logo_CERS.jpeg'); logoTx.colorSpace = THREE.SRGBColorSpace;
-const portal = new THREE.Group(); portal.position.set(0, 0, 10.5); scene.add(portal);
-caja(0.35, 3.6, 0.35, 0x0E3A6B, -2.6, 1.8, 0, portal); caja(0.35, 3.6, 0.35, 0x0E3A6B, 2.6, 1.8, 0, portal); caja(5.6, 0.5, 0.4, 0x0E3A6B, 0, 3.7, 0, portal);
-caja(1.7, 1.75, 0.08, 0xffffff, 0, 4.75, -0.01, portal);
-const placaLogo = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.55), new THREE.MeshBasicMaterial({ map: logoTx, side: THREE.DoubleSide })); placaLogo.position.set(0, 4.75, 0.05); portal.add(placaLogo);
-const tC = cartel('CAMPUS DE SIMULACIÓN SST', 5.2, 0.42, '#0E3A6B'); tC.position.set(0, 3.7, 0.22); portal.add(tC);
-const tot = new THREE.Group(); tot.position.set(0, 0, -3); scene.add(tot); caja(0.9, 2.2, 0.9, 0xffffff, 0, 1.1, 0, tot);
-[0, Math.PI / 2, Math.PI, -Math.PI / 2].forEach(r => { const p = new THREE.Mesh(new THREE.PlaneGeometry(0.78, 0.8), new THREE.MeshBasicMaterial({ map: logoTx }));
-  p.position.set(Math.sin(r) * 0.46, 1.5, Math.cos(r) * 0.46); p.rotation.y = r; tot.add(p); });
-const obstaculos = [{ x: 0, z: -3, r: 0.9 }];
-// Árboles y bancas
-const arbol = (x, z) => { const t = new THREE.Group(); t.position.set(x, 0, z); const tr = new THREE.Mesh(new THREE.CylinderGeometry(.12, .15, 1, 8), M(0x8B6B4A)); tr.position.y = .5; t.add(tr);
-  const co = new THREE.Mesh(new THREE.SphereGeometry(.75, 14, 10), M(0x5E9E6E)); co.position.y = 1.45; t.add(co); scene.add(t); };
-[[-8, 8], [8, 8], [-8, -12], [8, -12], [-20, 6], [20, 6], [-20, -14], [20, -14], [-6, -22], [6, -22], [0, 17], [-14, 14], [14, 14]].forEach(([x, z]) => arbol(x, z));
-[[-5, 2], [5, 2]].forEach(([x, z]) => { caja(1.6, 0.12, 0.5, 0x8B6B4A, x, 0.45, z); caja(0.1, 0.45, 0.4, 0x5B6B7C, x - 0.65, 0.22, z); caja(0.1, 0.45, 0.4, 0x5B6B7C, x + 0.65, 0.22, z); obstaculos.push({ x, z, r: 1 }); });
+const logoCERS = tex('recursos/logo_CERS.jpeg'), banner = tex('recursos/banner_AMISI_CERS.jpg');
+const plano = (w, h, map, x, y, z, p = scene, ry = 0) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map })); m.position.set(x, y, z); m.rotation.y = ry; p.add(m); return m; };
+const tocables = [], obstaculos = [];
+const obst = (x, z, r) => obstaculos.push({ x, z, r });
+
+// ---------------------------------------------------------------- suelo, plaza, anillo y caminos
+const pisos = [];
+const disco = (r0, r1, c, y) => { const m = new THREE.Mesh(r0 ? new THREE.RingGeometry(r0, r1, 96) : new THREE.CircleGeometry(r1, 96), M(c)); m.rotation.x = -Math.PI / 2; m.position.y = y; m.userData.piso = true; scene.add(m); pisos.push(m); return m; };
+disco(0, 90, 0x9CC48E, 0); disco(0, R_PLAZA, 0xE9E4DA, 0.012); disco(R_PLAZA - 0.35, R_PLAZA, 0xC9BFAF, 0.016);
+disco(20.5, 24.9, 0xE2DDD3, 0.012);
+for (let r = 3.5; r < R_PLAZA; r += 3) disco(r - 0.05, r, 0xD6CFC2, 0.014);   // juntas del adoquín
+function camino(a, r0, r1, ancho = 3) { const c = polar(a, (r0 + r1) / 2); const m = new THREE.Mesh(new THREE.PlaneGeometry(ancho, r1 - r0), M(0xE2DDD3));
+  m.rotation.x = -Math.PI / 2; m.rotation.z = -rad(a); m.position.set(c.x, 0.011, c.z); m.userData.piso = true; scene.add(m); pisos.push(m); }
+AREAS.forEach(a => camino(a.ang, R_PLAZA - 0.5, 21, 3)); camino(0, R_PLAZA - 0.5, 30, 4);
+
+// ---------------------------------------------------------------- fuente central con monolito de logos
+const fuente = new THREE.Group(); scene.add(fuente);
+cil(3.2, 0.55, 0xB8B2A6, 0, 0.27, 0, fuente); const agua = cil(2.9, 0.08, 0x6EC6E8, 0, 0.5, 0, fuente); agua.material = M(0x6EC6E8, { transparent: true, opacity: .85, roughness: .1 });
+caja(1.0, 3.0, 1.0, 0xffffff, 0, 1.6, 0, fuente); caja(1.25, 0.18, 1.25, 0x0E3A6B, 0, 3.15, 0, fuente);
+[0, Math.PI / 2, Math.PI, -Math.PI / 2].forEach(r => plano(0.85, 0.88, logoCERS, Math.sin(r) * 0.51, 2.2, Math.cos(r) * 0.51, fuente, r));
+// Escultura 3D del logo CERS (engrane + escudo con cruz + casco + letras) sobre la fuente
+const escultura = new THREE.Group(); escultura.position.set(0, 4.75, 0); fuente.add(escultura);
+{ const metal = new THREE.MeshStandardMaterial({ color: 0x0E3A6B, metalness: .55, roughness: .3 }), blanco = new THREE.MeshStandardMaterial({ color: 0xF4F7FA, metalness: .2, roughness: .4 });
+  const ext = (shape, prof, mat, z = 0) => { const geo = new THREE.ExtrudeGeometry(shape, { depth: prof, bevelEnabled: true, bevelThickness: 0.025, bevelSize: 0.02, bevelSegments: 2, curveSegments: 24 }); geo.translate(0, 0, -prof / 2 + z); const m = new THREE.Mesh(geo, mat); escultura.add(m); return m; };
+  const engrane = new THREE.Shape(), D = 12;   // engrane de 12 dientes
+  for (let i = 0; i <= D * 4; i++) { const a = i / (D * 4) * Math.PI * 2, r = (i % 4 === 1 || i % 4 === 2) ? 1.3 : 1.1; i ? engrane.lineTo(Math.cos(a) * r, Math.sin(a) * r) : engrane.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+  const hueco = new THREE.Path(); hueco.absarc(0, 0, 0.88, 0, Math.PI * 2, true); engrane.holes.push(hueco); ext(engrane, 0.22, metal);
+  const escudo = (s) => { const sh = new THREE.Shape(); sh.moveTo(-0.5 * s, 0.42 * s); sh.quadraticCurveTo(0, 0.56 * s, 0.5 * s, 0.42 * s); sh.lineTo(0.5 * s, -0.02 * s);
+    sh.quadraticCurveTo(0.46 * s, -0.42 * s, 0, -0.66 * s); sh.quadraticCurveTo(-0.46 * s, -0.42 * s, -0.5 * s, -0.02 * s); sh.closePath(); return sh; };
+  ext(escudo(1.12), 0.14, blanco, -0.02); ext(escudo(1), 0.2, metal, 0.02).position.y = 0.0;
+  const cruzV = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.5, 0.06), blanco), cruzH = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 0.06), blanco);
+  [cruzV, cruzH].forEach(c => { c.position.set(0, 0.0, 0.15); escultura.add(c); });
+  const casco = new THREE.Mesh(new THREE.SphereGeometry(0.2, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), blanco); casco.position.set(0, 0.55, 0.02); escultura.add(casco);
+  const ala = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.27, 0.03, 24), blanco); ala.position.set(0, 0.55, 0.02); escultura.add(ala);
+  new FontLoader().load('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_bold.typeface.json', f => {
+    const g = new TextGeometry('CERS', { font: f, size: 0.2, height: 0.08, curveSegments: 6 }); g.computeBoundingBox(); g.translate(-(g.boundingBox.max.x - g.boundingBox.min.x) / 2, 0, 0);
+    [0, Math.PI].forEach(ry => { const t = new THREE.Mesh(g, blanco); t.rotation.y = ry; t.position.set(0, -0.84, ry ? -0.13 : 0.13); escultura.add(t); }); }); }
+const brilloEsc = new THREE.PointLight(0xffffff, 6, 8); brilloEsc.position.set(0, 5, 2.5); fuente.add(brilloEsc);
+const gotas = 220, gp = new Float32Array(gotas * 3), gfase = Array.from({ length: gotas }, () => Math.random()), gdir = Array.from({ length: gotas }, () => Math.random() * Math.PI * 2);
+const gGeo = new THREE.BufferGeometry(); gGeo.setAttribute('position', new THREE.BufferAttribute(gp, 3));
+const chorro = new THREE.Points(gGeo, new THREE.PointsMaterial({ color: 0xBFEAFB, size: 0.09, transparent: true, opacity: .9 })); chorro.position.y = 3.25; fuente.add(chorro);
+obst(0, 0, 3.4);
+
+// ---------------------------------------------------------------- mobiliario: bancas, árboles, luminarias, jardineras
+function banca(x, z, ry) { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g);
+  caja(1.8, 0.1, 0.5, 0x8B6B4A, 0, 0.47, 0, g); caja(1.8, 0.45, 0.08, 0x8B6B4A, 0, 0.8, -0.22, g);
+  [-0.75, 0.75].forEach(dx => caja(0.08, 0.47, 0.45, 0x37474F, dx, 0.235, 0, g)); obst(x, z, 1); }
+for (let k = 0; k < 8; k++) { const a = 22.5 + k * 45; if (Math.abs(((a + 180) % 360) - 180) < 15) continue; const p = polar(a, 6.4); banca(p.x, p.z, rad(a) + Math.PI); }
+const tronco = new THREE.CylinderGeometry(.14, .18, 1.2, 8), copa = new THREE.IcosahedronGeometry(1, 1), copa2 = new THREE.ConeGeometry(1, 2.4, 9);
+function arbol(x, z, s = 1, pino = false) { const t = new THREE.Group(); t.position.set(x, 0, z); t.scale.setScalar(s); scene.add(t);
+  const tr = new THREE.Mesh(tronco, M(0x7A5A3A)); tr.position.y = .6; t.add(tr);
+  const co = new THREE.Mesh(pino ? copa2 : copa, M(pino ? 0x3F7D4E : 0x5E9E6E)); co.position.y = pino ? 2.2 : 1.8; if (!pino) co.scale.set(1.1, 1, 1.1); t.add(co); obst(x, z, 0.7 * s); }
+AREAS.forEach((a, i) => { const m = a.ang + 20; [16.5, 19].forEach((r, k) => { const p = polar(m + (k ? 6 : -6), r); arbol(p.x, p.z, 1 + k * .2, k === 1); }); });
+[-14, 14].forEach(a => { const p = polar(a, 19); arbol(p.x, p.z, 1.2); });
+for (let i = 0; i < 46; i++) { const a = i * 7.83 + (i % 3) * 2, r = 33 + (i * 37 % 17); const p = polar(a, r); if (Math.abs(p.x) < 4 && p.z > 0) continue; arbol(p.x, p.z, 1.1 + (i % 4) * .2, i % 2 === 0); }
+function luminaria(x, z) { cil(0.06, 3.4, 0x37474F, x, 1.7, z); const l = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 10), M(0xFFF6D5, { emissive: 0xFFE9A8, emissiveIntensity: .6 })); l.position.set(x, 3.5, z); scene.add(l); obst(x, z, 0.3); }
+for (let k = 0; k < 8; k++) { const p = polar(k * 45, R_PLAZA + 0.5); luminaria(p.x, p.z); }
+function jardinera(x, z) { cil(0.9, 0.45, 0xB8B2A6, x, 0.22, z); const f = new THREE.Mesh(new THREE.IcosahedronGeometry(0.75, 1), M(0x4E9A5A)); f.position.set(x, 0.65, z); f.scale.y = .55; scene.add(f);
+  [0xE53935, 0xFDD835, 0xAB47BC].forEach((c, i) => { const fl = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), M(c)); fl.position.set(x + Math.cos(i * 2) * .4, 0.95, z + Math.sin(i * 2) * .4); scene.add(fl); }); obst(x, z, 1); }
+[35, 145, 215, 325].forEach(a => { const p = polar(a, 10.6); jardinera(p.x, p.z); });
+
+// ---------------------------------------------------------------- terraza de la cafetería (mesas, sombrillas, sillas)
+const caf = AREAS.find(a => a.id === 'cafeteria');
+function mesa(c) { cil(0.55, 0.05, 0xffffff, c.x, 0.75, c.z); cil(0.05, 0.75, 0x5B6B7C, c.x, 0.37, c.z); cil(0.03, 2.2, 0xffffff, c.x, 1.1, c.z);
+  const s = new THREE.Mesh(new THREE.ConeGeometry(1.25, 0.5, 10, 1, true), M(0xC62828, { side: THREE.DoubleSide })); s.position.set(c.x, 2.2, c.z); scene.add(s);
+  for (let k = 0; k < 4; k++) { const g = new THREE.Group(); const a = k * Math.PI / 2; g.position.set(c.x + Math.cos(a) * 0.95, 0, c.z + Math.sin(a) * 0.95); g.rotation.y = -a - Math.PI / 2; scene.add(g);
+    caja(0.42, 0.05, 0.42, 0x3FA7C6, 0, 0.45, 0, g); caja(0.42, 0.45, 0.05, 0x3FA7C6, 0, 0.68, -0.2, g); [[-.18, -.18], [.18, -.18], [-.18, .18], [.18, .18]].forEach(([dx, dz]) => caja(0.04, 0.45, 0.04, 0x37474F, dx, 0.22, dz, g)); }
+  obst(c.x, c.z, 1.35); }
+{ const centro = polar(caf.ang, 17), tan = new THREE.Vector3(Math.cos(rad(caf.ang)), 0, -Math.sin(rad(caf.ang))), rad_ = polar(caf.ang, 1);
+  const patio = new THREE.Mesh(new THREE.CircleGeometry(5, 48), M(0xD9C7B0)); patio.rotation.x = -Math.PI / 2; patio.position.set(centro.x, 0.013, centro.z); patio.userData.piso = true; scene.add(patio); pisos.push(patio);
+  [[-3, -1.6], [3, -1.6], [-3, 1.6], [3, 1.6]].forEach(([t, r]) => mesa(centro.clone().addScaledVector(tan, t).addScaledVector(rad_, r))); }
+
+// ---------------------------------------------------------------- señales (NOM-026-STPS-2008 / NOM-003-SEGOB-2011)
+const texSenal = {};
+function senal(id, w, x, y, z, ry, p = scene) {
+  const cv = Senales.canvas(id, 256); const t = texSenal[id] || (texSenal[id] = new THREE.CanvasTexture(cv)); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  const h = w * cv.height / cv.width, g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry; p.add(g);
+  const cara = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t, transparent: true })); cara.position.z = 0.026; g.add(cara);
+  const atras = new THREE.Mesh(new THREE.PlaneGeometry(w * .96, h * .96), M(0x9AA9B8)); atras.rotation.y = Math.PI; atras.position.z = 0.02; g.add(atras);
+  cara.userData = { tipo: 'senal', id }; tocables.push(cara); return g;
+}
+function poste(ids, x, z, ry, w = 0.62) { cil(0.05, 2.6, 0x5B6B7C, x, 1.3, z); ids.forEach((id, i) => { const ancho = (Senales.POR_ID[id].ancho || 1) * w; senal(id, ancho, x, 2.25 - i * (w + 0.08), z, ry); }); obst(x, z, 0.35); }
+const dirRy = d => Math.atan2(-d.z, d.x);   // rotación para que la derecha de la señal apunte en la dirección d
+function extintor(x, z, ry) { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g);
+  caja(0.5, 0.06, 0.4, 0x5B6B7C, 0, 0.03, 0, g); const c = cil(0.13, 0.62, 0xD3122A, 0, 0.4, 0, g); cil(0.04, 0.12, 0x222222, 0, 0.77, 0, g);
+  c.userData = { tipo: 'senal', id: 'extintor' }; tocables.push(c); cil(0.04, 1.9, 0x5B6B7C, 0, 0.95, -0.15, g); senal('extintor', 0.5, 0, 1.75, -0.12, 0, g); obst(x, z, 0.45); }
+function hidrante(x, z, ry) { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g);
+  const b = cil(0.17, 0.75, 0xD3122A, 0, 0.38, 0, g); cil(0.2, 0.12, 0xD3122A, 0, 0.8, 0, g); const tapa = new THREE.Mesh(new THREE.SphereGeometry(0.17, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), M(0xD3122A)); tapa.position.y = 0.86; g.add(tapa);
+  [-1, 1].forEach(s => { const n = cil(0.07, 0.18, 0xB0101F, s * 0.2, 0.5, 0, g); n.rotation.z = Math.PI / 2; });
+  b.userData = { tipo: 'senal', id: 'hidrante' }; tocables.push(b); cil(0.04, 2.3, 0x5B6B7C, 0.45, 1.15, 0, g); senal('hidrante', 0.55, 0.45, 2.0, 0.03, 0, g); obst(x, z, 0.6); }
+[20, 120, 240, 340].forEach(a => { const p = polar(a, 22.9); hidrante(p.x, p.z, rad(a) + Math.PI); });
+// Punto de reunión (zona abierta, lejos de edificios) y ruta de evacuación pintada en el anillo
+const ANG_REUNION = 332, pReunion = polar(ANG_REUNION, 16.8);
+{ const z = new THREE.Mesh(new THREE.CircleGeometry(2.3, 40), M(0x00995C)); z.rotation.x = -Math.PI / 2; z.position.set(pReunion.x, 0.02, pReunion.z); z.userData.piso = true; scene.add(z); pisos.push(z);
+  const cv = Senales.canvas('reunion', 256), t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace;
+  const pl = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), new THREE.MeshBasicMaterial({ map: t, transparent: true })); pl.rotation.x = -Math.PI / 2; pl.position.set(pReunion.x, 0.03, pReunion.z); scene.add(pl);
+  const dentroPlaza = pReunion.clone().normalize().multiplyScalar(-1); poste(['reunion'], pReunion.x + 2.6, pReunion.z - 0.4, dirRy(new THREE.Vector3(dentroPlaza.z, 0, -dentroPlaza.x)) , 0.8); }
+const flechaPiso = (() => { const cv = document.createElement('canvas'); cv.width = 256; cv.height = 128; const g = cv.getContext('2d'); g.fillStyle = '#00995C'; g.beginPath(); g.roundRect ? g.roundRect(4, 4, 248, 120, 18) : g.rect(4, 4, 248, 120); g.fill();
+  g.fillStyle = '#fff'; g.beginPath(); g.moveTo(40, 50); g.lineTo(150, 50); g.lineTo(150, 22); g.lineTo(220, 64); g.lineTo(150, 106); g.lineTo(150, 78); g.lineTo(40, 78); g.closePath(); g.fill();
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+function flechaSuelo(p, d) { const g = new THREE.Group(); g.position.set(p.x, 0.025, p.z); g.rotation.y = dirRy(d); scene.add(g);
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.55), new THREE.MeshBasicMaterial({ map: flechaPiso, transparent: true })); m.rotation.x = -Math.PI / 2; g.add(m); }
+for (let a = 10; a < 360; a += 15) { if (Math.abs(a - ANG_REUNION) < 8) continue; const sentido = ((ANG_REUNION - a + 540) % 360) - 180 > 0 ? 1 : -1;   // camino más corto al punto de reunión
+  const p = polar(a, 22.2), d = polar(a + sentido * 90, 1).normalize(); flechaSuelo(p, d);
+  if ([10, 85, 160, 235, 310].includes(a)) poste(['ruta'], polar(a, 24.4).x, polar(a, 24.4).z, dirRy(d), 0.42); }
+[22, 19.5].forEach(r => flechaSuelo(polar(ANG_REUNION, r), polar(ANG_REUNION, -1)));
+// Plaza: piso resbaloso junto a la fuente (caballete amarillo) y módulo de información en la entrada
+{ const p = polar(200, 4.2); const g = new THREE.Group(); g.position.set(p.x, 0, p.z); g.rotation.y = rad(200); scene.add(g);
+  [-1, 1].forEach(s => { const pl = caja(0.55, 0.85, 0.03, 0xFFD100, 0, 0.42, s * 0.12, g); pl.rotation.x = s * 0.25; });
+  senal('resbaloso', 0.48, 0, 0.5, 0.15, 0, g); obst(p.x, p.z, 0.5); }
+
+// ---------------------------------------------------------------- entrada: pórtico con logos, banner y espectacular AMISI
+const portal = new THREE.Group(); portal.position.set(0, 0, 27.6); scene.add(portal);
+caja(0.4, 4, 0.4, 0x0E3A6B, -3.2, 2, 0, portal); caja(0.4, 4, 0.4, 0x0E3A6B, 3.2, 2, 0, portal); caja(6.8, 0.6, 0.45, 0x0E3A6B, 0, 4.1, 0, portal);
+const tC = cartel('CAMPUS DE SIMULACIÓN SST', 6.4, 0.5, '#0E3A6B'); tC.position.set(0, 4.1, -0.24); tC.rotation.y = Math.PI; portal.add(tC);
+const tC2 = cartel('CAMPUS DE SIMULACIÓN SST', 6.4, 0.5, '#0E3A6B'); tC2.position.set(0, 4.1, 0.24); portal.add(tC2);
+caja(4.2, 1.5, 0.1, 0xffffff, 0, 5.2, 0, portal);
+[-1, 1].forEach(s => plano(1.35, 1.4, logoCERS, 0, 5.2, s * 0.06, portal, s < 0 ? Math.PI : 0));
+senal('accesible', 0.6, 3.2, 1.7, -0.22, Math.PI, portal);
+// Banner de información (gran tótem) junto al módulo de información: al tocarlo abre la página de Información
+const INFO_URL = 'mundos/informacion/index.html';
+function totemBanner(x, z, ry, alto) { const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = ry; scene.add(g); const ancho = alto * 470 / 1037;
+  caja(ancho + 0.3, 0.25, 0.6, 0x0E3A6B, 0, 0.12, 0, g); caja(ancho + 0.16, alto + 0.16, 0.12, 0x0E3A6B, 0, alto / 2 + 0.3, -0.07, g);
+  const b = plano(ancho, alto, banner, 0, alto / 2 + 0.3, 0.0, g); b.userData = { tipo: 'info' }; tocables.push(b); obst(x, z, ancho / 2 + 0.4); }
+totemBanner(4.6, 20.4, -0.35, 4.6);
+{ const p = new THREE.Vector3(-3.4, 0, 21.4); const g = new THREE.Group(); g.position.copy(p); g.rotation.y = 0.35; scene.add(g);
+  const k = caja(1.6, 1.15, 0.8, 0x0D6EB8, 0, 0.57, 0, g); caja(1.75, 0.08, 0.95, 0xffffff, 0, 1.18, 0, g); cil(0.05, 1.5, 0x5B6B7C, 0, 1.9, -0.3, g);
+  const c = cartel('INFORMACIÓN · CONTACTO · ACCESO', 1.7, 0.28, '#0D6EB8'); c.position.set(0, 0.8, 0.41); g.add(c); c.userData = { tipo: 'info' }; tocables.push(c); k.userData = { tipo: 'info' }; tocables.push(k);
+  senal('informacion', 0.6, 0, 2.6, -0.28, 0, g); obst(p.x, p.z, 1.0); }
 
 // ============================================================================ EDIFICIOS Y PUERTAS
-const tocables = []; const ED = {};
+const ED = {};
 AREAS.forEach(a => {
-  const n = a.modulos.length, cols = Math.min(POR_PISO, n), pisos = Math.ceil(n / POR_PISO);
-  const ancho = Math.max(5.5, cols * PASO_PUERTA + 1.2), alto = pisos * ALTO_PISO + 1.4;
-  const g = new THREE.Group(); g.position.set(...a.pos); g.lookAt(0, 0, (LIM.zMax + LIM.zMin) / 2 * 0.3); scene.add(g); g.updateMatrixWorld();
-  const cuerpo = caja(ancho, alto, 4, a.color, 0, alto / 2, -2, g); cuerpo.userData = { tipo: 'edificio', area: a.id }; tocables.push(cuerpo);
-  caja(ancho + 0.4, 0.3, 4.4, 0xffffff, 0, alto + 0.15, -2, g);
-  const rot = cartel(a.nombre.toUpperCase(), Math.min(ancho - 0.6, 5), 0.75, '#ffffff', '#' + a.color.toString(16).padStart(6, '0'), 0.6);
-  rot.position.set(0, alto - 0.6, 0.03); g.add(rot);
+  const n = a.modulos.length, cols = Math.min(POR_PISO, n), pisosE = Math.ceil(n / POR_PISO);
+  const ancho = Math.max(6, cols * PASO_PUERTA + 1.4), alto = pisosE * ALTO_PISO + 1.6;
+  const pos = polar(a.ang, R_EDIF);
+  const g = new THREE.Group(); g.position.copy(pos); g.lookAt(0, 0, 0); scene.add(g); g.updateMatrixWorld();
+  const cuerpo = caja(ancho, alto, 5, a.color, 0, alto / 2, -2.5, g); cuerpo.userData = { tipo: 'edificio', area: a.id }; tocables.push(cuerpo);
+  caja(ancho + 0.5, 0.35, 5.5, 0xffffff, 0, alto + 0.17, -2.5, g); caja(ancho + 0.3, 0.25, 0.3, 0xffffff, 0, 0.12, 0.1, g);
+  [-1, 1].forEach(s => { for (let py = 0; py < pisosE; py++) for (let k = 0; k < 3; k++) caja(0.06, 1.1, 0.8, 0xBFE3F2, s * (ancho / 2 + 0.01), py * ALTO_PISO + 1.6, -0.9 - k * 1.4, g); });
+  const rot = cartel(`${a.nombre.toUpperCase()}`, Math.min(ancho - 0.6, 5.4), 0.8, '#ffffff', '#' + a.color.toString(16).padStart(6, '0'), 0.6);
+  rot.position.set(0, alto - 0.65, 0.03); g.add(rot);
   const puertas = a.modulos.map((m, i) => {
     const piso = Math.floor(i / POR_PISO), k = i % POR_PISO, enPiso = Math.min(POR_PISO, n - piso * POR_PISO);
     const x = (k - (enPiso - 1) / 2) * PASO_PUERTA, y = piso * ALTO_PISO;
-    if (piso > 0 && k === 0) caja(ancho - 0.4, 0.15, 0.9, 0xffffff, 0, y - 0.05, 0.35, g);   // balcón del piso superior
+    if (piso > 0 && k === 0) caja(ancho - 0.4, 0.15, 0.9, 0xffffff, 0, y - 0.05, 0.35, g);
     const pronto = m.estado === 'pronto';
     const p = caja(ANCHO_PUERTA, 2.0, 0.14, pronto ? 0x9AA9B8 : (m.tipo === 'juego' ? 0x3FA7C6 : 0xF4F7FA), x, y + 1.0, 0.05, g);
     caja(ANCHO_PUERTA + 0.18, 0.12, 0.2, 0xffffff, x, y + 2.05, 0.06, g);
     p.userData = { tipo: 'puerta', area: a.id, i }; tocables.push(p);
     return { m, p, ancla: new THREE.Vector3(x, y + 2.15, 0.1) };
   });
-  const frente = new THREE.Vector3(0, 0, 3.2).applyQuaternion(g.quaternion).add(g.position);   // punto de llegada del muñequito
-  ED[a.id] = { a, g, ancho, alto, puertas, frente, techo: new THREE.Vector3(0, alto + 0.8, -1) };
+  // seguridad en la fachada: poste izquierdo con señales y extintor a la derecha
+  const izq = new THREE.Vector3(-ancho / 2 - 0.55, 0, 0.7).applyMatrix4(g.matrixWorld), der = new THREE.Vector3(ancho / 2 + 0.55, 0, 0.7).applyMatrix4(g.matrixWorld);
+  const ry = Math.atan2(-pos.x, -pos.z);   // de frente hacia la plaza (no usar g.rotation.y: lookAt puede dar ángulos de Euler con x = z = π)
+  poste(a.senales, izq.x, izq.z, ry); extintor(der.x, der.z, ry);
+  // la señal de salida apunta hacia el lado del poste (lejos de las puertas)
+  const frente = new THREE.Vector3(0, 0, 3.4).applyMatrix4(g.matrixWorld);
+  ED[a.id] = { a, g, ancho, alto, puertas, frente, techo: new THREE.Vector3(0, alto + 0.9, -1) };
 });
+// cuarto de máquinas (prohibido el paso / riesgo eléctrico)
+{ const p = polar(162, 31); const g = new THREE.Group(); g.position.copy(p); g.lookAt(0, 0, 0); scene.add(g); caja(3, 2.6, 2.4, 0x90A4AE, 0, 1.3, 0, g);
+  senal('no_paso', 0.6, -0.6, 1.6, 1.22, 0, g); senal('electrico', 0.62, 0.6, 1.6, 1.22, 0, g); }
 
-// ============================================================================ MUÑEQUITO
-const yo = new THREE.Group(); scene.add(yo);
-const piel = 0xE0B48F, camisa = 0x154F90, pantalon = 0x0E3A6B;
-const mk = (geo, c, x, y, z, p = yo) => { const m = new THREE.Mesh(geo, M(c)); m.position.set(x, y, z); p.add(m); return m; };
-const torso = mk(new THREE.CapsuleGeometry(0.28, 0.5, 6, 14), camisa, 0, 1.05, 0);
-mk(new THREE.SphereGeometry(0.24, 20, 16), piel, 0, 1.68, 0);
-mk(new THREE.SphereGeometry(0.25, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), 0x3B2A1E, 0, 1.72, -0.02);   // cabello
-const pecho = new THREE.Mesh(new THREE.PlaneGeometry(0.26, 0.27), new THREE.MeshBasicMaterial({ map: logoTx })); pecho.position.set(0, 1.12, 0.285); yo.add(pecho);
-function extremidad(x, y, c, largo, r) { const piv = new THREE.Group(); piv.position.set(x, y, 0); yo.add(piv); mk(new THREE.CapsuleGeometry(r, largo, 4, 10), c, 0, -largo / 2 - r, 0, piv); return piv; }
-const brazoI = extremidad(-0.36, 1.35, camisa, 0.42, 0.08), brazoD = extremidad(0.36, 1.35, camisa, 0.42, 0.08);
-const piernaI = extremidad(-0.13, 0.66, pantalon, 0.42, 0.1), piernaD = extremidad(0.13, 0.66, pantalon, 0.42, 0.1);
+// ============================================================================ AVATAR PROPIO
+let perfil = Avatar.cargar();
+let yo = null, animYo = null; const pecho = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.23), new THREE.MeshBasicMaterial({ map: logoCERS }));
+function vestir() { const pos = yo ? yo.position.clone() : INICIO.clone(), ry = yo ? yo.rotation.y : Math.PI, vis = yo ? yo.visible : true;
+  if (yo) scene.remove(yo); const a = Avatar.construir(THREE, perfil); yo = a.grupo; animYo = a.animar; yo.position.copy(pos); yo.rotation.y = ry; yo.visible = vis;
+  if (!['saco', 'overol'].includes(perfil.superior)) { pecho.position.copy(yo.userData.pecho); pecho.position.x = 0.1; yo.add(pecho); } scene.add(yo); }
+vestir();
 const marca = new THREE.Mesh(new THREE.RingGeometry(0.35, 0.48, 32), new THREE.MeshBasicMaterial({ color: 0x3FA7C6, transparent: true, opacity: .9 }));
 marca.rotation.x = -Math.PI / 2; marca.visible = false; scene.add(marca);
-yo.position.copy(INICIO); yo.rotation.y = Math.PI;
 
 // ============================================================================ ESTADO Y NAVEGACIÓN
 const $ = s => document.querySelector(s);
-let destino = null, alLlegar = null, dentro = null, camModo = 'seguir', fase = 0;
+let destino = null, alLlegar = null, dentro = null, camModo = 'seguir', fase = 0; const pila = [];
 const OFFSET = new THREE.Vector3(0, 8.5, 10);
 const tweens = [];
 const mover = (v, a, ms) => new Promise(res => tweens.push({ v, de: v.clone(), a: a.clone(), t0: performance.now(), ms, res }));
-function limitar(p) { p.x = THREE.MathUtils.clamp(p.x, -LIM.x, LIM.x); p.z = THREE.MathUtils.clamp(p.z, LIM.zMin, LIM.zMax); return p; }
-function caminarA(p, cb) { destino = limitar(p.clone()); destino.y = 0; alLlegar = cb || null; marca.position.set(destino.x, 0.03, destino.z); marca.visible = true; $('#ayuda').style.display = 'none'; }
+function limitar(p) { const r = Math.hypot(p.x, p.z); if (r > R_CAMINA) { p.x *= R_CAMINA / r; p.z *= R_CAMINA / r; } return p; }
+function recordar() { const u = pila[pila.length - 1]; if (!u || u.distanceTo(yo.position) > 2) pila.push(yo.position.clone()); if (pila.length > 20) pila.shift(); }
+function caminarA(p, cb, guardar = true) { if (guardar) recordar(); destino = limitar(p.clone()); destino.y = 0; alLlegar = cb || null; marca.position.set(destino.x, 0.03, destino.z); marca.visible = true; $('#ayuda').style.display = 'none'; }
 function irAEdificio(id) { if (dentro) return; const e = ED[id]; caminarA(e.frente, () => entrarEdificio(id)); aviso(`Caminando a ${e.a.icono} ${e.a.nombre}…`); }
 async function entrarEdificio(id) {
   const e = ED[id]; dentro = id; camModo = 'edificio'; history.replaceState(null, '', '?mundo=' + id + (QA ? '&qa' : ''));
   yo.lookAt(e.g.position.x, 0, e.g.position.z);
-  // encuadre de la fachada según el ancho/alto del edificio y la pantalla
   const hfov = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect), vfov = THREE.MathUtils.degToRad(camera.fov);
-  const dist = Math.max((e.ancho / 2 + 0.6) / Math.tan(hfov / 2), (e.alto / 2 + 1.6) / Math.tan(vfov / 2), 6);
+  const dist = Math.max((e.ancho / 2 + 1.4) / Math.tan(hfov / 2), (e.alto / 2 + 1.6) / Math.tan(vfov / 2), 6);
   const centro = new THREE.Vector3(0, e.alto / 2 - (camera.aspect < 1 ? 1.4 : 0.2), 0).applyQuaternion(e.g.quaternion).add(e.g.position);
   const pos = new THREE.Vector3(0, e.alto / 2 + 0.6, dist).applyQuaternion(e.g.quaternion).add(e.g.position);
   controls.enabled = false;
@@ -176,86 +366,188 @@ async function entrarEdificio(id) {
   if (dentro !== id) return; yo.visible = false;
   $('#dTit').innerHTML = `${e.a.icono} ${e.a.nombre}<small>Toca una puerta para entrar · ${e.a.desc}</small>`; $('#dentro').style.display = 'flex';
 }
-function salirEdificio() {
+function salirEdificio(rapido) {
   if (!dentro) return; const e = ED[dentro]; dentro = null; yo.visible = true; $('#dentro').style.display = 'none'; history.replaceState(null, '', location.pathname + (QA ? '?qa' : ''));
-  const atras = e.frente.clone().sub(e.g.position).setY(0).normalize().multiplyScalar(2.5);
   camModo = 'volver'; controls.enabled = true;
+  if (rapido) { camModo = 'seguir'; return; }
+  const atras = e.frente.clone().sub(e.g.position).setY(0).normalize().multiplyScalar(2.5);
   Promise.all([mover(camera.position, yo.position.clone().add(OFFSET), 800), mover(controls.target, yo.position.clone().setY(1), 800)])
-    .then(() => { camModo = 'seguir'; caminarA(e.frente.clone().add(atras)); });
+    .then(() => { camModo = 'seguir'; caminarA(e.frente.clone().add(atras), null, false); });
 }
+function reiniciar() { salirEdificio(true); tweens.length = 0; destino = null; marca.visible = false; pila.length = 0; controls.enabled = true; camModo = 'seguir';
+  yo.position.copy(INICIO); yo.rotation.y = Math.PI; camera.position.copy(INICIO).add(OFFSET); controls.target.copy(INICIO).setY(1); $('#ayuda').style.display = 'block'; aviso('Regresaste al inicio del campus.'); }
+function atras() { if (dentro) return salirEdificio(); const p = pila.pop(); if (!p) return aviso('Ya estás en el punto de partida. Usa ↺ Inicio para reiniciar.'); caminarA(p, null, false); aviso('Regresando al lugar anterior…'); }
 function entrar(m) {
   if (m.estado === 'pronto') return aviso(`🚧 "${m.titulo}" estará disponible cuando se imparta su curso.`);
+  if (!Acceso.puede(m.puerta)) return Acceso.bloquear({ titulo: `${m.icono} ${m.titulo}`, puerta: m.puerta });
   $('#fundido').style.opacity = 1; setTimeout(() => location.href = m.url, 450);
 }
-function aviso(t) { const a = $('#aviso'); a.textContent = t; a.style.display = 'block'; clearTimeout(a._t); a._t = setTimeout(() => a.style.display = 'none', 2400); }
-$('#bSalirEdif').onclick = salirEdificio;
-$('#bInicio').onclick = () => { if (dentro) { salirEdificio(); setTimeout(() => caminarA(INICIO), 900); } else caminarA(INICIO); };
-$('#bAyuda').onclick = () => { const a = $('#ayuda'); a.style.display = a.style.display === 'none' ? 'block' : 'none'; };
+const abrirInfo = () => { $('#fundido').style.opacity = 1; setTimeout(() => location.href = INFO_URL, 350); };
+AREAS.forEach(a => a.modulos.forEach(m => m.puerta = Acceso.idPuerta(a.id, m.url || '')));
+function aviso(t) { const a = $('#aviso'); a.textContent = t; a.style.display = 'block'; clearTimeout(a._t); a._t = setTimeout(() => a.style.display = 'none', 2600); }
+function modal(html) { $('#mCont').innerHTML = html + '<br><button class="prim" id="mCerrar">Cerrar</button>'; $('#modal').style.display = 'flex'; $('#mCerrar').onclick = () => $('#modal').style.display = 'none'; }
+$('#modal').onclick = e => { if (e.target.id === 'modal') $('#modal').style.display = 'none'; };
+function fichaSenal(id) { const s = Senales.POR_ID[id];
+  modal(`<h2>${s.nombre}</h2><img class="senal" src="${Senales.dataURL(id, 256)}" alt="${s.nombre}"><p><b>Tipo:</b> ${s.tipo}</p><p>${s.significado}</p>
+    <p class="fuente">Fuente: ${s.norma}. Colores: rojo = alto, prohibición y equipo contra incendio; amarillo = precaución; verde = condición segura y primeros auxilios; azul = obligación (NOM-026-STPS-2008, Tabla 1; NOM-003-SEGOB-2011, 6.2).</p>`); }
+$('#bSalirEdif').onclick = () => salirEdificio();
+$('#bAtras').onclick = atras; $('#bReiniciar').onclick = reiniciar;
+$('#bInfo').onclick = abrirInfo;
+$('#bAyuda').onclick = () => modal(`<h2>❔ Cómo moverte</h2><p>• Toca el piso para caminar; toca un edificio para ir y entrar; dentro, toca una puerta.<br>• En computadora: flechas o W A S D; arrastra para girar la vista y usa la rueda para acercar.<br>
+  • <b>⬅ Atrás</b> regresa al lugar anterior (o sale del edificio). <b>↺ Inicio</b> te lleva a la entrada. <b>🚪 Salir</b> vuelve a la pantalla de inicio.<br>• Toca las señales, extintores e hidrantes para aprender qué significan (NOM-026-STPS-2008 y NOM-003-SEGOB-2011).<br>
+  • Sigue las flechas verdes del piso: llevan al <b>punto de reunión</b>.<br>• <b>🔗 Compartir</b> genera el enlace y el QR de este edificio o del campus.</p>`);
+$('#bComp').onclick = () => dentro ? compartirEdif() : Compartir.abrir(Compartir.url('index.html'), 'Campus de Simulación SST');
+const compartirEdif = () => { const e = ED[dentro]; Compartir.abrir(Compartir.url('index.html?mundo=' + e.a.id), `${e.a.icono} ${e.a.nombre} · Campus de Simulación SST`); };
+$('#bCompEdif').onclick = compartirEdif;
 
-// Etiquetas HTML (legibles en cualquier pantalla): nombre de cada edificio y, dentro, de cada puerta
+// Etiquetas HTML: edificios, puertas y jugadores
 const capa = $('#etiquetas'); const etqEd = {}, etqPu = [];
 AREAS.forEach(a => {
-  const d = document.createElement('div'); d.className = 'etq edif'; d.textContent = `${a.icono} ${a.nombre}`; d.onclick = () => irAEdificio(a.id); capa.appendChild(d); etqEd[a.id] = d;
+  const d = document.createElement('div'); d.className = 'etq edif'; d.style.setProperty('--c', '#' + a.color.toString(16).padStart(6, '0')); d.textContent = `${a.icono} ${a.nombre}`; d.onclick = () => irAEdificio(a.id); capa.appendChild(d); etqEd[a.id] = d;
   ED[a.id].puertas.forEach(pu => { const el = document.createElement('div'); const m = pu.m;
     el.className = `etq puerta ${m.estado === 'pronto' ? 'pronto' : m.tipo === 'juego' ? 'juego' : ''}`; el.style.display = 'none';
-    el.innerHTML = `<span class="i">${m.icono}</span>${m.titulo}<span class="t">${m.estado === 'pronto' ? 'PRÓXIMAMENTE' : m.tipo === 'juego' ? 'JUEGO' : 'SIMULADOR 3D'}</span>`;
     el.onclick = () => entrar(m); capa.appendChild(el); etqPu.push({ area: a.id, el, pu }); });
 });
+// Etiquetas de puertas: candado si el código de acceso no incluye esa puerta
+function pintarPuertas() { etqPu.forEach(({ el, pu }) => { const m = pu.m, libre = m.estado === 'pronto' || Acceso.puede(m.puerta);
+  el.classList.toggle('candado', !libre);
+  el.innerHTML = `<span class="i">${libre ? m.icono : '🔒'}</span>${m.titulo}<span class="t">${m.estado === 'pronto' ? 'PRÓXIMAMENTE' : !libre ? 'SOLICITAR ACCESO' : m.tipo === 'juego' ? 'JUEGO' : 'SIMULADOR 3D'}</span>`; }); }
+pintarPuertas();
+Acceso.listo.then(() => { pintarPuertas(); $('#accEstado').innerHTML = Acceso.textoEstado() + (Acceso.estado.modo === 'publico' ? ` · <a href="${Acceso.whatsapp('Hola, solicito acceso a la plataforma Campus de Simulación SST.')}" target="_blank" rel="noopener">💬 Pedir acceso por WhatsApp</a>` : ''); });
 const v = new THREE.Vector3();
 function proyectar(p3, el) { v.copy(p3).project(camera); const vis = v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1;
   el.style.visibility = vis ? 'visible' : 'hidden'; if (vis) { el.style.left = (v.x + 1) / 2 * innerWidth + 'px'; el.style.top = (1 - v.y) / 2 * innerHeight + 'px'; } }
 function actualizarEtiquetas() {
   AREAS.forEach(a => { const el = etqEd[a.id]; el.style.display = dentro ? 'none' : 'block'; if (!dentro) proyectar(ED[a.id].techo.clone().applyMatrix4(ED[a.id].g.matrixWorld), el); });
   let anchoPx = 110;
-  if (dentro) { const e = ED[dentro]; const a0 = e.puertas[0].ancla;   // ancho disponible por puerta en pantalla
+  if (dentro) { const e = ED[dentro]; const a0 = e.puertas[0].ancla;
     const a1 = a0.clone().applyMatrix4(e.g.matrixWorld).project(camera), a2 = a0.clone().setX(a0.x + PASO_PUERTA).applyMatrix4(e.g.matrixWorld).project(camera);
     anchoPx = Math.max(64, Math.min(150, Math.abs(a2.x - a1.x) / 2 * innerWidth - 6)); }
   etqPu.forEach(({ area, el, pu }) => { const on = dentro === area && camModo === 'edificio'; el.style.display = on ? 'block' : 'none';
     if (on) { el.style.setProperty('--w', anchoPx + 'px'); el.style.setProperty('--fs', (anchoPx < 85 ? .72 : anchoPx < 110 ? .82 : .92) + 'rem'); proyectar(pu.ancla.clone().applyMatrix4(ED[area].g.matrixWorld), el); } });
+  OTROS.forEach(o => { o.el.style.display = dentro ? 'none' : 'block'; if (!dentro) proyectar(o.g.position.clone().setY(2.25), o.el); });
 }
 
-// Toques y clic: piso = caminar; edificio = ir y entrar; puerta (dentro) = abrir sub-mundo
+// Toques y clic: piso = caminar; edificio = ir y entrar; puerta (dentro) = abrir; señal = ficha
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let abajo = null;
 renderer.domElement.addEventListener('pointerdown', e => abajo = [e.clientX, e.clientY]);
 renderer.domElement.addEventListener('pointerup', e => {
   if (!abajo || Math.hypot(e.clientX - abajo[0], e.clientY - abajo[1]) > 10) return;
   ptr.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ptr, camera);
-  const h = ray.intersectObjects([...tocables, plaza, suelo], false)[0]; if (!h) return; const u = h.object.userData;
+  const h = ray.intersectObjects([...tocables, ...pisos], false)[0]; if (!h) return; const u = h.object.userData;
+  if (u.tipo === 'senal') return fichaSenal(u.id);
+  if (u.tipo === 'info') return abrirInfo();
+  if (u.tipo === 'imagen') return modal(`<h2>${u.titulo}</h2><img src="${u.src}" style="width:100%;max-width:420px;display:block;margin:auto;border-radius:12px">`);
   if (dentro) { if (u.tipo === 'puerta' && u.area === dentro) entrar(AREAS.find(a => a.id === u.area).modulos[u.i]); return; }
   if (u.tipo === 'edificio' || u.tipo === 'puerta') return irAEdificio(u.area);
   if (u.piso) caminarA(h.point);
 });
-// Teclado (computadora)
-const teclas = new Set(); addEventListener('keydown', e => { teclas.add(e.key.toLowerCase()); if (e.key === 'Escape') salirEdificio(); }); addEventListener('keyup', e => teclas.delete(e.key.toLowerCase()));
+const teclas = new Set(); addEventListener('keydown', e => { if (e.target.tagName === 'INPUT') return; teclas.add(e.key.toLowerCase()); if (e.key === 'Escape') salirEdificio(); }); addEventListener('keyup', e => teclas.delete(e.key.toLowerCase()));
 addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (dentro && camModo === 'edificio') entrarEdificio(dentro); });
+
+// ============================================================================ MULTIJUGADOR (servidor de aula en el mismo wifi)
+// Funciona cuando el campus se abre desde `python 05_herramientas/servidor_aula.py <curso>`: cada celular envía su
+// nombre, avatar y posición a /api/sala y recibe a los demás. Sin servidor (GitHub Pages / doble clic) = modo individual.
+// Dos formas: (1) AULA: servidor de aula en el mismo wifi (/api/sala). (2) EN LÍNEA: sala con código por internet
+// (SalaLinea, WebRTC con PeerJS: gratis y sin cuentas; la persona que crea la sala la mantiene abierta).
+const MP = { activo: false, modo: '', id: sessionStorage.getItem('mp_id') || Math.random().toString(36).slice(2, 10) }; sessionStorage.setItem('mp_id', MP.id);
+const OTROS = new Map();
+const miEstado = () => ({ id: MP.id, perfil: Avatar.limpiar(perfil), x: +yo.position.x.toFixed(2), z: +yo.position.z.toFixed(2), ry: +yo.rotation.y.toFixed(2), lugar: dentro || 'plaza', andando: !!destino || teclas.size > 0 });
+function procesarJugadores(lista) {
+  const vistos = new Set();
+  lista.filter(j => j && j.id && j.id !== MP.id).forEach(j => { vistos.add(j.id); let o = OTROS.get(j.id); const firma = JSON.stringify(j.perfil);
+    if (!o || o.firma !== firma) { if (o) { scene.remove(o.g); o.el.remove(); } const a = Avatar.construir(THREE, j.perfil || {}); const el = document.createElement('div'); el.className = 'etq jug'; capa.appendChild(el);
+      o = { g: a.grupo, animar: a.animar, el, firma, fase: 0 }; o.g.position.set(+j.x || 0, 0, +j.z || 0); scene.add(o.g); OTROS.set(j.id, o); }
+    o.meta = new THREE.Vector3(+j.x || 0, 0, +j.z || 0); o.ry = +j.ry || 0; o.andando = j.andando; o.lugar = String(j.lugar || 'plaza'); o.nombre = String((j.perfil || {}).nombre || 'Participante').slice(0, 30);
+    o.el.textContent = o.nombre + (o.lugar !== 'plaza' ? ` · en ${(AREAS.find(a => a.id === o.lugar) || {}).nombre || o.lugar}` : ''); });
+  OTROS.forEach((o, id) => { if (!vistos.has(id)) { scene.remove(o.g); o.el.remove(); OTROS.delete(id); } });
+  $('#nJug').textContent = OTROS.size + 1;
+}
+async function mpTick() {
+  if (window.SalaLinea && SalaLinea.activa()) { SalaLinea.enviar(miEstado()); procesarJugadores(SalaLinea.jugadores()); if (!MP.activo || MP.modo !== 'linea') { MP.activo = true; MP.modo = 'linea'; estadoMP(); } return; }
+  if (MP.sinAula || !location.protocol.startsWith('http')) return;
+  try {
+    const r = await fetch('/api/sala', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(miEstado()) });
+    if (!r.ok) throw 0; const d = await r.json(); if (!MP.activo) { MP.activo = true; MP.modo = 'aula'; estadoMP(); }
+    procesarJugadores(d.jugadores); MP.fallas = 0;
+  } catch (e) { MP.fallas = (MP.fallas || 0) + 1;   // sin servidor de aula: deja de preguntar (modo individual)
+    if (!MP.activo || MP.fallas > 6) { MP.sinAula = true; if (MP.activo) { MP.activo = false; estadoMP(); } } }
+}
+function estadoMP() { $('#mpEstado').innerHTML = MP.activo ? (MP.modo === 'linea' ? `🌐 <b>Sala en línea ${SalaLinea.codigo()}</b>: los demás verán tu nombre y avatar.` : `👥 <b>Multijugador del aula activo</b>: los demás verán tu nombre y avatar.`)
+  : `👤 <b>Modo individual.</b> Para jugar en grupo usa 👥: sala en línea con código, o el servidor de aula en el mismo wifi.`; }
+setTimeout(() => { estadoMP(); }, 1500); mpTick(); MP.timer = setInterval(mpTick, 700);
+function panelJugadores() {
+  const lista = MP.activo ? `<p>Conectados: <b>${OTROS.size + 1}</b></p><ul><li><b>${perfil.nombre || 'Tú'}</b> (tú)</li>${[...OTROS.values()].map(o => `<li>${o.nombre}${o.lugar !== 'plaza' ? ' · ' + o.lugar : ''}</li>`).join('')}</ul>` : '<p>Estás en <b>modo individual</b>.</p>';
+  const enLinea = window.SalaLinea && SalaLinea.activa();
+  modal(`<h2>👥 Jugar en grupo</h2>${lista}
+    <h3>🌐 Sala en línea (por internet)</h3>${enLinea ? `<p>Estás en la sala <b>${SalaLinea.codigo()}</b>${SalaLinea.soyAnfitrion() ? ' (tú la creaste: mantén esta pantalla abierta)' : ''}.</p><button class="prim" id="bInvitar">🔗 Invitar (enlace y QR)</button> <button class="sec" id="bDejar">Salir de la sala</button>`
+      : `<p>Crea una sala y comparte el código o el QR; cada persona entra con su nombre y avatar. Gratis y sin cuentas (conexión directa entre dispositivos).</p><button class="prim" id="bCrear">Crear sala</button> <input id="codSala" placeholder="Código" maxlength="6" style="width:110px;padding:9px;border-radius:10px;border:1px solid #8CCDE0;text-transform:uppercase"> <button class="sec" id="bUnir">Unirme</button>`}
+    <h3>🏫 En el aula (mismo wifi)</h3><p>La persona instructora abre <code>Abrir_campus_en_aula.bat</code> (o <code>python 05_herramientas/servidor_aula.py 03_cursos/&lt;curso&gt;</code>) y todos escanean el QR del campus en <code>/aula</code>.</p>`);
+  const q = id => document.getElementById(id);
+  if (q('bCrear')) q('bCrear').onclick = async () => { try { await SalaLinea.crear(); $('#modal').style.display = 'none'; mpTick(); aviso(`Sala ${SalaLinea.codigo()} creada. Invita con 👥 → Invitar.`); } catch (e) { aviso('No se pudo crear la sala: ' + e.message); } };
+  if (q('bUnir')) q('bUnir').onclick = async () => { try { await SalaLinea.unir(q('codSala').value); $('#modal').style.display = 'none'; mpTick(); aviso('Te uniste a la sala ' + SalaLinea.codigo()); } catch (e) { aviso('No se pudo unir: ' + e.message); } };
+  if (q('bInvitar')) q('bInvitar').onclick = () => Compartir.abrir(Compartir.url('index.html?sala=' + SalaLinea.codigo()), `Únete a mi sala ${SalaLinea.codigo()} en el Campus SST`);
+  if (q('bDejar')) q('bDejar').onclick = () => { SalaLinea.salir(); MP.activo = false; procesarJugadores([]); estadoMP(); $('#modal').style.display = 'none'; };
+}
+$('#bJug').onclick = panelJugadores;
+if (P.get('sala') && window.SalaLinea) SalaLinea.unir(P.get('sala')).then(() => aviso('Te uniste a la sala ' + SalaLinea.codigo())).catch(e => aviso('No se pudo unir a la sala: ' + e.message));
+
+// ============================================================================ PANTALLA DE INICIO (nombre + avatar)
+const pr = { r: new THREE.WebGLRenderer({ canvas: $('#prev'), antialias: true, alpha: true }), s: new THREE.Scene(), c: new THREE.PerspectiveCamera(35, 1, 0.1, 20), g: null, activo: false };
+pr.s.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.3)); const sp = new THREE.DirectionalLight(0xffffff, 1.2); sp.position.set(2, 3, 4); pr.s.add(sp);
+pr.c.position.set(0, 1.25, 4.1); pr.c.lookAt(0, 0.95, 0);
+const base = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.06, 32), M(0x8CCDE0)); base.position.y = -0.03; pr.s.add(base);
+function previa() { if (pr.g) pr.s.remove(pr.g); pr.g = Avatar.construir(THREE, perfil).grupo; pr.s.add(pr.g); }
+function tamPrevia() { const c = $('#prev'); pr.r.setPixelRatio(Math.min(devicePixelRatio, 2)); pr.r.setSize(c.clientWidth, c.clientHeight, false); pr.c.aspect = c.clientWidth / c.clientHeight; pr.c.updateProjectionMatrix(); }
+const ed = Avatar.editor($('#editorAv'), (p, soloNombre) => { perfil = p; if (!soloNombre) previa(); });
+$('#bInfo2').onclick = abrirInfo;
+$('#bCodigo').onclick = () => Acceso.bloquear({ titulo: 'Activar mi código de acceso' });
+function abrirInicio() { salirEdificio(true); $('#inicio').style.display = 'block'; pr.activo = true; previa(); tamPrevia(); estadoMP(); }
+function cerrarInicio() { perfil = ed.perfil(); if (!perfil.nombre.trim()) { aviso('Escribe tu nombre para entrar.'); $('#avNombre').focus(); return; }
+  Avatar.guardar(perfil); vestir(); $('#inicio').style.display = 'none'; pr.activo = false; sessionStorage.setItem('campus_entro', '1'); aviso(`¡Bienvenida/o, ${perfil.nombre}!`); }
+$('#bEntrar').onclick = cerrarInicio;
+$('#bAleatorio').onclick = () => { const r = l => l[Math.floor(Math.random() * l.length)], O = Avatar.OPC;
+  perfil = { ...perfil, sexo: r(O.sexo)[0], piel: r(O.piel), cabello: r(O.cabello), superior: r(O.superior)[0], colorSup: r(O.colores), pantalon: r(O.colores), zapatos: r(O.zapatos), lentes: Math.random() < .3, gorra: Math.random() < .3, casco: false };
+  Avatar.guardar(perfil); Avatar.editor($('#editorAv'), (p, s) => { perfil = p; if (!s) previa(); }); previa(); };
+$('#bAvatar').onclick = abrirInicio;
+$('#bSalir').onclick = () => { sessionStorage.removeItem('campus_entro'); abrirInicio(); };
+addEventListener('resize', () => pr.activo && tamPrevia());
 
 // ============================================================================ CICLO
 const reloj = new THREE.Clock(); const prev = new THREE.Vector3();
 renderer.setAnimationLoop(() => {
-  const dt = Math.min(0.05, reloj.getDelta()), ahora = performance.now();
-  for (let i = tweens.length - 1; i >= 0; i--) { const t = tweens[i]; const k = Math.min(1, (ahora - t.t0) / t.ms); const ee = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-    t.v.lerpVectors(t.de, t.a, ee); if (k >= 1) { tweens.splice(i, 1); t.res(); } }
+  const dt = Math.min(0.05, reloj.getDelta()), ahora = performance.now(), t = reloj.elapsedTime;
+  if (pr.activo) { if (pr.g) pr.g.rotation.y = t * 0.6; pr.r.render(pr.s, pr.c); return; }
+  for (let i = tweens.length - 1; i >= 0; i--) { const tw = tweens[i]; const k = Math.min(1, (ahora - tw.t0) / tw.ms); const ee = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    tw.v.lerpVectors(tw.de, tw.a, ee); if (k >= 1) { tweens.splice(i, 1); tw.res(); } }
   prev.copy(yo.position);
   if (!dentro && teclas.size) { const f = new THREE.Vector3(); camera.getWorldDirection(f); f.y = 0; f.normalize(); const r = new THREE.Vector3(-f.z, 0, f.x); const d = new THREE.Vector3();
     if (teclas.has('w') || teclas.has('arrowup')) d.add(f); if (teclas.has('s') || teclas.has('arrowdown')) d.sub(f);
     if (teclas.has('d') || teclas.has('arrowright')) d.add(r); if (teclas.has('a') || teclas.has('arrowleft')) d.sub(r);
-    if (d.lengthSq()) { destino = null; marca.visible = false; $('#ayuda').style.display = 'none'; d.normalize(); limitar(yo.position.addScaledVector(d, 4 * dt)); yo.rotation.y = Math.atan2(d.x, d.z); } }
+    if (d.lengthSq()) { destino = null; marca.visible = false; $('#ayuda').style.display = 'none'; d.normalize(); limitar(yo.position.addScaledVector(d, 4.5 * dt)); yo.rotation.y = Math.atan2(d.x, d.z); } }
   if (destino) { const d = destino.clone().sub(yo.position); d.y = 0; const L = d.length();
     if (L < 0.08) { destino = null; marca.visible = false; const cb = alLlegar; alLlegar = null; cb && cb(); }
-    else { d.normalize(); yo.position.addScaledVector(d, Math.min(L, 4.2 * dt)); yo.rotation.y = Math.atan2(d.x, d.z); } }
+    else { d.normalize(); yo.position.addScaledVector(d, Math.min(L, 5 * dt)); yo.rotation.y = Math.atan2(d.x, d.z); } }
   obstaculos.forEach(o => { const dx = yo.position.x - o.x, dz = yo.position.z - o.z, dd = Math.hypot(dx, dz); if (dd < o.r + 0.3 && dd > 0) { yo.position.x = o.x + dx / dd * (o.r + 0.3); yo.position.z = o.z + dz / dd * (o.r + 0.3); } });
-  const andando = yo.position.distanceToSquared(prev) > 1e-6; fase += andando ? dt * 10 : 0;
-  const s = andando ? Math.sin(fase) * 0.6 : 0; brazoI.rotation.x = s; brazoD.rotation.x = -s; piernaI.rotation.x = -s; piernaD.rotation.x = s; torso.position.y = 1.05 + (andando ? Math.abs(Math.sin(fase)) * 0.04 : 0);
+  const andando = yo.position.distanceToSquared(prev) > 1e-6; fase += andando ? dt * 10 : 0; animYo(fase, andando);
+  OTROS.forEach(o => { if (!o.meta) return; const d = o.meta.clone().sub(o.g.position); const mov = d.length() > 0.02; o.g.position.lerp(o.meta, Math.min(1, dt * 6)); o.g.rotation.y = o.ry; o.g.visible = o.lugar === 'plaza';
+    o.fase += mov ? dt * 10 : 0; o.animar(o.fase, mov); });
   if (camModo === 'seguir') { const delta = yo.position.clone().sub(prev); camera.position.add(delta); controls.target.add(delta); }
-  marca.rotation.z += dt * 2; placaLogo.rotation.y = Math.sin(reloj.elapsedTime * 0.6) * 0.15;
+  // agua de la fuente
+  for (let i = 0; i < gotas; i++) { const k = (gfase[i] + t * 0.55) % 1, r = k * 2.4, a = gdir[i]; gp[i * 3] = Math.cos(a) * r; gp[i * 3 + 1] = 1.4 * k - 3.2 * k * k * 1.5 + 0.2; gp[i * 3 + 2] = Math.sin(a) * r; }
+  gGeo.attributes.position.needsUpdate = true;
+  marca.rotation.z += dt * 2; escultura.rotation.y = t * 0.35;
   controls.update(); renderer.render(scene, camera); actualizarEtiquetas();
 });
 
 // ============================================================================ INICIO
 camera.position.copy(INICIO).add(OFFSET); controls.target.copy(INICIO).setY(1);
-const pedido = new URLSearchParams(location.search).get('mundo');
+const pedido = P.get('mundo');
 if (pedido && ED[pedido]) { yo.position.copy(ED[pedido].frente); $('#ayuda').style.display = 'none'; camera.position.copy(yo.position).add(OFFSET); controls.target.copy(yo.position).setY(1); entrarEdificio(pedido); }
-if (QA) window.__qa = { AREAS, ED, irAEdificio, salirEdificio, entrar: (a, i) => entrar(AREAS.find(x => x.id === a).modulos[i]), yo, caminarA: (x, z) => caminarA(new THREE.Vector3(x, 0, z)), estado: () => ({ dentro, camModo, pos: yo.position.toArray().map(n => +n.toFixed(2)) }) };
+if (P.has('salir') || (!pedido && !P.has('plaza') && !sessionStorage.getItem('campus_entro') && !QA) || (!perfil.nombre && !QA)) abrirInicio();
+if (P.has('salir') || P.has('plaza')) history.replaceState(null, '', location.pathname + (QA ? '?qa' : ''));
+if (QA) window.__qa = { AREAS, ED, camera, controls, irAEdificio, salirEdificio, atras, reiniciar, abrirInicio, cerrarInicio, fichaSenal, entrar: (a, i) => entrar(AREAS.find(x => x.id === a).modulos[i]), yo: () => yo, caminarA: (x, z) => caminarA(new THREE.Vector3(x, 0, z)),
+  estado: () => ({ dentro, camModo, pila: pila.length, mp: MP.activo, otros: OTROS.size, pos: yo.position.toArray().map(n => +n.toFixed(2)) }) };
 </script>
 </body>
 </html>
