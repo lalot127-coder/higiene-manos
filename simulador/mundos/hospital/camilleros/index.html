@@ -41,11 +41,12 @@
   @media print{#barra,#panel,canvas,#toast{display:none!important}.modal{position:static;background:none}.tarjeta{max-height:none}}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script src="../../../motor/acceso.js"></script><script>addEventListener('load', () => Acceso.proteger('🛏️ Camilleros: traslado seguro', '../../../index.html?mundo=hospital'));</script>
 </head>
 <body>
 <div id="barra">
   <img src="../../../recursos/logo_CERS.jpeg" alt="CERS" style="height:34px;border-radius:7px;background:#fff;padding:2px"><b>🏥 Hospital · Camilleros</b><span class="chip" id="cPaso">Paso 0/0</span><span class="chip" id="cPts">0 pts</span><span class="chip" id="cTiempo">0:00</span>
-  <div class="der"><button class="sec peq" id="bVista">🎥 Vista</button><button class="sec peq" id="bReini">↺ Reiniciar</button><button class="sec peq salir" id="bSalir">✖ Salir</button></div>
+  <div class="der"><button class="sec peq" id="bAtrasC" title="Regresar al hospital">⬅ Atrás</button><button class="sec peq" id="bVista">🎥 Vista</button><button class="sec peq" id="bReini">↺ Reiniciar</button><button class="sec peq" id="bInicioC" title="Inicio del campus">🏠 Inicio</button><button class="sec peq salir" id="bSalir">✖ Salir</button></div>
 </div>
 <div id="panel"><div class="paso" id="pNum"></div><h2 id="pTit">Cargando…</h2><p id="pTxt"></p><small id="pFuente"></small><div id="acciones"></div></div>
 <div id="toast"></div>
@@ -327,7 +328,8 @@ document.querySelectorAll('.caso').forEach(b=>b.onclick=()=>{document.querySelec
 $('bIni').onclick=()=>{S.nombre=$('nom').value.trim()||'Participante'; $('modal').style.display='none'; preparar(casoSel);};
 $('bRes').onclick=grupo;
 const enPartida=()=>S.t0&&nPaso<pasos.length;
-$('bSalir').onclick=()=>{ if(!enPartida()||confirm('¿Salir del simulador? La partida en curso se cancelará y no se registrará.')) location.href='../../../index.html?mundo=hospital'; };
+const irCampus=q=>()=>{ if(!enPartida()||confirm('¿Salir del simulador? La partida en curso se cancelará y no se registrará.')) location.href='../../../index.html'+q; };
+$('bAtrasC').onclick=irCampus('?mundo=hospital'); $('bInicioC').onclick=irCampus('?plaza'); $('bSalir').onclick=irCampus('?salir');
 $('bReini').onclick=()=>{ if(!enPartida()||confirm('¿Reiniciar? La partida en curso se cancelará.')) location.reload(); };
 cama.add(pac); pac.position.set(0,0.95,0); pose('acostado');
 // Modo de prueba para control de calidad (solo con ?qa en la dirección)
