@@ -26,6 +26,7 @@ canvas{display:block;touch-action:none}
 button{font-family:inherit} .prim{background:var(--azul);color:#fff;border:0;border-radius:12px;padding:11px 18px;font-size:1.02rem;font-weight:700;cursor:pointer}
 .sec{background:var(--hielo);color:var(--navy);border:0;border-radius:12px;padding:11px 16px;font-size:1rem;cursor:pointer}
 .peq{padding:6px 11px;font-size:.9rem}
+@media (max-width:700px){#barra .txt{display:none}#barra .chip{font-size:.8rem;padding:3px 8px}}
 #toast{position:fixed;top:62px;left:50%;transform:translateX(-50%);max-width:min(640px,92vw);padding:12px 16px;border-radius:14px;color:#fff;z-index:10;display:none;box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:1.02rem}
 #toast.ok{background:var(--bien)} #toast.no{background:var(--mal)} #toast.info{background:var(--azul)} #toast small{display:block;opacity:.92;font-style:italic;margin-top:3px}
 .modal{position:fixed;inset:0;background:rgba(14,58,107,.7);display:none;align-items:center;justify-content:center;padding:70px 14px 14px;z-index:8}
@@ -44,15 +45,24 @@ function crearMundo(THREE, OrbitControls, cfg) {
   document.head.insertAdjacentHTML('beforeend', `<style>${CSS}</style>`);
   document.body.insertAdjacentHTML('afterbegin', `
 <div id="barra"><img src="${new URL('../recursos/logo_CERS.jpeg', BASE_MOTOR).href}" alt="CERS" style="height:34px;border-radius:7px;background:#fff;padding:2px"><b>${cfg.icono} ${cfg.titulo}</b><span class="chip" id="cPaso">Paso 0/0</span><span class="chip" id="cPts">0 pts</span><span class="chip" id="cTiempo">0:00</span>
-<div class="der"><button class="sec peq" id="bVista">🎥 Vista</button><button class="sec peq" id="bReini">↺ Reiniciar</button><button class="sec peq salir" id="bCampus">✖ Salir</button></div></div>
+<div class="der"><button class="sec peq" id="bAtrasM" title="Regresar al edificio">⬅<span class="txt"> Atrás</span></button><button class="sec peq" id="bVista" title="Cambiar la vista">🎥<span class="txt"> Vista</span></button><button class="sec peq" id="bReini" title="Reiniciar el caso">↺<span class="txt"> Reiniciar</span></button><button class="sec peq" id="bInicioM" title="Inicio del campus">🏠<span class="txt"> Inicio</span></button><button class="sec peq" id="bCompM" title="Compartir este simulador">🔗</button><button class="sec peq salir" id="bCampus" title="Salir del simulador">✖<span class="txt"> Salir</span></button></div></div>
 <div id="panel"><div class="paso" id="pNum"></div><h2 id="pTit">Cargando…</h2><p id="pTxt"></p><small id="pFuente"></small><div id="acciones"></div></div>
 <div id="toast"></div><div class="modal" id="modal"><div class="tarjeta" id="mCont"></div></div>`);
   const $ = s => document.getElementById(s);
   // Regresa al mundo principal, frente al edificio del área (…/mundos/<area>/<modulo>/index.html)
   const area = (location.pathname.match(/mundos\/([^/]+)\//) || [])[1];
-  const alCampus = () => { location.href = cfg.campus || ('../../../index.html' + (area ? '?mundo=' + area : '')); };
+  const alCampus = (q) => { location.href = cfg.campus || ('../../../index.html' + (q || (area ? '?mundo=' + area : ''))); };
   const enPartida = () => S.t0 && nPaso < pasos.length;
-  $('bCampus').onclick = () => { if (!enPartida() || confirm('¿Salir del simulador? La partida en curso se cancelará y no se registrará.')) alCampus(); };
+  const confirmar = (fn) => () => { if (!enPartida() || confirm('¿Salir del simulador? La partida en curso se cancelará y no se registrará.')) fn(); };
+  $('bAtrasM').onclick = confirmar(() => alCampus());            // al edificio de su área
+  $('bInicioM').onclick = confirmar(() => alCampus('?plaza'));   // a la entrada del campus
+  $('bCampus').onclick = confirmar(() => alCampus('?salir'));    // a la pantalla de inicio (salir)
+  $('bCompM').onclick = () => { const u = new URL(location.href); u.searchParams.delete('qa');
+    if (window.Compartir) Compartir.abrir(u.href, `${cfg.icono} ${cfg.titulo} · Campus SST`); else { navigator.clipboard && navigator.clipboard.writeText(u.href); toast('info', '🔗 Enlace copiado: ' + u.href); } };
+  if (!window.Compartir) { const s = document.createElement('script'); s.src = new URL('compartir.js', BASE_MOTOR).href; document.head.appendChild(s); }
+  // Control de acceso: si se abre con enlace directo sin código vigente para esta puerta, muestra el candado + WhatsApp
+  const proteger = () => Acceso.proteger(`${cfg.icono} ${cfg.titulo}`, new URL('../index.html' + (area ? '?mundo=' + area : ''), BASE_MOTOR).href);
+  if (window.Acceso) proteger(); else { const s = document.createElement('script'); s.src = new URL('acceso.js', BASE_MOTOR).href; s.onload = proteger; document.head.appendChild(s); }
   $('bReini').onclick = () => { if (!enPartida() || confirm('¿Reiniciar? La partida en curso se cancelará.')) location.reload(); };
 
   // ---------------------------------------------------------------- escena
@@ -157,13 +167,13 @@ function crearMundo(THREE, OrbitControls, cfg) {
     try { const a = leer(); a.push(reg); localStorage.setItem(K, JSON.stringify(a)); } catch (e) { }
     $('mCont').innerHTML = `<h2>${aprobado ? '🏆 ¡Lo lograste!' : '💪 Hay que repasar'}</h2>
      <p><b>${S.nombre}</b> · ${cfg.titulo}${S.caso ? ' · ' + S.caso : ''}<br>Puntaje: <b>${S.pts}/${max} (${pct}%)</b> · Errores críticos: <b>${S.criticos}</b> · Tiempo: ${Math.floor(s / 60)} min ${s % 60} s<br>
-     Criterio: ${crit.pct}% o más${crit.sinCriticos ? ' y sin errores críticos' : ''}.</p><p class="ficticio" id="estReg">Enviando a la instructora…</p>
+     Criterio: ${crit.pct}% o más${crit.sinCriticos ? ' y sin errores críticos' : ''}.</p><p class="ficticio" id="estReg">Enviando a la persona instructora…</p>
      ${S.errores.length ? '<table><tr><th>Paso</th><th>Qué pasó</th><th>Fuente</th></tr>' + S.errores.map(e => `<tr><td>${e.paso}</td><td>${e.critico ? '⛔ ' : ''}${e.txt}</td><td>${e.f || ''}</td></tr>`).join('') + '</table>' : '<p>Sin errores. 👏</p>'}
      <br><button class="prim" onclick="location.reload()">Siguiente participante</button> <button class="sec" onclick="print()">Imprimir / PDF</button> <button class="sec" id="bGrupo">Resultados del grupo</button> <button class="sec" id="bVolver2">⬅ Regresar al campus</button>`;
-    $('bVolver2').onclick = alCampus;
+    $('bVolver2').onclick = () => alCampus();
     $('modal').style.display = 'flex'; $('bGrupo').onclick = grupo;
     const ok = await registrar(reg);
-    $('estReg').textContent = ok ? '✅ Resultado registrado en la computadora de la instructora.' : 'Resultado guardado en este dispositivo (sin conexión al aula). Puedes imprimirlo o guardarlo como PDF.';
+    $('estReg').textContent = ok ? '✅ Resultado registrado en la computadora de la persona instructora.' : 'Resultado guardado en este dispositivo (sin conexión al aula). Puedes imprimirlo o guardarlo como PDF.';
   }
   function grupo() {
     const a = leer();
@@ -182,7 +192,8 @@ function crearMundo(THREE, OrbitControls, cfg) {
       <input type="text" id="nom" placeholder="Nombre completo del participante" autocomplete="off">
       <div id="casos" style="display:grid;gap:8px;margin:8px 0">${casos.map((c, i) => `<button class="op ${i ? '' : 'marcada'}" data-c="${c.id}">${c.txt}</button>`).join('')}</div>
       <button class="prim" id="bIni">Comenzar</button> <button class="sec" id="bRes">Resultados del grupo</button> <button class="sec" id="bVolver">⬅ Regresar al campus</button><p class="ficticio">${notaFuentes}</p>`;
-    $('bVolver').onclick = alCampus;
+    $('bVolver').onclick = () => alCampus();
+    try { const pf = JSON.parse(localStorage.getItem('campus_perfil') || '{}'); if (pf.nombre) $('nom').value = pf.nombre; } catch (e) { }   // nombre del avatar del campus
     $('modal').style.display = 'flex';
     document.querySelectorAll('#casos .op').forEach(b => b.onclick = () => { document.querySelectorAll('#casos .op').forEach(x => x.classList.remove('marcada')); b.classList.add('marcada'); sel = b.dataset.c; });
     $('bIni').onclick = () => { S.nombre = $('nom').value.trim() || 'Participante'; $('modal').style.display = 'none'; S.caso = casos.find(c => c.id === sel).txt.replace(/<[^>]+>/g, '');
@@ -191,8 +202,14 @@ function crearMundo(THREE, OrbitControls, cfg) {
   }
   const qa = () => ({ paso: nPaso, titulo: paso && paso.titulo, pts: S.pts, criticos: S.criticos, errores: S.errores.length });
 
-  return { THREE, scene, camera, controls, renderer, M, caja, cil, esfera, capsula, tocable, letrero, mover, resaltar, irVista, cuadro,
+  const api = { THREE, scene, camera, controls, renderer, M, caja, cil, esfera, capsula, tocable, letrero, mover, resaltar, irVista, cuadro,
     toast, bien, mal, botones, pregunta, aviso, siguiente, inicio, qa, tocar, $, estado: () => S };
+  // Modo inmersivo (WebXR) opcional: cfg.xr = { inicio:[x,z], piso, entorno } (ver motor/xr.js). Se puede llamar
+  // también después con api.activarXR({...}) cuando el piso y el entorno ya existen.
+  api.activarXR = (opc) => { const go = () => { api.xr = MotorXR.activar(api, opc || {}); };
+    if (window.MotorXR) go(); else { const s = document.createElement('script'); s.src = new URL('xr.js', BASE_MOTOR).href; s.onload = go; document.head.appendChild(s); } };
+  if (cfg.xr) api.activarXR(cfg.xr);
+  return api;
 }
 
 window.MotorSim = { crearMundo };

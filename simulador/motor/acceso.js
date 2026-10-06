@@ -9,7 +9,7 @@
 //   Acceso.listo → Promise(estado)   Acceso.puede(id)   Acceso.idPuerta(area, url)   Acceso.idPagina()
 //   Acceso.bloquear({titulo, puerta})   Acceso.whatsapp(texto)   Acceso.textoEstado()
 (function () {
-const LLAVE_PUBLICA = {"kty":"EC","crv":"P-256","x":"XD9wvhRF0Z8TUuCR7bHTNVZPSf8J39yAoX34nfRreWA","y":"RwaXaigmHK50pbszuA7qG1rok9Xrq1x0A4n-wPYAwN0"};   // la escribe acceso_semanal.py llaves
+const LLAVE_PUBLICA = {"kty":"EC","crv":"P-256","x":"5PRytfcMjnoGTScsqc1MI8jtZM5ab6opAZrnh3Chfyo","y":"5P9ntPXikb96EFdSTipp4xV0QZ6ZcQJKKYP_GV-5QAI"};   // la escribe acceso_semanal.py llaves
 const WHATSAPP = '522411794542';   // +52 241 179 4542 (Carlos Eduardo Roa Sánchez · CERS)
 const SIEMPRE = ['informacion', 'cafeteria', 'biblioteca'];   // gratis para todos, siempre (decisión del propietario 04/10/2026)
 const K = 'campus_acceso';
@@ -55,7 +55,8 @@ function puede(id) {
 }
 function idPuerta(area, url) {
   const u = String(url || '');
-  let m = u.match(/mundos\/([^/]+)\/([^/]+)\/index\.html/); if (m) return `${m[1]}/${m[2]}`;
+  let m = u.match(/mundos\/modulos\/(?:index\.html)?\?m=([\w-]+)/); if (m) return `${area || 'modulos'}/${m[1]}`;   // salas de modelos 3D (05/10/2026)
+  m = u.match(/mundos\/([^/]+)\/([^/]+)\/index\.html/); if (m) return `${m[1]}/${m[2]}`;
   m = u.match(/mundos\/(cafeteria|biblioteca|informacion)\//); if (m) return m[1];
   m = u.match(/mundos\/([^/]+)\//); if (m) area = m[1];
   return `${area}/${u.split('/').pop().replace(/\.html.*$/, '')}`;
@@ -97,6 +98,6 @@ function bloquear(o = {}) {
     const r = await verificar(v); if (!r.valido) { alert(r.motivo); return; } try { localStorage.setItem(K, v); } catch (e) { } location.reload(); };
 }
 // Protege una página completa (sub-mundo, juego, biblioteca): si no tiene permiso, muestra el bloqueo.
-async function proteger(titulo, volver) { await listo; const id = idPagina(); if (!puede(id)) bloquear({ titulo, puerta: id, volver }); }
+async function proteger(titulo, volver, idFijo) { await listo; const id = idFijo || idPagina(); if (!puede(id)) bloquear({ titulo, puerta: id, volver }); }
 window.Acceso = { listo, estado, puede, idPuerta, idPagina, bloquear, proteger, whatsapp, textoEstado, fecha, WHATSAPP };
 })();
