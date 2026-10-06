@@ -81,6 +81,13 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { Kit3D } from './motor/kit3d.js';
+import { Props } from './motor/props.js';
+import { Navegacion } from './motor/navegacion.js';
+import { construirInterior } from './motor/interior.js';
+import { construirZonas, HUECOS } from './motor/zonas.js';
+import { crearXR } from './motor/xr_campus.js';
+import { letreroTextura } from './motor/letreros.js';
 document.head.insertAdjacentHTML('beforeend', `<style>${Avatar.CSS}</style>`);
 
 // ============================================================================ CONFIGURACIÓN DEL MUNDO
@@ -111,29 +118,66 @@ const AREAS = [
       { titulo: 'Maratón de primeros auxilios', icono: '🏁', tipo: 'juego', url: '../03_cursos/BASE_primeros_auxilios_5h/05_recursos_digitales/juego_maraton_equipos.html' },
       { titulo: '¿Qué lleva mi botiquín?', icono: '🧰', tipo: 'juego', url: '../03_cursos/BASE_primeros_auxilios_5h/05_recursos_digitales/juego_botiquin.html' },
       { titulo: 'RPBI 3D: ruta de recolección', icono: '♻️', tipo: '3d', estado: 'pronto' },
+      { titulo: 'Primeros auxilios: equipo y botiquín', icono: '⛑️', tipo: 'sala', url: 'mundos/modulos/index.html?m=primeros-auxilios', nom: 'NOM-030-STPS-2009 · LFT 504', color: 'verde', senal: 'primeros' },
+      { titulo: 'Radiaciones ionizantes', icono: '☢️', tipo: '3d', estado: 'pendiente', nom: 'NOM-012-STPS', color: 'amarillo' },
     ] },
   { id: 'industria', nombre: 'Industria', icono: '🏭', color: 0x5B6B7C, ang: 140, desc: 'Mundos por norma STPS', senales: ['salida', 'casco', 'auditiva'],
     modulos: [
-      { titulo: 'NOM-004-STPS Maquinaria', icono: '⚙️', tipo: '3d', estado: 'pronto' },
-      { titulo: 'NOM-009-STPS Alturas', icono: '🪜', tipo: '3d', estado: 'pronto' },
-      { titulo: 'NOM-036-1-STPS Cargas', icono: '📦', tipo: '3d', estado: 'pronto' },
+      { titulo: 'Trabajos en alturas', icono: '🪜', tipo: 'sala', url: 'mundos/modulos/index.html?m=alturas', nom: 'NOM-009-STPS-2011', color: 'amarillo', senal: 'caida' },
+      { titulo: 'Espacios confinados', icono: '🕳️', tipo: 'sala', url: 'mundos/modulos/index.html?m=espacios-confinados', nom: 'NOM-033-STPS-2015', color: 'amarillo', senal: 'prec_general' },
+      { titulo: 'Seguridad eléctrica', icono: '⚡', tipo: 'sala', url: 'mundos/modulos/index.html?m=seguridad-electrica', nom: 'NOM-029-STPS-2011', color: 'amarillo', senal: 'electrico' },
+      { titulo: 'Bloqueo y etiquetado (LOTO)', icono: '🔒', tipo: 'sala', url: 'mundos/modulos/index.html?m=loto', nom: 'NOM-004-STPS-1999 · NOM-029-STPS-2011', color: 'azul', senal: 'guantes' },
+      { titulo: 'NOM-004-STPS Maquinaria', icono: '⚙️', tipo: '3d', estado: 'pronto', nom: 'NOM-004-STPS-1999', color: 'amarillo' },
+      { titulo: 'NOM-036-1-STPS Cargas', icono: '📦', tipo: '3d', estado: 'pronto', nom: 'NOM-036-1-STPS-2018', color: 'amarillo' },
+      { titulo: 'Sustancias químicas peligrosas', icono: '🧪', tipo: '3d', estado: 'pendiente', nom: 'NOM-005-STPS', color: 'amarillo' },
+      { titulo: 'Almacenamiento y montacargas', icono: '🏗️', tipo: '3d', estado: 'pendiente', nom: 'NOM-006-STPS-2023', color: 'amarillo', senal: 'montacargas' },
+      { titulo: 'Agentes químicos', icono: '⚗️', tipo: '3d', estado: 'pendiente', nom: 'NOM-010-STPS', color: 'amarillo' },
+      { titulo: 'Ruido', icono: '🔊', tipo: '3d', estado: 'pendiente', nom: 'NOM-011-STPS', color: 'azul', senal: 'auditiva' },
+      { titulo: 'Radiaciones no ionizantes', icono: '📡', tipo: '3d', estado: 'pendiente', nom: 'NOM-013-STPS', color: 'amarillo' },
+      { titulo: 'Presiones ambientales anormales', icono: '🌡️', tipo: '3d', estado: 'pendiente', nom: 'NOM-014-STPS', color: 'amarillo' },
+      { titulo: 'Condiciones térmicas', icono: '🔥', tipo: '3d', estado: 'pendiente', nom: 'NOM-015-STPS', color: 'amarillo' },
+      { titulo: 'Comunicación de peligros (químicos)', icono: '🏷️', tipo: '3d', estado: 'pendiente', nom: 'NOM-018-STPS', color: 'amarillo' },
+      { titulo: 'Recipientes sujetos a presión y calderas', icono: '🛢️', tipo: '3d', estado: 'pendiente', nom: 'NOM-020-STPS', color: 'amarillo' },
+      { titulo: 'Electricidad estática', icono: '⚡', tipo: '3d', estado: 'pendiente', nom: 'NOM-022-STPS', color: 'amarillo', senal: 'electrico' },
+      { titulo: 'Vibraciones', icono: '〰️', tipo: '3d', estado: 'pendiente', nom: 'NOM-024-STPS', color: 'amarillo' },
+      { titulo: 'Iluminación', icono: '💡', tipo: '3d', estado: 'pendiente', nom: 'NOM-025-STPS', color: 'amarillo' },
+      { titulo: 'Soldadura y corte', icono: '🧑‍🏭', tipo: '3d', estado: 'pendiente', nom: 'NOM-027-STPS', color: 'azul', senal: 'cara' },
+      { titulo: 'Procesos con sustancias químicas', icono: '🏭', tipo: '3d', estado: 'pendiente', nom: 'NOM-028-STPS', color: 'amarillo' },
     ] },
   { id: 'proteccion', nombre: 'Protección civil', icono: '🚨', color: 0xE07A1F, ang: 180, desc: 'Extintores (NOM-002-STPS-2010), evacuación y punto de reunión · con modo de realidad virtual y mixta', senales: ['salida', 'alarma', 'telefono'],
     modulos: [
       { titulo: 'Uso de extintores: fuego real virtual', icono: '🧯', tipo: '3d', url: 'mundos/proteccion/extintores/index.html' },
       { titulo: 'Evacuación al punto de reunión', icono: '🏃', tipo: '3d', url: 'mundos/proteccion/evacuacion/index.html' },
-      { titulo: 'Evacuación hospitalaria', icono: '🚪', tipo: '3d', estado: 'pronto' }] },
-  { id: 'laboral', nombre: 'Laboral STPS', icono: '⚖️', color: 0x1F4E79, ang: 220, desc: 'Inspecciones de la STPS: recepción del inspector, la visita y el acta', senales: ['salida', 'informacion'],
+      { titulo: 'Evacuación hospitalaria', icono: '🚪', tipo: '3d', estado: 'pronto' },
+      { titulo: 'Extintores y fuego: equipo', icono: '🧯', tipo: 'sala', url: 'mundos/modulos/index.html?m=extintores-fuego', nom: 'NOM-002-STPS-2010', color: 'rojo', senal: 'extintor' }] },
+  { id: 'laboral', nombre: 'Laboral STPS', icono: '⚖️', color: 0x1F4E79, ang: 220, desc: 'Inspecciones de la STPS (recepción, visita y acta) y NOM-035 de factores de riesgo psicosocial: 4 escenarios inmersivos con realidad virtual', senales: ['salida', 'informacion'],
     modulos: [
       { titulo: 'Recepción del inspector', icono: '🛎️', tipo: '3d', url: 'mundos/laboral/recepcion_inspector/index.html' },
       { titulo: 'La visita de inspección', icono: '📋', tipo: '3d', url: 'mundos/laboral/visita_inspeccion/index.html' },
       { titulo: 'Día D: ¿lo haces o no?', icono: '🎮', tipo: 'juego', url: '../03_cursos/BASE_auditorias_stps_2h/05_recursos_digitales/juego_dia_d.html' },
+      { titulo: 'NOM-035: Detecta los factores de riesgo', icono: '🧭', tipo: '3d', url: 'mundos/laboral/nom035_factores/index.html' },
+      { titulo: 'NOM-035: Acontecimiento traumático severo', icono: '🚨', tipo: '3d', url: 'mundos/laboral/nom035_ats/index.html' },
+      { titulo: 'NOM-035: Construye un entorno favorable', icono: '🌱', tipo: '3d', url: 'mundos/laboral/nom035_entorno/index.html' },
+      { titulo: 'NOM-035: Requisitos y multas', icono: '⚖️', tipo: '3d', url: 'mundos/laboral/nom035_requisitos/index.html' },
+      { titulo: '¿Es factor de riesgo?', icono: '🧠', tipo: 'juego', url: '../03_cursos/BASE_nom035_trabajadores_4h/05_recursos_digitales/juego_riesgo_o_no.html' },
+      { titulo: '¿Violencia laboral? ¿Qué hago?', icono: '🛑', tipo: 'juego', url: '../03_cursos/BASE_nom035_trabajadores_4h/05_recursos_digitales/juego_violencia_que_hago.html' },
+      { titulo: 'Escape room: la oficina en calma', icono: '🔐', tipo: 'juego', url: '../03_cursos/BASE_nom035_trabajadores_4h/05_recursos_digitales/juego_escape_oficina.html' },
+      { titulo: 'Memorama: factor y medida', icono: '🧩', tipo: 'juego', url: '../03_cursos/BASE_nom035_trabajadores_4h/05_recursos_digitales/juego_memorama_factor_medida.html' },
+      { titulo: '¿Qué me toca según mi tamaño?', icono: '🏢', tipo: 'juego', url: '../03_cursos/BASE_nom035_directivos_4h/05_recursos_digitales/juego_que_me_toca.html' },
+      { titulo: 'Maratón NOM-035', icono: '🏁', tipo: 'juego', url: '../03_cursos/BASE_nom035_directivos_4h/05_recursos_digitales/juego_maraton_equipos.html' },
     ] },
   { id: 'empresa', nombre: 'Empresa · RH', icono: '🏢', color: 0x14284B, ang: 260, desc: 'Jornada laboral de 40 horas: auditoría, horarios y cumplimiento', senales: ['salida', 'no_fumar'],
     modulos: [
       { titulo: 'Oficina de RH: auditoría del checador', icono: '⏱️', tipo: '3d', url: 'mundos/empresa/rh_checador/index.html' },
       { titulo: 'Mesa de ayuda: preguntas sobre horarios', icono: '❓', tipo: '3d', url: 'mundos/empresa/horarios_qa/index.html' },
       { titulo: '¿Cumple o no cumple?', icono: '🎮', tipo: 'juego', url: '../03_cursos/BASE_jornada_40_horas_2h/05_recursos_digitales/juego_cumple_o_no.html' },
+      { titulo: 'Edificios, locales e instalaciones', icono: '🏢', tipo: '3d', estado: 'pendiente', nom: 'NOM-001-STPS', color: 'amarillo' },
+      { titulo: 'Equipo de protección personal', icono: '🦺', tipo: '3d', estado: 'pendiente', nom: 'NOM-017-STPS-2024', color: 'azul', senal: 'casco' },
+      { titulo: 'Comisión de seguridad e higiene', icono: '👥', tipo: '3d', estado: 'pendiente', nom: 'NOM-019-STPS-2011', color: 'verde' },
+      { titulo: 'Colores y señales de seguridad', icono: '🚸', tipo: '3d', estado: 'pendiente', nom: 'NOM-026-STPS-2008', color: 'amarillo', senal: 'prec_general' },
+      { titulo: 'Servicios preventivos de SST', icono: '🩺', tipo: '3d', estado: 'pendiente', nom: 'NOM-030-STPS-2009', color: 'verde' },
+      { titulo: 'Trabajadores con discapacidad', icono: '♿', tipo: '3d', estado: 'pendiente', nom: 'NOM-034-STPS', color: 'azul', senal: 'accesible' },
+      { titulo: 'Teletrabajo', icono: '💻', tipo: '3d', estado: 'pendiente', nom: 'NOM-037-STPS', color: 'azul' },
     ] },
   { id: 'biblioteca', nombre: 'Biblioteca', icono: '📚', color: 0x5D4037, ang: 300, desc: 'Leyes, reglamentos, NOM y tratados por dependencia, con liga oficial y referencia APA', senales: ['salida', 'accesible'],
     modulos: [
@@ -153,8 +197,8 @@ const rad = THREE.MathUtils.degToRad, polar = (a, r) => new THREE.Vector3(Math.s
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight);
 document.body.prepend(renderer.domElement);
-const scene = new THREE.Scene(); scene.background = new THREE.Color(0xBFE0F0); scene.fog = new THREE.Fog(0xBFE0F0, 60, 120);
-const camera = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 220);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xBFE0F0); scene.fog = new THREE.Fog(0xBFE0F0, 80, 300);
+const camera = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 700);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.46; controls.minDistance = 4; controls.maxDistance = 38; controls.enablePan = false;
 scene.add(new THREE.HemisphereLight(0xffffff, 0x88a0b0, 1.2));
@@ -173,16 +217,23 @@ function cartel(texto, w, h, fondo = '#154F90', color = '#fff', tam = 0.55) {
 const logoCERS = tex('recursos/logo_CERS.jpeg'), banner = tex('recursos/banner_AMISI_CERS.jpg');
 const plano = (w, h, map, x, y, z, p = scene, ry = 0) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map })); m.position.set(x, y, z); m.rotation.y = ry; p.add(m); return m; };
 const tocables = [], obstaculos = [];
-const obst = (x, z, r) => obstaculos.push({ x, z, r });
+// Navegación del mundo exterior (rejilla de 1 m, radio 175 m): el avatar rodea obstáculos y prefiere plaza, anillo y caminos
+const R_MUNDO = 175, NAV = new Navegacion({ x0: -R_MUNDO, z0: -R_MUNDO, x1: R_MUNDO, z1: R_MUNDO, celda: 1, costoBase: 1 });
+for (let k = 0; k < NAV.nz; k++) for (let i = 0; i < NAV.nx; i++) { const p = NAV.centro(i, k), r = Math.hypot(p.x, p.z), j = NAV.idx(i, k);
+  if (r > R_MUNDO - 4) NAV.bloq[j] = 1; else if (r < 13 || (r > 20.5 && r < 24.9)) NAV.costo[j] = .45; }
+const obst = (x, z, r) => { obstaculos.push({ x, z, r }); NAV.bloquearCirculo(x, z, Math.max(.4, r * .85)); };
+const KIT = new Kit3D(THREE, ''), PROPS = Props(THREE);
 
 // ---------------------------------------------------------------- suelo, plaza, anillo y caminos
 const pisos = [];
 const disco = (r0, r1, c, y) => { const m = new THREE.Mesh(r0 ? new THREE.RingGeometry(r0, r1, 96) : new THREE.CircleGeometry(r1, 96), M(c)); m.rotation.x = -Math.PI / 2; m.position.y = y; m.userData.piso = true; scene.add(m); pisos.push(m); return m; };
-disco(0, 90, 0x9CC48E, 0); disco(0, R_PLAZA, 0xE9E4DA, 0.012); disco(R_PLAZA - 0.35, R_PLAZA, 0xC9BFAF, 0.016);
+{ const forma = new THREE.Shape(); forma.absarc(0, 0, R_MUNDO + 30, 0, Math.PI * 2, false);
+  HUECOS.forEach(h => { const q = new THREE.Path(); q.absarc(h.x, -h.z, h.r, 0, Math.PI * 2, true); forma.holes.push(q); });   // -z: el plano se gira -90° en x
+  const suelo = new THREE.Mesh(new THREE.ShapeGeometry(forma, 96), M(0x9CC48E)); suelo.rotation.x = -Math.PI / 2; suelo.userData.piso = true; scene.add(suelo); pisos.push(suelo); } disco(0, R_PLAZA, 0xE9E4DA, 0.012); disco(R_PLAZA - 0.35, R_PLAZA, 0xC9BFAF, 0.016);
 disco(20.5, 24.9, 0xE2DDD3, 0.012);
 for (let r = 3.5; r < R_PLAZA; r += 3) disco(r - 0.05, r, 0xD6CFC2, 0.014);   // juntas del adoquín
 function camino(a, r0, r1, ancho = 3) { const c = polar(a, (r0 + r1) / 2); const m = new THREE.Mesh(new THREE.PlaneGeometry(ancho, r1 - r0), M(0xE2DDD3));
-  m.rotation.x = -Math.PI / 2; m.rotation.z = -rad(a); m.position.set(c.x, 0.011, c.z); m.userData.piso = true; scene.add(m); pisos.push(m); }
+  m.rotation.x = -Math.PI / 2; m.rotation.z = -rad(a); m.position.set(c.x, 0.011, c.z); m.userData.piso = true; scene.add(m); pisos.push(m); NAV.camino(c.x, c.z, ancho, r1 - r0, rad(a), .45); }
 AREAS.forEach(a => camino(a.ang, R_PLAZA - 0.5, 21, 3)); camino(0, R_PLAZA - 0.5, 30, 4);
 
 // ---------------------------------------------------------------- fuente central con monolito de logos
@@ -300,92 +351,119 @@ totemBanner(4.6, 20.4, -0.35, 4.6);
   const c = cartel('INFORMACIÓN · CONTACTO · ACCESO', 1.7, 0.28, '#0D6EB8'); c.position.set(0, 0.8, 0.41); g.add(c); c.userData = { tipo: 'info' }; tocables.push(c); k.userData = { tipo: 'info' }; tocables.push(k);
   senal('informacion', 0.6, 0, 2.6, -0.28, 0, g); obst(p.x, p.z, 1.0); }
 
-// ============================================================================ EDIFICIOS Y PUERTAS
-const ED = {};
+// ============================================================================ EDIFICIOS (fachada con entrada; los módulos están ADENTRO)
+// Desde 05/10/2026 cada edificio tiene una entrada principal: el avatar entra físicamente a un interior caminable
+// (motor/interior.js) con las puertas de sus módulos. Agregar puertas: sigue siendo en "modulos" de AREAS.
+const ED = {}; const ANCHO_ED = 9, ALTO_ED = 6.4;
+const SENAL_AREA = { hospital: 'primeros', proteccion: 'extintor', industria: 'casco', laboral: 'informacion', empresa: 'informacion', cafeteria: 'informacion', biblioteca: 'informacion' };
+const PISO_AREA = { industria: 'concreto', proteccion: 'placa_metal', biblioteca: 'tablones', cafeteria: 'tablones', laboral: 'concreto', empresa: 'concreto', hospital: 'concreto' };
+AREAS.forEach(a => a.modulos.forEach(m => m.puerta = Acceso.idPuerta(a.id, m.url || '')));
 AREAS.forEach(a => {
-  const n = a.modulos.length, cols = Math.min(POR_PISO, n), pisosE = Math.ceil(n / POR_PISO);
-  const ancho = Math.max(6, cols * PASO_PUERTA + 1.4), alto = pisosE * ALTO_PISO + 1.6;
-  const pos = polar(a.ang, R_EDIF);
+  const ancho = ANCHO_ED, alto = ALTO_ED, pos = polar(a.ang, R_EDIF), hex = '#' + a.color.toString(16).padStart(6, '0');
   const g = new THREE.Group(); g.position.copy(pos); g.lookAt(0, 0, 0); scene.add(g); g.updateMatrixWorld();
-  const cuerpo = caja(ancho, alto, 5, a.color, 0, alto / 2, -2.5, g); cuerpo.userData = { tipo: 'edificio', area: a.id }; tocables.push(cuerpo);
-  caja(ancho + 0.5, 0.35, 5.5, 0xffffff, 0, alto + 0.17, -2.5, g); caja(ancho + 0.3, 0.25, 0.3, 0xffffff, 0, 0.12, 0.1, g);
-  [-1, 1].forEach(s => { for (let py = 0; py < pisosE; py++) for (let k = 0; k < 3; k++) caja(0.06, 1.1, 0.8, 0xBFE3F2, s * (ancho / 2 + 0.01), py * ALTO_PISO + 1.6, -0.9 - k * 1.4, g); });
-  const rot = cartel(`${a.nombre.toUpperCase()}`, Math.min(ancho - 0.6, 5.4), 0.8, '#ffffff', '#' + a.color.toString(16).padStart(6, '0'), 0.6);
-  rot.position.set(0, alto - 0.65, 0.03); g.add(rot);
-  const puertas = a.modulos.map((m, i) => {
-    const piso = Math.floor(i / POR_PISO), k = i % POR_PISO, enPiso = Math.min(POR_PISO, n - piso * POR_PISO);
-    const x = (k - (enPiso - 1) / 2) * PASO_PUERTA, y = piso * ALTO_PISO;
-    if (piso > 0 && k === 0) caja(ancho - 0.4, 0.15, 0.9, 0xffffff, 0, y - 0.05, 0.35, g);
-    const pronto = m.estado === 'pronto';
-    const p = caja(ANCHO_PUERTA, 2.0, 0.14, pronto ? 0x9AA9B8 : (m.tipo === 'juego' ? 0x3FA7C6 : 0xF4F7FA), x, y + 1.0, 0.05, g);
-    caja(ANCHO_PUERTA + 0.18, 0.12, 0.2, 0xffffff, x, y + 2.05, 0.06, g);
-    p.userData = { tipo: 'puerta', area: a.id, i }; tocables.push(p);
-    return { m, p, ancla: new THREE.Vector3(x, y + 2.15, 0.1) };
-  });
+  const ry = Math.atan2(-pos.x, -pos.z);   // de frente hacia la plaza (no usar g.rotation.y: lookAt puede dar ángulos de Euler con x = z = π)
+  const tq = m => { m.userData = { tipo: 'edificio', area: a.id }; tocables.push(m); return m; };
+  tq(caja(ancho, alto, 6, a.color, 0, alto / 2, -3, g)); caja(ancho + 0.5, 0.35, 6.5, 0xffffff, 0, alto + 0.17, -3, g); caja(ancho + 0.3, 0.25, 0.3, 0xffffff, 0, 0.12, 0.1, g);
+  [-1, 1].forEach(s => [1.7, 4.6].forEach(y => { caja(1.7, 1.1, 0.06, 0xBFE3F2, s * 3.0, y, 0.02, g); for (let k = 0; k < 3; k++) caja(0.06, 1.1, 0.9, 0xBFE3F2, s * (ancho / 2 + 0.01), y, -1.2 - k * 1.7, g); }));
+  // entrada principal: marco, puerta (modelo 3D del kit "puertas"), marquesina, escalón y letrero SVG
+  caja(2.7, 2.95, 0.2, 0x37474F, 0, 1.47, 0.02, g); const hoja = tq(caja(2.3, 2.6, 0.08, 0xF4F7FA, 0, 1.3, 0.1, g));
+  KIT.pieza('puertas', ['industria', 'proteccion'].includes(a.id) ? 'porton' : 'puerta_doble').then(o => { const b = new THREE.Box3().setFromObject(o), s = b.getSize(new THREE.Vector3());
+    o.scale.multiply(new THREE.Vector3(2.3 / Math.max(s.x, .01), 2.6 / Math.max(s.y, .01), 1)); o.position.set(0, 0, 0.14); g.add(o); o.traverse(q => { if (q.isMesh) tq(q); }); hoja.visible = false; }).catch(() => { });
+  caja(3.8, 0.15, 1.7, 0xffffff, 0, 3.15, 0.8, g); [-1.7, 1.7].forEach(x => cil(0.05, 3.1, 0x5B6B7C, x, 1.55, 1.55, g)); caja(3.6, 0.12, 1.5, 0xC9C3B8, 0, 0.06, 0.85, g);
+  const rot = cartel(`${a.nombre.toUpperCase()}`, 6.2, 0.8, '#ffffff', hex, 0.6); rot.position.set(0, alto - 0.65, 0.03); g.add(rot);
+  const L = tq(new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.12), new THREE.MeshBasicMaterial({ map: letreroTextura(THREE, { titulo: 'ENTRADA', sub: `${a.modulos.length} puertas adentro`, estado: 'entrada', color: 'marino', senal: SENAL_AREA[a.id] }) })));
+  L.position.set(0, 3.85, 0.16); g.add(L);
   // seguridad en la fachada: poste izquierdo con señales y extintor a la derecha
   const izq = new THREE.Vector3(-ancho / 2 - 0.55, 0, 0.7).applyMatrix4(g.matrixWorld), der = new THREE.Vector3(ancho / 2 + 0.55, 0, 0.7).applyMatrix4(g.matrixWorld);
-  const ry = Math.atan2(-pos.x, -pos.z);   // de frente hacia la plaza (no usar g.rotation.y: lookAt puede dar ángulos de Euler con x = z = π)
   poste(a.senales, izq.x, izq.z, ry); extintor(der.x, der.z, ry);
-  // la señal de salida apunta hacia el lado del poste (lejos de las puertas)
-  const frente = new THREE.Vector3(0, 0, 3.4).applyMatrix4(g.matrixWorld);
-  ED[a.id] = { a, g, ancho, alto, puertas, frente, techo: new THREE.Vector3(0, alto + 0.9, -1) };
+  const c = new THREE.Vector3(0, 0, -3).applyMatrix4(g.matrixWorld); NAV.bloquearRect(c.x, c.z, ancho + 0.8, 6.8, ry);
+  ED[a.id] = { a, g, ancho, alto, frente: new THREE.Vector3(0, 0, 3.0).applyMatrix4(g.matrixWorld), techo: new THREE.Vector3(0, alto + 0.9, -1) };
 });
 // cuarto de máquinas (prohibido el paso / riesgo eléctrico)
 { const p = polar(162, 31); const g = new THREE.Group(); g.position.copy(p); g.lookAt(0, 0, 0); scene.add(g); caja(3, 2.6, 2.4, 0x90A4AE, 0, 1.3, 0, g);
-  senal('no_paso', 0.6, -0.6, 1.6, 1.22, 0, g); senal('electrico', 0.62, 0.6, 1.6, 1.22, 0, g); }
+  senal('no_paso', 0.6, -0.6, 1.6, 1.22, 0, g); senal('electrico', 0.62, 0.6, 1.6, 1.22, 0, g); NAV.bloquearCirculo(p.x, p.z, 2.2); }
+// zonas alejadas: mina a cielo abierto, mina subterránea, obra, aserradero, ferrocarril y campo agrícola (motor/zonas.js)
+const Z = construirZonas({ THREE, escena: scene, kit: KIT, props: PROPS, nav: NAV, tocables, pisos, obst, cartel, poste, base: '' });
+// árboles del anillo exterior que quedan sobre un camino nuevo: se ocultan
+scene.children.filter(o => o.isGroup && o.children.length === 2 && o.children[1].geometry && ['IcosahedronGeometry', 'ConeGeometry'].includes(o.children[1].geometry.type)).forEach(o => {
+  const [i, k] = NAV.celda(o.position.x, o.position.z); if (NAV.dentro(i, k) && NAV.costo[NAV.idx(i, k)] < .5 && Math.hypot(o.position.x, o.position.z) > 26) { o.visible = false; NAV.liberarRect(o.position.x, o.position.z, 2, 2); } });
 
 // ============================================================================ AVATAR PROPIO
 let perfil = Avatar.cargar();
 let yo = null, animYo = null; const pecho = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.23), new THREE.MeshBasicMaterial({ map: logoCERS }));
-function vestir() { const pos = yo ? yo.position.clone() : INICIO.clone(), ry = yo ? yo.rotation.y : Math.PI, vis = yo ? yo.visible : true;
-  if (yo) scene.remove(yo); const a = Avatar.construir(THREE, perfil); yo = a.grupo; animYo = a.animar; yo.position.copy(pos); yo.rotation.y = ry; yo.visible = vis;
-  if (!['saco', 'overol'].includes(perfil.superior)) { pecho.position.copy(yo.userData.pecho); pecho.position.x = 0.1; yo.add(pecho); } scene.add(yo); }
+function vestir() { const pos = yo ? yo.position.clone() : INICIO.clone(), ry = yo ? yo.rotation.y : Math.PI, vis = yo ? yo.visible : true, padre = yo ? yo.parent : scene;
+  if (yo) yo.parent && yo.parent.remove(yo); const a = Avatar.construir(THREE, perfil); yo = a.grupo; animYo = a.animar; yo.position.copy(pos); yo.rotation.y = ry; yo.visible = vis;
+  if (!['saco', 'overol'].includes(perfil.superior)) { pecho.position.copy(yo.userData.pecho); pecho.position.x = 0.1; yo.add(pecho); } (padre || scene).add(yo); }
 vestir();
 const marca = new THREE.Mesh(new THREE.RingGeometry(0.35, 0.48, 32), new THREE.MeshBasicMaterial({ color: 0x3FA7C6, transparent: true, opacity: .9 }));
 marca.rotation.x = -Math.PI / 2; marca.visible = false; scene.add(marca);
 
 // ============================================================================ ESTADO Y NAVEGACIÓN
 const $ = s => document.querySelector(s);
-let destino = null, alLlegar = null, dentro = null, camModo = 'seguir', fase = 0; const pila = [];
-const OFFSET = new THREE.Vector3(0, 8.5, 10);
+let ruta = [], alLlegar = null, dentro = null, I = null, escena = scene, camModo = 'seguir', fase = 0, pose, sentadoEn = -1; const pila = [], INTERIORES = {};
+const OFFSET = new THREE.Vector3(0, 8.5, 10), OFFSET_IN = new THREE.Vector3(0, 6.0, 7.0);
 const tweens = [];
 const mover = (v, a, ms) => new Promise(res => tweens.push({ v, de: v.clone(), a: a.clone(), t0: performance.now(), ms, res }));
-function limitar(p) { const r = Math.hypot(p.x, p.z); if (r > R_CAMINA) { p.x *= R_CAMINA / r; p.z *= R_CAMINA / r; } return p; }
-function recordar() { const u = pila[pila.length - 1]; if (!u || u.distanceTo(yo.position) > 2) pila.push(yo.position.clone()); if (pila.length > 20) pila.shift(); }
-function caminarA(p, cb, guardar = true) { if (guardar) recordar(); destino = limitar(p.clone()); destino.y = 0; alLlegar = cb || null; marca.position.set(destino.x, 0.03, destino.z); marca.visible = true; $('#ayuda').style.display = 'none'; }
-function irAEdificio(id) { if (dentro) return; const e = ED[id]; caminarA(e.frente, () => entrarEdificio(id)); aviso(`Caminando a ${e.a.icono} ${e.a.nombre}…`); }
-async function entrarEdificio(id) {
-  const e = ED[id]; dentro = id; camModo = 'edificio'; history.replaceState(null, '', '?mundo=' + id + (QA ? '&qa' : ''));
-  yo.lookAt(e.g.position.x, 0, e.g.position.z);
-  const hfov = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect), vfov = THREE.MathUtils.degToRad(camera.fov);
-  const dist = Math.max((e.ancho / 2 + 1.4) / Math.tan(hfov / 2), (e.alto / 2 + 1.6) / Math.tan(vfov / 2), 6);
-  const centro = new THREE.Vector3(0, e.alto / 2 - (camera.aspect < 1 ? 1.4 : 0.2), 0).applyQuaternion(e.g.quaternion).add(e.g.position);
-  const pos = new THREE.Vector3(0, e.alto / 2 + 0.6, dist).applyQuaternion(e.g.quaternion).add(e.g.position);
-  controls.enabled = false;
-  await Promise.all([mover(camera.position, pos, 900), mover(controls.target, centro, 900)]);
-  if (dentro !== id) return; yo.visible = false;
-  $('#dTit').innerHTML = `${e.a.icono} ${e.a.nombre}<small>Toca una puerta para entrar · ${e.a.desc}</small>`; $('#dentro').style.display = 'flex';
+const navAct = () => I ? I.nav : NAV, tocAct = () => I ? I.tocables : tocables, pisAct = () => I ? I.pisos : pisos;
+const areaDe = id => AREAS.find(a => a.id === id) || (Z.ZONAS.find(z => z.id === id) || {}).area;
+function levantar() { if (pose === 'sentado' && I && sentadoEn >= 0) yo.position.copy(I.sillas[sentadoEn].frente); sentadoEn = -1; pose = undefined; yo.position.y = 0; }
+function recordar() { if (I) return; const u = pila[pila.length - 1]; if (!u || u.distanceTo(yo.position) > 2) pila.push(yo.position.clone()); if (pila.length > 20) pila.shift(); }
+const vertical = () => camera.aspect < 0.8;   // celular en vertical: vista más alta y campo de visión más amplio
+function ajustarFov() { const f = vertical() ? 66 : 52; if (camera.fov !== f) { camera.fov = f; camera.updateProjectionMatrix(); } }
+function colocarCamara() { ajustarFov(); const off = I ? (vertical() ? new THREE.Vector3(0, 15, 10.5) : OFFSET_IN) : OFFSET; camera.position.copy(yo.position).add(off); controls.target.copy(yo.position).setY(1); }
+function caminarA(p, cb, guardar = true) {
+  levantar(); if (guardar) recordar(); const dest = new THREE.Vector3(p.x, 0, p.z); ruta = navAct().ruta(yo.position, dest); alLlegar = cb || null;
+  if (!ruta.length) { alLlegar = null; if (yo.position.distanceTo(dest) < 1.2) { cb && cb(); return; } if (cb) return teletransportar(dest, cb); return aviso('No hay paso por ahí: sigue los caminos.'); }
+  marca.position.set(dest.x, 0.03, dest.z); marca.visible = true; $('#ayuda').style.display = 'none'; }
+// teletransporte con fundido (evita mareo y recorridos largos; en el visor es la forma de moverse)
+function teletransportar(p, cb, ry) { levantar(); ruta = []; marca.visible = false; $('#fundido').style.opacity = 1;
+  setTimeout(() => { yo.position.set(p.x, 0, p.z); if (ry !== undefined) yo.rotation.y = ry; colocarCamara(); if (xr.activo()) xr.colocar(yo.position, yo.rotation.y + Math.PI);
+    $('#fundido').style.opacity = 0; cb && cb(); }, 420); }
+function irAEdificio(id) { if (dentro) return; const e = ED[id]; if (yo.position.distanceTo(e.frente) > 45) return teletransportar(e.frente, () => entrarEdificio(id));
+  caminarA(e.frente, () => entrarEdificio(id)); aviso(`Caminando a ${e.a.icono} ${e.a.nombre}…`); }
+function irAZona(id, entrarTambien) { const z = Z.ZONAS.find(q => q.id === id); if (!z || dentro) return; Z.cargar(id);
+  const dest = entrarTambien ? z.puertaMundo : z.entrada, cb = entrarTambien ? () => entrarEdificio(id) : () => aviso(`${z.icono} ${z.nombre}: toca los marcadores numerados y la caseta de acceso.`);
+  if (yo.position.distanceTo(dest) > 40) teletransportar(dest, cb, Math.atan2(z.centro.x - dest.x, z.centro.z - dest.z)); else caminarA(dest, cb); }
+function entrarEdificio(id) {
+  const a = areaDe(id); if (!a) return; $('#fundido').style.opacity = 1;
+  setTimeout(() => {
+    if (!INTERIORES[id]) INTERIORES[id] = construirInterior({ ...a, modulos: a.modulos.map(m => ({ ...m, senal: m.senal || SENAL_AREA[a.id] || 'informacion', puerta: m.puerta || `${a.id}/pendiente` })) },
+      { THREE, kit: KIT, props: PROPS, logo: logoCERS, piso: a.piso || PISO_AREA[a.id] || 'concreto', base: '' });
+    I = INTERIORES[id]; dentro = id; escena = I.escena; levantar(); ruta = []; escena.add(yo); escena.add(marca); marca.visible = false;
+    yo.position.copy(I.entrada); yo.rotation.y = Math.PI; colocarCamara(); controls.maxDistance = 26;
+    history.replaceState(null, '', '?mundo=' + id + (QA ? '&qa' : ''));
+    $('#dTit').innerHTML = `${a.icono} ${a.nombre}<small>Camina por el pasillo y toca una puerta · siéntate en la sala de espera · toca las señales</small>`; $('#dentro').style.display = 'flex'; $('#ayuda').style.display = 'none';
+    crearEtiquetasPuertas(); if (xr.activo()) xr.colocar(yo.position, 0); $('#fundido').style.opacity = 0; }, 380);
 }
 function salirEdificio(rapido) {
-  if (!dentro) return; const e = ED[dentro]; dentro = null; yo.visible = true; $('#dentro').style.display = 'none'; history.replaceState(null, '', location.pathname + (QA ? '?qa' : ''));
-  camModo = 'volver'; controls.enabled = true;
-  if (rapido) { camModo = 'seguir'; return; }
-  const atras = e.frente.clone().sub(e.g.position).setY(0).normalize().multiplyScalar(2.5);
-  Promise.all([mover(camera.position, yo.position.clone().add(OFFSET), 800), mover(controls.target, yo.position.clone().setY(1), 800)])
-    .then(() => { camModo = 'seguir'; caminarA(e.frente.clone().add(atras), null, false); });
+  if (!dentro) return; const id = dentro, e = ED[id], z = Z.ZONAS.find(q => q.id === id), fuera = e ? e.frente : z.puertaMundo;
+  const go = () => { levantar(); I.puertas.forEach(p => p.cerrar()); dentro = null; I = null; escena = scene; scene.add(yo); scene.add(marca); limpiarEtiquetasPuertas();
+    $('#dentro').style.display = 'none'; controls.maxDistance = 38; history.replaceState(null, '', location.pathname + (QA ? '?qa' : ''));
+    yo.position.copy(fuera); const d = e ? fuera.clone().sub(e.g.position) : new THREE.Vector3(0, 0, 1); yo.rotation.y = Math.atan2(d.x, d.z); colocarCamara();
+    if (xr.activo()) xr.colocar(yo.position, yo.rotation.y + Math.PI); $('#fundido').style.opacity = 0; };
+  if (rapido) return go(); $('#fundido').style.opacity = 1; setTimeout(go, 380);
 }
-function reiniciar() { salirEdificio(true); tweens.length = 0; destino = null; marca.visible = false; pila.length = 0; controls.enabled = true; camModo = 'seguir';
-  yo.position.copy(INICIO); yo.rotation.y = Math.PI; camera.position.copy(INICIO).add(OFFSET); controls.target.copy(INICIO).setY(1); $('#ayuda').style.display = 'block'; aviso('Regresaste al inicio del campus.'); }
+function reiniciar() { salirEdificio(true); tweens.length = 0; ruta = []; marca.visible = false; pila.length = 0; controls.enabled = !xr.activo(); camModo = 'seguir'; levantar();
+  yo.position.copy(INICIO); yo.rotation.y = Math.PI; colocarCamara(); if (xr.activo()) xr.colocar(yo.position, 0); $('#ayuda').style.display = 'block'; aviso('Regresaste al inicio del campus.'); }
 function atras() { if (dentro) return salirEdificio(); const p = pila.pop(); if (!p) return aviso('Ya estás en el punto de partida. Usa ↺ Inicio para reiniciar.'); caminarA(p, null, false); aviso('Regresando al lugar anterior…'); }
+function avisoVR(t, msg) { if (xr.activo()) xr.panel(t, msg); else aviso(msg); }
 function entrar(m) {
-  if (m.estado === 'pronto') return aviso(`🚧 "${m.titulo}" estará disponible cuando se imparta su curso.`);
-  if (!Acceso.puede(m.puerta)) return Acceso.bloquear({ titulo: `${m.icono} ${m.titulo}`, puerta: m.puerta });
+  if (m.estado === 'pronto') return avisoVR(m.titulo, `🚧 "${m.titulo}"${m.nom ? ' (' + m.nom + ')' : ''} estará disponible cuando se imparta su curso.`);
+  if (m.estado === 'pendiente') return avisoVR(m.titulo, `📌 Puerta pendiente: ${m.nom || ''} · ${m.titulo}. Se habilitará cuando se cree su curso.`);
+  if (!Acceso.puede(m.puerta)) { if (xr.activo()) return xr.panel('Contenido con acceso', `"${m.titulo}" se abre con un código de acceso. Solicítalo por WhatsApp al +52 241 179 4542.`); return Acceso.bloquear({ titulo: `${m.icono} ${m.titulo}`, puerta: m.puerta }); }
   $('#fundido').style.opacity = 1; setTimeout(() => location.href = m.url, 450);
 }
+// puertas, sillas y señales del interior
+function irAPuerta(k) { const p = I && I.puertas[k]; if (!p) return; caminarA(p.frente, () => { yo.lookAt(p.g.position.x, 0, p.g.position.z); const m = p.m;
+  if (m.estado === 'pronto' || m.estado === 'pendiente' || !Acceso.puede(m.puerta)) return entrar(m); p.abrir(); setTimeout(() => entrar(m), 650); }); }
+function sentar(k) { const s = I && I.sillas[k]; if (!s) return; caminarA(s.frente, () => { yo.position.set(s.pos.x, Avatar.ALTO_SENTADO(s.asiento), s.pos.z); yo.rotation.y = s.ry; pose = 'sentado'; sentadoEn = k; }); }
+function verSenal(id, obj) { const wp = obj.getWorldPosition(new THREE.Vector3()), n = obj.getWorldDirection(new THREE.Vector3()); n.y = 0; n.normalize();
+  const de = wp.clone().addScaledVector(n, 1.7); de.y = 0; if (!navAct().libre(de.x, de.z)) return fichaSenal(id);
+  caminarA(de, () => { yo.lookAt(wp.x, 0, wp.z); pose = 'mirando'; mover(controls.target, wp.clone(), 600); fichaSenal(id); }); }
 const abrirInfo = () => { $('#fundido').style.opacity = 1; setTimeout(() => location.href = INFO_URL, 350); };
-AREAS.forEach(a => a.modulos.forEach(m => m.puerta = Acceso.idPuerta(a.id, m.url || '')));
 function aviso(t) { const a = $('#aviso'); a.textContent = t; a.style.display = 'block'; clearTimeout(a._t); a._t = setTimeout(() => a.style.display = 'none', 2600); }
-function modal(html) { $('#mCont').innerHTML = html + '<br><button class="prim" id="mCerrar">Cerrar</button>'; $('#modal').style.display = 'flex'; $('#mCerrar').onclick = () => $('#modal').style.display = 'none'; }
+function modal(html) { if (xr.activo()) { const t = (html.match(/<h2>(.*?)<\/h2>/) || [])[1] || 'Campus SST'; return xr.panel(t.replace(/<[^>]+>/g, ''), html.replace(/<h2>.*?<\/h2>/, '')); }
+  $('#mCont').innerHTML = html + '<br><button class="prim" id="mCerrar">Cerrar</button>'; $('#modal').style.display = 'flex'; $('#mCerrar').onclick = () => $('#modal').style.display = 'none'; }
 $('#modal').onclick = e => { if (e.target.id === 'modal') $('#modal').style.display = 'none'; };
 function fichaSenal(id) { const s = Senales.POR_ID[id];
   modal(`<h2>${s.nombre}</h2><img class="senal" src="${Senales.dataURL(id, 256)}" alt="${s.nombre}"><p><b>Tipo:</b> ${s.tipo}</p><p>${s.significado}</p>
@@ -393,57 +471,69 @@ function fichaSenal(id) { const s = Senales.POR_ID[id];
 $('#bSalirEdif').onclick = () => salirEdificio();
 $('#bAtras').onclick = atras; $('#bReiniciar').onclick = reiniciar;
 $('#bInfo').onclick = abrirInfo;
-$('#bAyuda').onclick = () => modal(`<h2>❔ Cómo moverte</h2><p>• Toca el piso para caminar; toca un edificio para ir y entrar; dentro, toca una puerta.<br>• En computadora: flechas o W A S D; arrastra para girar la vista y usa la rueda para acercar.<br>
-  • <b>⬅ Atrás</b> regresa al lugar anterior (o sale del edificio). <b>↺ Inicio</b> te lleva a la entrada. <b>🚪 Salir</b> vuelve a la pantalla de inicio.<br>• Toca las señales, extintores e hidrantes para aprender qué significan (NOM-026-STPS-2008 y NOM-003-SEGOB-2011).<br>
+$('#bAyuda').onclick = () => modal(`<h2>❔ Cómo moverte</h2><p>• Toca el piso para caminar (el avatar sigue los caminos y rodea obstáculos); toca un edificio para ir y <b>entrar caminando</b>; adentro, toca una puerta.<br>• Toca una <b>silla</b> para sentarte y una <b>señal</b> para pararte frente a ella.<br>• En computadora: flechas o W A S D; arrastra para girar la vista y usa la rueda para acercar.<br>
+  • <b>🗺️ Mapa</b>: viaja (teletransporte) a cualquier edificio o zona: mina a cielo abierto, mina subterránea, obra, aserradero, ferrocarril y campo agrícola.<br>
+  • <b>⬅ Atrás</b> regresa al lugar anterior (o sale del edificio). <b>↺ Inicio</b> te lleva a la entrada. <b>🚪 Salir</b> vuelve a la pantalla de inicio.<br>• <b>🥽 VR</b> (visor Meta Quest): apunta al piso y aprieta el gatillo para teletransportarte; apunta a puertas y objetos para tocarlos; joystick para girar.<br>
   • Sigue las flechas verdes del piso: llevan al <b>punto de reunión</b>.<br>• <b>🔗 Compartir</b> genera el enlace y el QR de este edificio o del campus.</p>`);
 $('#bComp').onclick = () => dentro ? compartirEdif() : Compartir.abrir(Compartir.url('index.html'), 'Campus de Simulación SST');
-const compartirEdif = () => { const e = ED[dentro]; Compartir.abrir(Compartir.url('index.html?mundo=' + e.a.id), `${e.a.icono} ${e.a.nombre} · Campus de Simulación SST`); };
+const compartirEdif = () => { const a = areaDe(dentro); Compartir.abrir(Compartir.url('index.html?mundo=' + dentro), `${a.icono} ${a.nombre} · Campus de Simulación SST`); };
 $('#bCompEdif').onclick = compartirEdif;
+// mapa: viajar a edificios y zonas
+$('#barra .der').insertAdjacentHTML('afterbegin', '<button class="sec" id="bMapa" title="Mapa: viajar a edificios y zonas">🗺️<span class="txt"> Mapa</span></button>');
+$('#bMapa').onclick = () => { const b = (k, t) => `<button class="sec" data-ir="${k}" style="margin:3px">${t}</button>`;
+  modal(`<h2>🗺️ Mapa del campus</h2><p><b>Plaza y edificios</b><br>${b('plaza', '⛲ Plaza')}${AREAS.map(a => b('e:' + a.id, a.icono + ' ' + a.nombre)).join('')}</p>
+    <p><b>Zonas de trabajo</b> (alejadas del campus)<br>${Z.ZONAS.map(z => b('z:' + z.id, z.icono + ' ' + z.nombre)).join('')}</p>
+    <p class="fuente">Viajar usa teletransporte (sin mareo). Los modelos de cada zona se descargan al llegar. <a href="mundos/informacion/creditos.html">📜 Créditos de modelos 3D</a></p>`);
+  document.querySelectorAll('[data-ir]').forEach(x => x.onclick = () => { $('#modal').style.display = 'none'; const [t, id] = x.dataset.ir.split(':'); salirEdificio(true);
+    if (t === 'plaza') teletransportar(INICIO, null, Math.PI); else if (t === 'e') teletransportar(ED[id].frente, null, Math.atan2(-ED[id].frente.x, -ED[id].frente.z)); else irAZona(id); }); };
 
-// Etiquetas HTML: edificios, puertas y jugadores
-const capa = $('#etiquetas'); const etqEd = {}, etqPu = [];
-AREAS.forEach(a => {
-  const d = document.createElement('div'); d.className = 'etq edif'; d.style.setProperty('--c', '#' + a.color.toString(16).padStart(6, '0')); d.textContent = `${a.icono} ${a.nombre}`; d.onclick = () => irAEdificio(a.id); capa.appendChild(d); etqEd[a.id] = d;
-  ED[a.id].puertas.forEach(pu => { const el = document.createElement('div'); const m = pu.m;
-    el.className = `etq puerta ${m.estado === 'pronto' ? 'pronto' : m.tipo === 'juego' ? 'juego' : ''}`; el.style.display = 'none';
-    el.onclick = () => entrar(m); capa.appendChild(el); etqPu.push({ area: a.id, el, pu }); });
-});
-// Etiquetas de puertas: candado si el código de acceso no incluye esa puerta
-function pintarPuertas() { etqPu.forEach(({ el, pu }) => { const m = pu.m, libre = m.estado === 'pronto' || Acceso.puede(m.puerta);
-  el.classList.toggle('candado', !libre);
-  el.innerHTML = `<span class="i">${libre ? m.icono : '🔒'}</span>${m.titulo}<span class="t">${m.estado === 'pronto' ? 'PRÓXIMAMENTE' : !libre ? 'SOLICITAR ACCESO' : m.tipo === 'juego' ? 'JUEGO' : 'SIMULADOR 3D'}</span>`; }); }
-pintarPuertas();
-Acceso.listo.then(() => { pintarPuertas(); $('#accEstado').innerHTML = Acceso.textoEstado() + (Acceso.estado.modo === 'publico' ? ` · <a href="${Acceso.whatsapp('Hola, solicito acceso a la plataforma Campus de Simulación SST.')}" target="_blank" rel="noopener">💬 Pedir acceso por WhatsApp</a>` : ''); });
+// Etiquetas HTML: edificios, zonas, puertas (adentro) y jugadores
+const capa = $('#etiquetas'); const etqEd = {}, etqZo = {}; let etqPu = [];
+AREAS.forEach(a => { const d = document.createElement('div'); d.className = 'etq edif'; d.style.setProperty('--c', '#' + a.color.toString(16).padStart(6, '0')); d.textContent = `${a.icono} ${a.nombre}`; d.onclick = () => irAEdificio(a.id); capa.appendChild(d); etqEd[a.id] = d; });
+Z.ZONAS.forEach(z => { const d = document.createElement('div'); d.className = 'etq edif'; d.style.setProperty('--c', '#' + z.color.toString(16).padStart(6, '0')); d.textContent = `${z.icono} ${z.nombre}`; d.onclick = () => irAZona(z.id); capa.appendChild(d); etqZo[z.id] = d; });
+const etiquetaPuerta = m => { const libre = m.estado === 'pronto' || m.estado === 'pendiente' || Acceso.puede(m.puerta);
+  return { clase: `etq puerta ${m.estado === 'pronto' || m.estado === 'pendiente' ? 'pronto' : m.tipo === 'juego' ? 'juego' : ''} ${libre ? '' : 'candado'}`,
+    html: `<span class="i">${libre ? m.icono : '🔒'}</span>${m.titulo}<span class="t">${m.estado === 'pronto' ? 'PRÓXIMAMENTE' : m.estado === 'pendiente' ? 'PENDIENTE' : !libre ? 'SOLICITAR ACCESO' : m.tipo === 'juego' ? 'JUEGO' : m.tipo === 'sala' ? 'SALA 3D' : 'SIMULADOR 3D'}</span>` }; };
+function crearEtiquetasPuertas() { limpiarEtiquetasPuertas(); I.puertas.forEach((p, k) => { const el = document.createElement('div'), e = etiquetaPuerta(p.m); el.className = e.clase; el.innerHTML = e.html; el.onclick = () => irAPuerta(k); capa.appendChild(el); etqPu.push({ el, p }); }); }
+function limpiarEtiquetasPuertas() { etqPu.forEach(x => x.el.remove()); etqPu = []; }
+Acceso.listo.then(() => { if (I) crearEtiquetasPuertas(); $('#accEstado').innerHTML = Acceso.textoEstado() + (Acceso.estado.modo === 'publico' ? ` · <a href="${Acceso.whatsapp('Hola, solicito acceso a la plataforma Campus de Simulación SST.')}" target="_blank" rel="noopener">💬 Pedir acceso por WhatsApp</a>` : ''); });
 const v = new THREE.Vector3();
-function proyectar(p3, el) { v.copy(p3).project(camera); const vis = v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1;
-  el.style.visibility = vis ? 'visible' : 'hidden'; if (vis) { el.style.left = (v.x + 1) / 2 * innerWidth + 'px'; el.style.top = (1 - v.y) / 2 * innerHeight + 'px'; } }
+function proyectar(p3, el, ancho) { v.copy(p3).project(camera); const vis = v.z < 1 && Math.abs(v.x) < (ancho ? 1.6 : 1.1) && Math.abs(v.y) < 1.1;
+  el.style.visibility = vis ? 'visible' : 'hidden'; if (!vis) return; let x = (v.x + 1) / 2 * innerWidth;
+  if (ancho) x = Math.max(ancho / 2 + 4, Math.min(innerWidth - ancho / 2 - 4, x));   // etiquetas de puertas: siempre completas dentro de la pantalla
+  el.style.left = x + 'px'; el.style.top = (1 - v.y) / 2 * innerHeight + 'px'; }
 function actualizarEtiquetas() {
-  AREAS.forEach(a => { const el = etqEd[a.id]; el.style.display = dentro ? 'none' : 'block'; if (!dentro) proyectar(ED[a.id].techo.clone().applyMatrix4(ED[a.id].g.matrixWorld), el); });
-  let anchoPx = 110;
-  if (dentro) { const e = ED[dentro]; const a0 = e.puertas[0].ancla;
-    const a1 = a0.clone().applyMatrix4(e.g.matrixWorld).project(camera), a2 = a0.clone().setX(a0.x + PASO_PUERTA).applyMatrix4(e.g.matrixWorld).project(camera);
-    anchoPx = Math.max(64, Math.min(150, Math.abs(a2.x - a1.x) / 2 * innerWidth - 6)); }
-  etqPu.forEach(({ area, el, pu }) => { const on = dentro === area && camModo === 'edificio'; el.style.display = on ? 'block' : 'none';
-    if (on) { el.style.setProperty('--w', anchoPx + 'px'); el.style.setProperty('--fs', (anchoPx < 85 ? .72 : anchoPx < 110 ? .82 : .92) + 'rem'); proyectar(pu.ancla.clone().applyMatrix4(ED[area].g.matrixWorld), el); } });
-  OTROS.forEach(o => { o.el.style.display = dentro ? 'none' : 'block'; if (!dentro) proyectar(o.g.position.clone().setY(2.25), o.el); });
+  const vr = xr.activo(), fuera = !dentro && !vr;
+  AREAS.forEach(a => { const el = etqEd[a.id]; el.style.display = fuera ? 'block' : 'none'; if (fuera) proyectar(ED[a.id].techo.clone().applyMatrix4(ED[a.id].g.matrixWorld), el); });
+  Z.ZONAS.forEach(z => { const el = etqZo[z.id], d = yo.position.distanceTo(z.centro); el.style.display = fuera ? 'block' : 'none'; el.style.opacity = d < 60 ? 1 : .85; if (fuera) proyectar(z.puertaMundo.clone().setY(6), el); });
+  const anchoPx = 118; etqPu.forEach(({ el, p }) => { const on = !!dentro && !vr && p.ancla.distanceTo(yo.position) < 14; el.style.display = on ? 'block' : 'none';
+    if (on) { el.style.setProperty('--w', anchoPx + 'px'); el.style.setProperty('--fs', '.8rem'); proyectar(p.ancla, el, anchoPx + 16); } });
+  OTROS.forEach(o => { const on = o.g.visible && !vr; o.el.style.display = on ? 'block' : 'none'; if (on) proyectar(o.g.position.clone().setY(2.25), o.el); });
 }
 
-// Toques y clic: piso = caminar; edificio = ir y entrar; puerta (dentro) = abrir; señal = ficha
+// Toques y clic (y rayo del visor): piso = caminar; edificio = ir y entrar; puerta = abrir; silla = sentarse; señal = pararse a verla
+function tocar(u, punto, obj) {
+  if (u.tipo === 'senal') return verSenal(u.id, obj);
+  if (u.tipo === 'info') return abrirInfo();
+  if (u.tipo === 'imagen') return modal(`<h2>${u.titulo}</h2><img src="${u.src}" style="width:100%;max-width:420px;display:block;margin:auto;border-radius:12px">`);
+  if (u.tipo === 'pin') return modal(`<h2>${u.titulo}</h2><p>${u.texto}</p><p class="fuente">Marcador del recorrido. Los requisitos detallados se revisan en el curso correspondiente.</p>`);
+  if (dentro) { if (u.tipo === 'puerta') return irAPuerta(u.i); if (u.tipo === 'silla') return sentar(u.i); if (u.tipo === 'salir') return caminarA(I.salida.frente, () => salirEdificio());
+    if (u.piso && punto) caminarA(punto); return; }
+  if (u.tipo === 'zona') return irAZona(u.zona, true);
+  if (u.tipo === 'edificio' || u.tipo === 'puerta') return irAEdificio(u.area);
+  if (u.piso && punto) caminarA(punto);
+}
 const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let abajo = null;
 renderer.domElement.addEventListener('pointerdown', e => abajo = [e.clientX, e.clientY]);
 renderer.domElement.addEventListener('pointerup', e => {
   if (!abajo || Math.hypot(e.clientX - abajo[0], e.clientY - abajo[1]) > 10) return;
   ptr.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1); ray.setFromCamera(ptr, camera);
-  const h = ray.intersectObjects([...tocables, ...pisos], false)[0]; if (!h) return; const u = h.object.userData;
-  if (u.tipo === 'senal') return fichaSenal(u.id);
-  if (u.tipo === 'info') return abrirInfo();
-  if (u.tipo === 'imagen') return modal(`<h2>${u.titulo}</h2><img src="${u.src}" style="width:100%;max-width:420px;display:block;margin:auto;border-radius:12px">`);
-  if (dentro) { if (u.tipo === 'puerta' && u.area === dentro) entrar(AREAS.find(a => a.id === u.area).modulos[u.i]); return; }
-  if (u.tipo === 'edificio' || u.tipo === 'puerta') return irAEdificio(u.area);
-  if (u.piso) caminarA(h.point);
-});
+  const h = ray.intersectObjects([...tocAct(), ...pisAct()], false)[0]; if (h) tocar(h.object.userData, h.point, h.object); });
 const teclas = new Set(); addEventListener('keydown', e => { if (e.target.tagName === 'INPUT') return; teclas.add(e.key.toLowerCase()); if (e.key === 'Escape') salirEdificio(); }); addEventListener('keyup', e => teclas.delete(e.key.toLowerCase()));
-addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (dentro && camModo === 'edificio') entrarEdificio(dentro); });
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); ajustarFov(); });
+// realidad virtual del campus (motor/xr_campus.js): teletransporte con el rayo, toques con gatillo o pellizco
+const xr = crearXR({ THREE, renderer, camera, controls, contenedor: $('#barra .der'), escena: () => escena, objetivos: () => [...tocAct(), ...pisAct()], yo: () => yo,
+  alTocar: h => tocar(h.object.userData, h.point, h.object), alTeletransportar: p => { if (navAct().libre(p.x, p.z)) { levantar(); ruta = []; yo.position.set(p.x, 0, p.z); xr.colocar(p); } } });
 
 // ============================================================================ MULTIJUGADOR (servidor de aula en el mismo wifi)
 // Funciona cuando el campus se abre desde `python 05_herramientas/servidor_aula.py <curso>`: cada celular envía su
@@ -452,7 +542,7 @@ addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; cam
 // (SalaLinea, WebRTC con PeerJS: gratis y sin cuentas; la persona que crea la sala la mantiene abierta).
 const MP = { activo: false, modo: '', id: sessionStorage.getItem('mp_id') || Math.random().toString(36).slice(2, 10) }; sessionStorage.setItem('mp_id', MP.id);
 const OTROS = new Map();
-const miEstado = () => ({ id: MP.id, perfil: Avatar.limpiar(perfil), x: +yo.position.x.toFixed(2), z: +yo.position.z.toFixed(2), ry: +yo.rotation.y.toFixed(2), lugar: dentro || 'plaza', andando: !!destino || teclas.size > 0 });
+const miEstado = () => ({ id: MP.id, perfil: Avatar.limpiar(perfil), x: +yo.position.x.toFixed(2), z: +yo.position.z.toFixed(2), ry: +yo.rotation.y.toFixed(2), lugar: dentro || 'plaza', andando: ruta.length > 0 || teclas.size > 0 });
 function procesarJugadores(lista) {
   const vistos = new Set();
   lista.filter(j => j && j.id && j.id !== MP.id).forEach(j => { vistos.add(j.id); let o = OTROS.get(j.id); const firma = JSON.stringify(j.perfil);
@@ -514,40 +604,53 @@ $('#bSalir').onclick = () => { sessionStorage.removeItem('campus_entro'); abrirI
 addEventListener('resize', () => pr.activo && tamPrevia());
 
 // ============================================================================ CICLO
-const reloj = new THREE.Clock(); const prev = new THREE.Vector3();
-renderer.setAnimationLoop(() => {
-  const dt = Math.min(0.05, reloj.getDelta()), ahora = performance.now(), t = reloj.elapsedTime;
+const reloj = new THREE.Clock(); const prev = new THREE.Vector3(); window.__fps = 0; let nCuadros = 0, tFps = 0;
+let dtForzado = null;   // solo modo de prueba (?qa): avanzar el ciclo aunque la pestaña esté oculta
+function cuadro() {
+  const dt = dtForzado ?? Math.min(0.05, reloj.getDelta()), ahora = performance.now() + (dtForzado ? (cuadro.extra = (cuadro.extra || 0) + dtForzado * 1000) : (cuadro.extra || 0)), t = reloj.elapsedTime;
   if (pr.activo) { if (pr.g) pr.g.rotation.y = t * 0.6; pr.r.render(pr.s, pr.c); return; }
+  nCuadros++; tFps += dt; if (tFps > 1) { window.__fps = Math.round(nCuadros / tFps); nCuadros = 0; tFps = 0; }
   for (let i = tweens.length - 1; i >= 0; i--) { const tw = tweens[i]; const k = Math.min(1, (ahora - tw.t0) / tw.ms); const ee = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
     tw.v.lerpVectors(tw.de, tw.a, ee); if (k >= 1) { tweens.splice(i, 1); tw.res(); } }
-  prev.copy(yo.position);
-  if (!dentro && teclas.size) { const f = new THREE.Vector3(); camera.getWorldDirection(f); f.y = 0; f.normalize(); const r = new THREE.Vector3(-f.z, 0, f.x); const d = new THREE.Vector3();
+  prev.copy(yo.position); const nav = navAct(), vr = xr.activo();
+  // teclado (computadora): avanza si la celda está libre; si choca, se desliza por el eje que sí está libre
+  if (teclas.size && !vr) { const f = new THREE.Vector3(); camera.getWorldDirection(f); f.y = 0; f.normalize(); const r = new THREE.Vector3(-f.z, 0, f.x); const d = new THREE.Vector3();
     if (teclas.has('w') || teclas.has('arrowup')) d.add(f); if (teclas.has('s') || teclas.has('arrowdown')) d.sub(f);
     if (teclas.has('d') || teclas.has('arrowright')) d.add(r); if (teclas.has('a') || teclas.has('arrowleft')) d.sub(r);
-    if (d.lengthSq()) { destino = null; marca.visible = false; $('#ayuda').style.display = 'none'; d.normalize(); limitar(yo.position.addScaledVector(d, 4.5 * dt)); yo.rotation.y = Math.atan2(d.x, d.z); } }
-  if (destino) { const d = destino.clone().sub(yo.position); d.y = 0; const L = d.length();
-    if (L < 0.08) { destino = null; marca.visible = false; const cb = alLlegar; alLlegar = null; cb && cb(); }
-    else { d.normalize(); yo.position.addScaledVector(d, Math.min(L, 5 * dt)); yo.rotation.y = Math.atan2(d.x, d.z); } }
-  obstaculos.forEach(o => { const dx = yo.position.x - o.x, dz = yo.position.z - o.z, dd = Math.hypot(dx, dz); if (dd < o.r + 0.3 && dd > 0) { yo.position.x = o.x + dx / dd * (o.r + 0.3); yo.position.z = o.z + dz / dd * (o.r + 0.3); } });
-  const andando = yo.position.distanceToSquared(prev) > 1e-6; fase += andando ? dt * 10 : 0; animYo(fase, andando);
-  OTROS.forEach(o => { if (!o.meta) return; const d = o.meta.clone().sub(o.g.position); const mov = d.length() > 0.02; o.g.position.lerp(o.meta, Math.min(1, dt * 6)); o.g.rotation.y = o.ry; o.g.visible = o.lugar === 'plaza';
-    o.fase += mov ? dt * 10 : 0; o.animar(o.fase, mov); });
-  if (camModo === 'seguir') { const delta = yo.position.clone().sub(prev); camera.position.add(delta); controls.target.add(delta); }
-  // agua de la fuente
-  for (let i = 0; i < gotas; i++) { const k = (gfase[i] + t * 0.55) % 1, r = k * 2.4, a = gdir[i]; gp[i * 3] = Math.cos(a) * r; gp[i * 3 + 1] = 1.4 * k - 3.2 * k * k * 1.5 + 0.2; gp[i * 3 + 2] = Math.sin(a) * r; }
-  gGeo.attributes.position.needsUpdate = true;
-  marca.rotation.z += dt * 2; escultura.rotation.y = t * 0.35;
-  controls.update(); renderer.render(scene, camera); actualizarEtiquetas();
-});
+    if (d.lengthSq()) { ruta = []; marca.visible = false; levantar(); $('#ayuda').style.display = 'none'; d.normalize(); const paso = (dentro ? 3.6 : 4.5) * dt, x = yo.position.x + d.x * paso, z = yo.position.z + d.z * paso;
+      if (nav.libre(x, z)) yo.position.set(x, 0, z); else if (nav.libre(x, yo.position.z)) yo.position.x = x; else if (nav.libre(yo.position.x, z)) yo.position.z = z;
+      yo.rotation.y = Math.atan2(d.x, d.z); } }
+  // seguir la ruta calculada (A*)
+  if (ruta.length && !vr) { const m = ruta[0], dx = m.x - yo.position.x, dz = m.z - yo.position.z, L = Math.hypot(dx, dz);
+    if (L < 0.08) { ruta.shift(); if (!ruta.length) { marca.visible = false; const cb = alLlegar; alLlegar = null; cb && cb(); } }
+    else { const s = Math.min(L, (dentro ? 3.6 : 5) * dt); yo.position.x += dx / L * s; yo.position.z += dz / L * s; yo.rotation.y = Math.atan2(dx, dz); } }
+  if (vr) xr.actualizar();
+  const andando = yo.position.distanceToSquared(prev) > 1e-6; fase += andando ? dt * 10 : 0; animYo(fase, andando, pose);
+  const lugar = dentro || 'plaza';
+  OTROS.forEach(o => { if (!o.meta) return; const d = o.meta.clone().sub(o.g.position); const mov = d.length() > 0.02; o.g.position.lerp(o.meta, Math.min(1, dt * 6)); o.g.rotation.y = o.ry;
+    o.g.visible = o.lugar === lugar; if (o.g.visible && o.g.parent !== escena) escena.add(o.g); o.fase += mov ? dt * 10 : 0; o.animar(o.fase, mov); });
+  if (camModo === 'seguir' && !vr) { const delta = yo.position.clone().sub(prev); delta.y = 0; camera.position.add(delta); controls.target.add(delta); }
+  if (I) I.actualizar(dt, vr ? null : camera, yo); else Z.actualizar(dt, yo.position);
+  if (!I) { for (let i = 0; i < gotas; i++) { const k = (gfase[i] + t * 0.55) % 1, r = k * 2.4, a = gdir[i]; gp[i * 3] = Math.cos(a) * r; gp[i * 3 + 1] = 1.4 * k - 3.2 * k * k * 1.5 + 0.2; gp[i * 3 + 2] = Math.sin(a) * r; }
+    gGeo.attributes.position.needsUpdate = true; escultura.rotation.y = t * 0.35; }
+  marca.rotation.z += dt * 2;
+  if (!vr) controls.update(); renderer.render(escena, camera); actualizarEtiquetas();
+}
+renderer.setAnimationLoop(cuadro);
 
 // ============================================================================ INICIO
-camera.position.copy(INICIO).add(OFFSET); controls.target.copy(INICIO).setY(1);
+ajustarFov(); camera.position.copy(INICIO).add(OFFSET); controls.target.copy(INICIO).setY(1);
 const pedido = P.get('mundo');
-if (pedido && ED[pedido]) { yo.position.copy(ED[pedido].frente); $('#ayuda').style.display = 'none'; camera.position.copy(yo.position).add(OFFSET); controls.target.copy(yo.position).setY(1); entrarEdificio(pedido); }
+if (pedido && (ED[pedido] || Z.ZONAS.find(z => z.id === pedido))) { const fuera = ED[pedido] ? ED[pedido].frente : Z.ZONAS.find(z => z.id === pedido).puertaMundo;
+  yo.position.copy(fuera); $('#ayuda').style.display = 'none'; colocarCamara(); entrarEdificio(pedido); }
+if (P.get('zona')) { const z = Z.ZONAS.find(q => q.id === P.get('zona')); if (z) { yo.position.copy(z.entrada); colocarCamara(); Z.cargar(z.id); } }
 if (P.has('salir') || (!pedido && !P.has('plaza') && !sessionStorage.getItem('campus_entro') && !QA) || (!perfil.nombre && !QA)) abrirInicio();
 if (P.has('salir') || P.has('plaza')) history.replaceState(null, '', location.pathname + (QA ? '?qa' : ''));
-if (QA) window.__qa = { AREAS, ED, camera, controls, irAEdificio, salirEdificio, atras, reiniciar, abrirInicio, cerrarInicio, fichaSenal, entrar: (a, i) => entrar(AREAS.find(x => x.id === a).modulos[i]), yo: () => yo, caminarA: (x, z) => caminarA(new THREE.Vector3(x, 0, z)),
-  estado: () => ({ dentro, camModo, pila: pila.length, mp: MP.activo, otros: OTROS.size, pos: yo.position.toArray().map(n => +n.toFixed(2)) }) };
+if (QA) window.__qa = { AREAS, ED, Z, NAV, KIT, camera, controls, irAEdificio, irAZona, entrarEdificio, salirEdificio, atras, reiniciar, abrirInicio, cerrarInicio, fichaSenal, teletransportar, sentar, irAPuerta,
+  entrar: (a, i) => entrar(AREAS.find(x => x.id === a).modulos[i]), yo: () => yo, I: () => I, caminarA: (x, z, cb) => caminarA(new THREE.Vector3(x, 0, z), cb), tocar,
+  avanzar: async seg => { for (let i = 0; i < seg * 30; i++) { dtForzado = 1 / 30; cuadro(); if (i % 30 === 29) await new Promise(r => setTimeout(r, 0)); } dtForzado = null; cuadro.extra = 0; },
+  estado: () => ({ dentro, pose, ruta: ruta.length, camModo, pila: pila.length, mp: MP.activo, otros: OTROS.size, pos: yo.position.toArray().map(n => +n.toFixed(2)), fps: window.__fps,
+    zonas: Object.fromEntries(Z.ZONAS.map(z => [z.id, z.estado + (z.ms ? ' ' + z.ms + ' ms' : '')])), kits: KIT.tiempos }) };
 </script>
 </body>
 </html>
