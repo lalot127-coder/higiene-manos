@@ -54,6 +54,7 @@ button{font-family:inherit;cursor:pointer}.sec{background:var(--hielo);color:var
 <script src="motor/compartir.js"></script>
 <script src="motor/acceso.js"></script>
 <script src="motor/sala_en_linea.js"></script>
+<script src="motor/realismo.js"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body>
@@ -96,6 +97,7 @@ document.head.insertAdjacentHTML('beforeend', `<style>${Avatar.CSS}</style>`);
 const AREAS = [
   { id: 'cafeteria', nombre: 'Cafetería', icono: '☕', color: 0xB8662E, ang: 60, desc: 'Juegos para repasar: memorama, adivina quién, serpientes y escaleras, ruleta', senales: ['salida', 'no_fumar'],
     modulos: [
+      { titulo: 'Análisis de riesgo del edificio', icono: '🔎', tipo: '3d', url: 'mundos/riesgo/analisis/index.html?e=cafeteria' },
       { titulo: 'Memorama de señales', icono: '🧩', tipo: 'juego', url: 'mundos/cafeteria/memorama.html' },
       { titulo: 'Adivina quién: las NOM', icono: '🕵️', tipo: 'juego', url: 'mundos/cafeteria/adivina_nom.html' },
       { titulo: 'Serpientes y escaleras', icono: '🎲', tipo: 'juego', url: 'mundos/cafeteria/serpientes_escaleras.html' },
@@ -103,6 +105,7 @@ const AREAS = [
     ] },
   { id: 'hospital', nombre: 'Hospital', icono: '🏥', color: 0x154F90, ang: 100, desc: 'Movilización de pacientes, higiene de manos, control de infecciones, RPBI y primeros auxilios (RCP, DEA, atragantamiento y hemorragias)', senales: ['salida', 'primeros'],
     modulos: [
+      { titulo: 'Análisis de riesgo del edificio', icono: '🔎', tipo: '3d', url: 'mundos/riesgo/analisis/index.html?e=hospital' },
       { titulo: 'Camilleros: traslado seguro', icono: '🛏️', tipo: '3d', url: 'mundos/hospital/camilleros/index.html' },
       { titulo: 'Los 5 momentos', icono: '🖐️', tipo: '3d', url: 'mundos/hospital/higiene_manos_5momentos/index.html' },
       { titulo: 'Lavado de manos correcto', icono: '🧼', tipo: '3d', url: 'mundos/hospital/higiene_manos_tecnica/index.html' },
@@ -123,7 +126,18 @@ const AREAS = [
     ] },
   { id: 'industria', nombre: 'Industria', icono: '🏭', color: 0x5B6B7C, ang: 140, desc: 'Mundos por norma STPS', senales: ['salida', 'casco', 'auditiva'],
     modulos: [
+      { titulo: 'Riesgo 1: Normativa del análisis', icono: '📜', tipo: '3d', url: 'mundos/industria/riesgo_normativa/index.html' },
+      { titulo: 'Riesgo 2: ¿Es riesgo o no?', icono: '⚠️', tipo: '3d', url: 'mundos/industria/riesgo_es_riesgo/index.html' },
+      { titulo: 'Riesgo 3: Mitigación (controles)', icono: '🛡️', tipo: '3d', url: 'mundos/industria/riesgo_mitigacion/index.html' },
+      { titulo: 'Análisis de riesgo del edificio', icono: '🔎', tipo: '3d', url: 'mundos/riesgo/analisis/index.html?e=industria' },
+      { titulo: '¿Es riesgo o no? (juego)', icono: '🎮', tipo: 'juego', url: '../03_cursos/BASE_analisis_de_riesgo_5h/05_recursos_digitales/juego_riesgo_o_no.html' },
+      { titulo: 'Calcula el riesgo: matriz NOM-031', icono: '🧮', tipo: 'juego', url: '../03_cursos/BASE_analisis_de_riesgo_5h/05_recursos_digitales/juego_matriz_nom031.html' },
+      { titulo: 'Ordena los controles', icono: '🪜', tipo: 'juego', url: '../03_cursos/BASE_analisis_de_riesgo_5h/05_recursos_digitales/juego_ordena_controles.html' },
+      { titulo: '¿Qué método uso?', icono: '🧭', tipo: 'juego', url: '../03_cursos/BASE_analisis_de_riesgo_5h/05_recursos_digitales/juego_que_metodo.html' },
+      { titulo: 'Maratón de análisis de riesgo', icono: '🏁', tipo: 'juego', url: '../03_cursos/BASE_analisis_de_riesgo_5h/05_recursos_digitales/juego_maraton_equipos.html' },
       { titulo: 'Trabajos en alturas', icono: '🪜', tipo: 'sala', url: 'mundos/modulos/index.html?m=alturas', nom: 'NOM-009-STPS-2011', color: 'amarillo', senal: 'caida' },
+      { titulo: 'Alturas 6: Escalera y plataforma de elevación', icono: '🛗', tipo: '3d', url: 'mundos/industria/alturas_escalera_plataforma/index.html', nom: 'NOM-009-STPS-2011', color: 'azul', senal: 'caida' },
+      { titulo: 'Alturas 7: Autorización por escrito', icono: '📝', tipo: '3d', url: 'mundos/industria/alturas_autorizacion/index.html', nom: 'NOM-009-STPS-2011', color: 'azul', senal: 'informacion' },
       { titulo: 'Espacios confinados', icono: '🕳️', tipo: 'sala', url: 'mundos/modulos/index.html?m=espacios-confinados', nom: 'NOM-033-STPS-2015', color: 'amarillo', senal: 'prec_general' },
       { titulo: 'Seguridad eléctrica', icono: '⚡', tipo: 'sala', url: 'mundos/modulos/index.html?m=seguridad-electrica', nom: 'NOM-029-STPS-2011', color: 'amarillo', senal: 'electrico' },
       { titulo: 'Bloqueo y etiquetado (LOTO)', icono: '🔒', tipo: 'sala', url: 'mundos/modulos/index.html?m=loto', nom: 'NOM-004-STPS-1999 · NOM-029-STPS-2011', color: 'azul', senal: 'guantes' },
@@ -146,12 +160,14 @@ const AREAS = [
     ] },
   { id: 'proteccion', nombre: 'Protección civil', icono: '🚨', color: 0xE07A1F, ang: 180, desc: 'Extintores (NOM-002-STPS-2010), evacuación y punto de reunión · con modo de realidad virtual y mixta', senales: ['salida', 'alarma', 'telefono'],
     modulos: [
+      { titulo: 'Análisis de riesgo del edificio', icono: '🔎', tipo: '3d', url: 'mundos/riesgo/analisis/index.html?e=proteccion' },
       { titulo: 'Uso de extintores: fuego real virtual', icono: '🧯', tipo: '3d', url: 'mundos/proteccion/extintores/index.html' },
       { titulo: 'Evacuación al punto de reunión', icono: '🏃', tipo: '3d', url: 'mundos/proteccion/evacuacion/index.html' },
       { titulo: 'Evacuación hospitalaria', icono: '🚪', tipo: '3d', estado: 'pronto' },
       { titulo: 'Extintores y fuego: equipo', icono: '🧯', tipo: 'sala', url: 'mundos/modulos/index.html?m=extintores-fuego', nom: 'NOM-002-STPS-2010', color: 'rojo', senal: 'extintor' }] },
   { id: 'laboral', nombre: 'Laboral STPS', icono: '⚖️', color: 0x1F4E79, ang: 220, desc: 'Inspecciones de la STPS (recepción, visita y acta) y NOM-035 de factores de riesgo psicosocial: 4 escenarios inmersivos con realidad virtual', senales: ['salida', 'informacion'],
     modulos: [
+      { titulo: 'Análisis de riesgo del edificio', icono: '🔎', tipo: '3d', url: 'mundos/riesgo/analisis/index.html?e=laboral' },
       { titulo: 'Recepción del inspector', icono: '🛎️', tipo: '3d', url: 'mundos/laboral/recepcion_inspector/index.html' },
       { titulo: 'La visita de inspección', icono: '📋', tipo: '3d', url: 'mundos/laboral/visita_inspeccion/index.html' },
       { titulo: 'Día D: ¿lo haces o no?', icono: '🎮', tipo: 'juego', url: '../03_cursos/BASE_auditorias_stps_2h/05_recursos_digitales/juego_dia_d.html' },
@@ -168,6 +184,7 @@ const AREAS = [
     ] },
   { id: 'empresa', nombre: 'Empresa · RH', icono: '🏢', color: 0x14284B, ang: 260, desc: 'Jornada laboral de 40 horas: auditoría, horarios y cumplimiento', senales: ['salida', 'no_fumar'],
     modulos: [
+      { titulo: 'Análisis de riesgo del edificio', icono: '🔎', tipo: '3d', url: 'mundos/riesgo/analisis/index.html?e=empresa' },
       { titulo: 'Oficina de RH: auditoría del checador', icono: '⏱️', tipo: '3d', url: 'mundos/empresa/rh_checador/index.html' },
       { titulo: 'Mesa de ayuda: preguntas sobre horarios', icono: '❓', tipo: '3d', url: 'mundos/empresa/horarios_qa/index.html' },
       { titulo: '¿Cumple o no cumple?', icono: '🎮', tipo: 'juego', url: '../03_cursos/BASE_jornada_40_horas_2h/05_recursos_digitales/juego_cumple_o_no.html' },
@@ -181,6 +198,7 @@ const AREAS = [
     ] },
   { id: 'biblioteca', nombre: 'Biblioteca', icono: '📚', color: 0x5D4037, ang: 300, desc: 'Leyes, reglamentos, NOM y tratados por dependencia, con liga oficial y referencia APA', senales: ['salida', 'accesible'],
     modulos: [
+      { titulo: 'Análisis de riesgo del edificio', icono: '🔎', tipo: '3d', url: 'mundos/riesgo/analisis/index.html?e=biblioteca' },
       { titulo: 'Sala de lectura', icono: '📖', tipo: '3d', url: 'mundos/biblioteca/index.html' },
       { titulo: 'Reto: encuentra la norma', icono: '🔎', tipo: '3d', url: 'mundos/biblioteca/index.html?reto' },
     ] },
@@ -201,8 +219,11 @@ const scene = new THREE.Scene(); scene.background = new THREE.Color(0xBFE0F0); s
 const camera = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 700);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.46; controls.minDistance = 4; controls.maxDistance = 38; controls.enablePan = false;
-scene.add(new THREE.HemisphereLight(0xffffff, 0x88a0b0, 1.2));
+const hemi = new THREE.HemisphereLight(0xffffff, 0x88a0b0, 1.2); scene.add(hemi);
 const sol = new THREE.DirectionalLight(0xffffff, 1.3); sol.position.set(10, 18, 12); scene.add(sol);
+// gráficos más realistas (motor/realismo.js): cielo con degradado, tono ACES, reflejos; sombras que siguen al avatar (solo
+// en computadora: en celular el mundo completo con sombras sería lento)
+if (window.Realismo) Realismo.aplicar(THREE, renderer, scene, { sol, hemi, radio: 34, cielo: true, soloAlta: true, exposicion: 0.95 });
 const MATS = {}; const M = (c, x) => x ? new THREE.MeshStandardMaterial({ color: c, roughness: .7, metalness: .05, ...x }) : (MATS[c] || (MATS[c] = new THREE.MeshStandardMaterial({ color: c, roughness: .7, metalness: .05 })));
 const caja = (w, h, d, c, x, y, z, p = scene) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c)); m.position.set(x, y, z); p.add(m); return m; };
 const cil = (r, h, c, x, y, z, p = scene, rt) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(rt ?? r, r, h, 20), M(c)); m.position.set(x, y, z); p.add(m); return m; };
@@ -226,14 +247,16 @@ const KIT = new Kit3D(THREE, ''), PROPS = Props(THREE);
 
 // ---------------------------------------------------------------- suelo, plaza, anillo y caminos
 const pisos = [];
-const disco = (r0, r1, c, y) => { const m = new THREE.Mesh(r0 ? new THREE.RingGeometry(r0, r1, 96) : new THREE.CircleGeometry(r1, 96), M(c)); m.rotation.x = -Math.PI / 2; m.position.y = y; m.userData.piso = true; scene.add(m); pisos.push(m); return m; };
+// texturas reales CC0 (motor/realismo.js): pasto, concreto y adoquín; las UV de círculos van de 0 a 1 → repetición según el radio
+const realPiso = (m, n, rx, ry) => { if (window.Realismo) m.material = Realismo.material(THREE, m.material, n, rx, ry ?? rx); return m; };
+const disco = (r0, r1, c, y, piso) => { const m = new THREE.Mesh(r0 ? new THREE.RingGeometry(r0, r1, 96) : new THREE.CircleGeometry(r1, 96), M(c)); m.rotation.x = -Math.PI / 2; m.position.y = y; m.userData.piso = true; scene.add(m); pisos.push(m); if (piso) realPiso(m, piso, r1 / 1.5); return m; };
 { const forma = new THREE.Shape(); forma.absarc(0, 0, R_MUNDO + 30, 0, Math.PI * 2, false);
   HUECOS.forEach(h => { const q = new THREE.Path(); q.absarc(h.x, -h.z, h.r, 0, Math.PI * 2, true); forma.holes.push(q); });   // -z: el plano se gira -90° en x
-  const suelo = new THREE.Mesh(new THREE.ShapeGeometry(forma, 96), M(0x9CC48E)); suelo.rotation.x = -Math.PI / 2; suelo.userData.piso = true; scene.add(suelo); pisos.push(suelo); } disco(0, R_PLAZA, 0xE9E4DA, 0.012); disco(R_PLAZA - 0.35, R_PLAZA, 0xC9BFAF, 0.016);
-disco(20.5, 24.9, 0xE2DDD3, 0.012);
+  const suelo = new THREE.Mesh(new THREE.ShapeGeometry(forma, 96), M(0x9CC48E)); suelo.rotation.x = -Math.PI / 2; suelo.userData.piso = true; scene.add(suelo); pisos.push(suelo); realPiso(suelo, 'pasto', 1 / 3); } disco(0, R_PLAZA, 0xE9E4DA, 0.012, 'concreto_pulido'); disco(R_PLAZA - 0.35, R_PLAZA, 0xC9BFAF, 0.016);
+disco(20.5, 24.9, 0xE2DDD3, 0.012, 'concreto_pulido');
 for (let r = 3.5; r < R_PLAZA; r += 3) disco(r - 0.05, r, 0xD6CFC2, 0.014);   // juntas del adoquín
 function camino(a, r0, r1, ancho = 3) { const c = polar(a, (r0 + r1) / 2); const m = new THREE.Mesh(new THREE.PlaneGeometry(ancho, r1 - r0), M(0xE2DDD3));
-  m.rotation.x = -Math.PI / 2; m.rotation.z = -rad(a); m.position.set(c.x, 0.011, c.z); m.userData.piso = true; scene.add(m); pisos.push(m); NAV.camino(c.x, c.z, ancho, r1 - r0, rad(a), .45); }
+  m.rotation.x = -Math.PI / 2; m.rotation.z = -rad(a); m.position.set(c.x, 0.011, c.z); m.userData.piso = true; scene.add(m); pisos.push(m); realPiso(m, 'concreto_pulido', ancho / 2.5, (r1 - r0) / 2.5); NAV.camino(c.x, c.z, ancho, r1 - r0, rad(a), .45); }
 AREAS.forEach(a => camino(a.ang, R_PLAZA - 0.5, 21, 3)); camino(0, R_PLAZA - 0.5, 30, 4);
 
 // ---------------------------------------------------------------- fuente central con monolito de logos
@@ -429,7 +452,7 @@ function entrarEdificio(id) {
   setTimeout(() => {
     if (!INTERIORES[id]) INTERIORES[id] = construirInterior({ ...a, modulos: a.modulos.map(m => ({ ...m, senal: m.senal || SENAL_AREA[a.id] || 'informacion', puerta: m.puerta || `${a.id}/pendiente` })) },
       { THREE, kit: KIT, props: PROPS, logo: logoCERS, piso: a.piso || PISO_AREA[a.id] || 'concreto', base: '' });
-    I = INTERIORES[id]; dentro = id; escena = I.escena; levantar(); ruta = []; escena.add(yo); escena.add(marca); marca.visible = false;
+    I = INTERIORES[id]; dentro = id; escena = I.escena; if (scene.environment && !escena.environment) escena.environment = scene.environment;   // mismos reflejos adentro levantar(); ruta = []; escena.add(yo); escena.add(marca); marca.visible = false;
     yo.position.copy(I.entrada); yo.rotation.y = Math.PI; colocarCamara(); controls.maxDistance = 26;
     history.replaceState(null, '', '?mundo=' + id + (QA ? '&qa' : ''));
     $('#dTit').innerHTML = `${a.icono} ${a.nombre}<small>Camina por el pasillo y toca una puerta · siéntate en la sala de espera · toca las señales</small>`; $('#dentro').style.display = 'flex'; $('#ayuda').style.display = 'none';
@@ -496,7 +519,7 @@ const etiquetaPuerta = m => { const libre = m.estado === 'pronto' || m.estado ==
     html: `<span class="i">${libre ? m.icono : '🔒'}</span>${m.titulo}<span class="t">${m.estado === 'pronto' ? 'PRÓXIMAMENTE' : m.estado === 'pendiente' ? 'PENDIENTE' : !libre ? 'SOLICITAR ACCESO' : m.tipo === 'juego' ? 'JUEGO' : m.tipo === 'sala' ? 'SALA 3D' : 'SIMULADOR 3D'}</span>` }; };
 function crearEtiquetasPuertas() { limpiarEtiquetasPuertas(); I.puertas.forEach((p, k) => { const el = document.createElement('div'), e = etiquetaPuerta(p.m); el.className = e.clase; el.innerHTML = e.html; el.onclick = () => irAPuerta(k); capa.appendChild(el); etqPu.push({ el, p }); }); }
 function limpiarEtiquetasPuertas() { etqPu.forEach(x => x.el.remove()); etqPu = []; }
-Acceso.listo.then(() => { if (I) crearEtiquetasPuertas(); $('#accEstado').innerHTML = Acceso.textoEstado() + (Acceso.estado.modo === 'publico' ? ` · <a href="${Acceso.whatsapp('Hola, solicito acceso a la plataforma Campus de Simulación SST.')}" target="_blank" rel="noopener">💬 Pedir acceso por WhatsApp</a>` : ''); });
+Acceso.sesionUnica(); Acceso.listo.then(() => { if (I) crearEtiquetasPuertas(); $('#accEstado').innerHTML = Acceso.textoEstado() + (Acceso.estado.modo === 'publico' ? ` · <a href="${Acceso.whatsapp('Hola, solicito acceso a la plataforma Campus de Simulación SST.')}" target="_blank" rel="noopener">💬 Pedir acceso por WhatsApp</a>` : ''); });
 const v = new THREE.Vector3();
 function proyectar(p3, el, ancho) { v.copy(p3).project(camera); const vis = v.z < 1 && Math.abs(v.x) < (ancho ? 1.6 : 1.1) && Math.abs(v.y) < 1.1;
   el.style.visibility = vis ? 'visible' : 'hidden'; if (!vis) return; let x = (v.x + 1) / 2 * innerWidth;
@@ -634,6 +657,7 @@ function cuadro() {
   if (!I) { for (let i = 0; i < gotas; i++) { const k = (gfase[i] + t * 0.55) % 1, r = k * 2.4, a = gdir[i]; gp[i * 3] = Math.cos(a) * r; gp[i * 3 + 1] = 1.4 * k - 3.2 * k * k * 1.5 + 0.2; gp[i * 3 + 2] = Math.sin(a) * r; }
     gGeo.attributes.position.needsUpdate = true; escultura.rotation.y = t * 0.35; }
   marca.rotation.z += dt * 2;
+  if (sol.castShadow && yo) { sol.position.set(yo.position.x + 10, 18, yo.position.z + 12); sol.target.position.copy(yo.position); sol.target.updateMatrixWorld(); }   // sombras alrededor del avatar
   if (!vr) controls.update(); renderer.render(escena, camera); actualizarEtiquetas();
 }
 renderer.setAnimationLoop(cuadro);

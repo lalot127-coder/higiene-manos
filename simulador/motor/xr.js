@@ -9,6 +9,13 @@
 //  · Apuntar al piso y apretar el gatillo = desplazarse ahí (teletransporte). Botón lateral (squeeze) = traer el panel
 //    al frente.
 // cfg.xr del sub-mundo: { inicio: [x, z], piso: Mesh, entorno: [Mesh…] (se ocultan en realidad mixta) }
+// Solo se ofrece VR / realidad mixta en visores (Meta Quest, Pico…) y computadoras. En celulares Android el navegador
+// dice "soporta VR" (modo Cardboard) y la pantalla se partía en dos sin ocupar todo el espacio (07/10/2026).
+// Forzar en cualquier equipo: agregar ?xr=1 a la dirección.
+window.CampusXR = window.CampusXR || (() => { const ua = navigator.userAgent || '';
+  const visor = /OculusBrowser|Quest|Pico|Wolvic|Vive|SamsungBrowser\/.*VR/i.test(ua);
+  const movil = !visor && (/Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (navigator.maxTouchPoints > 1 && matchMedia('(pointer: coarse)').matches));
+  return { visor, movil, permitir: visor || !movil || /[?&]xr=1/.test(location.search) }; })();
 (function () {
   const ANCHO = 1024, ALTO = 1280, MW = 0.95, MH = MW * ALTO / ANCHO;
 
@@ -140,7 +147,7 @@
       s.addEventListener('end', () => { renderer.xr.setReferenceSpace(null); scene.background = fondo; (opc.entorno || []).forEach(o => o.visible = true); panel.visible = false; mira.visible = false; controls.enabled = true; });
     }
     (async () => {
-      if (!navigator.xr) return;
+      if (!navigator.xr || !window.CampusXR.permitir) return;
       const der = document.querySelector('#barra .der'); if (!der) return;
       for (const [modo, txt, tit] of [['immersive-ar', '🔲', 'Realidad mixta: tu espacio real'], ['immersive-vr', '🥽 VR', 'Entrar en realidad virtual']]) {
         let ok = false; try { ok = await navigator.xr.isSessionSupported(modo); } catch (e) { }

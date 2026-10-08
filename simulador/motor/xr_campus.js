@@ -1,3 +1,10 @@
+// Solo se ofrece VR / realidad mixta en visores (Meta Quest, Pico…) y computadoras. En celulares Android el navegador
+// dice "soporta VR" (modo Cardboard) y la pantalla se partía en dos sin ocupar todo el espacio (07/10/2026).
+// Forzar en cualquier equipo: agregar ?xr=1 a la dirección.
+window.CampusXR = window.CampusXR || (() => { const ua = navigator.userAgent || '';
+  const visor = /OculusBrowser|Quest|Pico|Wolvic|Vive|SamsungBrowser\/.*VR/i.test(ua);
+  const movil = !visor && (/Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (navigator.maxTouchPoints > 1 && matchMedia('(pointer: coarse)').matches));
+  return { visor, movil, permitir: visor || !movil || /[?&]xr=1/.test(location.search) }; })();
 // Realidad virtual (WebXR) para el campus, los interiores y las salas de módulos (módulo ES). Probado para el navegador
 // del Meta Quest 3S; en computadora/celular sin visor no aparece el botón.
 // - Rayo desde cada control (o mano: el pellizco cuenta como "select"). Apuntar al PISO + gatillo = TELETRANSPORTE
@@ -27,7 +34,7 @@ export function crearXR(o) {
   // ---------------- botón
   const btn = document.createElement('button'); btn.className = 'sec'; btn.id = 'bVR'; btn.textContent = '🥽 VR'; btn.title = 'Entrar en realidad virtual (Meta Quest)'; btn.style.display = 'none';
   if (o.contenedor) o.contenedor.prepend(btn);
-  if (navigator.xr && navigator.xr.isSessionSupported) navigator.xr.isSessionSupported('immersive-vr').then(ok => { if (ok) btn.style.display = ''; }).catch(() => { });
+  if (navigator.xr && navigator.xr.isSessionSupported && window.CampusXR.permitir) navigator.xr.isSessionSupported('immersive-vr').then(ok => { if (ok) btn.style.display = ''; }).catch(() => { });
   btn.onclick = async () => { if (sesion) { sesion.end(); return; }
     try { sesion = await navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking'] });
       await renderer.xr.setSession(sesion); } catch (e) { sesion = null; alert('No se pudo iniciar la realidad virtual: ' + e.message); } };

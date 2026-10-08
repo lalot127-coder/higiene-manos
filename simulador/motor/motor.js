@@ -17,8 +17,10 @@ canvas{display:block;touch-action:none}
 #barra .salir{background:#C62828;color:#fff}
 #barra b{font-size:1.02rem} #barra .chip{background:var(--azul);border-radius:999px;padding:4px 11px;font-weight:700;font-size:.92rem}
 #barra .der{margin-left:auto;display:flex;gap:6px}
-#panel{position:fixed;left:12px;bottom:12px;width:min(470px,calc(100vw - 24px));background:rgba(255,255,255,.97);border-radius:16px;padding:13px 15px;z-index:3;box-shadow:0 6px 24px rgba(14,58,107,.25);max-height:44vh;overflow:auto}
-#panel .paso{color:var(--cian);font-weight:800;font-size:.85rem;letter-spacing:.04em}
+#panel{position:fixed;left:12px;bottom:12px;width:min(470px,calc(100vw - 24px));background:rgba(255,255,255,.97);border-radius:16px;padding:13px 15px;z-index:3;box-shadow:0 6px 24px rgba(14,58,107,.25);max-height:min(44vh,calc(100vh - var(--barraH,60px) - 30px));overflow:auto}
+#panel .min{position:absolute;top:6px;right:8px;border:0;background:var(--hielo);color:var(--navy);border-radius:10px;padding:3px 10px;font-weight:800;cursor:pointer}
+#panel.mini{max-height:none}#panel.mini #pTxt,#panel.mini #pFuente,#panel.mini #acciones{display:none}
+#panel .paso{color:var(--cian);font-weight:800;font-size:.85rem;letter-spacing:.04em;padding-right:40px}
 #panel h2{margin:.15rem 0 .35rem;color:var(--navy);font-size:1.2rem}
 #panel p{margin:.2rem 0 .45rem;font-size:1.02rem}
 #panel small{display:block;color:var(--tenue);font-style:italic}
@@ -26,11 +28,11 @@ canvas{display:block;touch-action:none}
 button{font-family:inherit} .prim{background:var(--azul);color:#fff;border:0;border-radius:12px;padding:11px 18px;font-size:1.02rem;font-weight:700;cursor:pointer}
 .sec{background:var(--hielo);color:var(--navy);border:0;border-radius:12px;padding:11px 16px;font-size:1rem;cursor:pointer}
 .peq{padding:6px 11px;font-size:.9rem}
-@media (max-width:700px){#barra .txt{display:none}#barra .chip{font-size:.8rem;padding:3px 8px}}
-#toast{position:fixed;top:62px;left:50%;transform:translateX(-50%);max-width:min(640px,92vw);padding:12px 16px;border-radius:14px;color:#fff;z-index:10;display:none;box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:1.02rem}
+@media (max-width:700px){#barra{padding:6px 8px;gap:5px}#barra img{height:26px}#barra b{font-size:.92rem;max-width:calc(100vw - 70px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#barra .txt{display:none}#barra .chip{font-size:.78rem;padding:2px 7px}#barra .der{margin-left:auto}#barra .der button{padding:5px 9px}#panel{left:8px;bottom:8px;width:calc(100vw - 16px);padding:10px 12px}#panel h2{font-size:1.05rem}#panel p{font-size:.95rem}}
+#toast{position:fixed;top:calc(var(--barraH,60px) + 6px);left:50%;transform:translateX(-50%);max-width:min(640px,92vw);padding:12px 16px;border-radius:14px;color:#fff;z-index:10;display:none;box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:1.02rem}
 #toast.ok{background:var(--bien)} #toast.no{background:var(--mal)} #toast.info{background:var(--azul)} #toast small{display:block;opacity:.92;font-style:italic;margin-top:3px}
-.modal{position:fixed;inset:0;background:rgba(14,58,107,.7);display:none;align-items:center;justify-content:center;padding:70px 14px 14px;z-index:8}
-.tarjeta{background:#fff;border-radius:18px;max-width:660px;width:100%;padding:20px;max-height:92vh;overflow:auto}
+.modal{position:fixed;inset:0;background:rgba(14,58,107,.7);display:none;align-items:center;justify-content:center;padding:calc(var(--barraH,60px) + 8px) 14px 14px;z-index:8}
+.tarjeta{background:#fff;border-radius:18px;max-width:660px;width:100%;padding:20px;max-height:calc(100vh - var(--barraH,60px) - 24px);overflow:auto}
 .tarjeta h2{color:var(--navy);margin-top:0}
 .op{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:var(--hielo);border:2px solid transparent;border-radius:12px;padding:12px;margin:7px 0;font-size:1.02rem;cursor:pointer;color:var(--texto)}
 .op.marcada{border-color:var(--azul);background:#D7ECF4}
@@ -46,9 +48,13 @@ function crearMundo(THREE, OrbitControls, cfg) {
   document.body.insertAdjacentHTML('afterbegin', `
 <div id="barra"><img src="${new URL('../recursos/logo_CERS.jpeg', BASE_MOTOR).href}" alt="CERS" style="height:34px;border-radius:7px;background:#fff;padding:2px"><b>${cfg.icono} ${cfg.titulo}</b><span class="chip" id="cPaso">Paso 0/0</span><span class="chip" id="cPts">0 pts</span><span class="chip" id="cTiempo">0:00</span>
 <div class="der"><button class="sec peq" id="bAtrasM" title="Regresar al edificio">⬅<span class="txt"> Atrás</span></button><button class="sec peq" id="bVista" title="Cambiar la vista">🎥<span class="txt"> Vista</span></button><button class="sec peq" id="bReini" title="Reiniciar el caso">↺<span class="txt"> Reiniciar</span></button><button class="sec peq" id="bInicioM" title="Inicio del campus">🏠<span class="txt"> Inicio</span></button><button class="sec peq" id="bCompM" title="Compartir este simulador">🔗</button><button class="sec peq salir" id="bCampus" title="Salir del simulador">✖<span class="txt"> Salir</span></button></div></div>
-<div id="panel"><div class="paso" id="pNum"></div><h2 id="pTit">Cargando…</h2><p id="pTxt"></p><small id="pFuente"></small><div id="acciones"></div></div>
+<div id="panel"><button class="min" id="bMin" title="Minimizar o ampliar las instrucciones">▾</button><div class="paso" id="pNum"></div><h2 id="pTit">Cargando…</h2><p id="pTxt"></p><small id="pFuente"></small><div id="acciones"></div></div>
 <div id="toast"></div><div class="modal" id="modal"><div class="tarjeta" id="mCont"></div></div>`);
   const $ = s => document.getElementById(s);
+  // la barra puede ocupar 1 o 2 renglones (celular): las ventanas se acomodan debajo de ella y nunca se enciman
+  const altoBarra = () => document.documentElement.style.setProperty('--barraH', $('barra').offsetHeight + 'px');
+  altoBarra(); addEventListener('resize', altoBarra); if (window.ResizeObserver) new ResizeObserver(altoBarra).observe($('barra'));
+  $('bMin').onclick = () => { const p = $('panel'); p.classList.toggle('mini'); $('bMin').textContent = p.classList.contains('mini') ? '▴' : '▾'; };
   // Regresa al mundo principal, frente al edificio del área (…/mundos/<area>/<modulo>/index.html)
   const area = (location.pathname.match(/mundos\/([^/]+)\//) || [])[1];
   const alCampus = (q) => { location.href = cfg.campus || ('../../../index.html' + (q || (area ? '?mundo=' + area : ''))); };
@@ -60,8 +66,9 @@ function crearMundo(THREE, OrbitControls, cfg) {
   $('bCompM').onclick = () => { const u = new URL(location.href); u.searchParams.delete('qa');
     if (window.Compartir) Compartir.abrir(u.href, `${cfg.icono} ${cfg.titulo} · Campus SST`); else { navigator.clipboard && navigator.clipboard.writeText(u.href); toast('info', '🔗 Enlace copiado: ' + u.href); } };
   if (!window.Compartir) { const s = document.createElement('script'); s.src = new URL('compartir.js', BASE_MOTOR).href; document.head.appendChild(s); }
+  if (!window.EnviarRes) { const s = document.createElement('script'); s.src = new URL('enviar_resultados.js', BASE_MOTOR).href; document.head.appendChild(s); }
   // Control de acceso: si se abre con enlace directo sin código vigente para esta puerta, muestra el candado + WhatsApp
-  const proteger = () => Acceso.proteger(`${cfg.icono} ${cfg.titulo}`, new URL('../index.html' + (area ? '?mundo=' + area : ''), BASE_MOTOR).href);
+  const proteger = () => { Acceso.sesionUnica && Acceso.sesionUnica(); Acceso.proteger(`${cfg.icono} ${cfg.titulo}`, new URL('../index.html' + (area ? '?mundo=' + area : ''), BASE_MOTOR).href); };
   if (window.Acceso) proteger(); else { const s = document.createElement('script'); s.src = new URL('acceso.js', BASE_MOTOR).href; s.onload = proteger; document.head.appendChild(s); }
   $('bReini').onclick = () => { if (!enPartida() || confirm('¿Reiniciar? La partida en curso se cancelará.')) location.reload(); };
 
@@ -79,8 +86,15 @@ function crearMundo(THREE, OrbitControls, cfg) {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(...VISTAS[0][1]); controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.49;
   controls.minDistance = 0.6; controls.maxDistance = 10; controls.update();
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.15));
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.15); scene.add(hemi);
   const sol = new THREE.DirectionalLight(0xffffff, 1.35); sol.position.set(3, 6, 4); scene.add(sol);
+  // gráficos más realistas: tono ACES, reflejos de entorno y sombras suaves (motor/realismo.js)
+  // piso por edificio (cfg.piso lo cambia; cfg.piso = false lo desactiva): texturas PBR CC0 de assets/texturas/pbr
+  const PISO = { hospital: 'azulejo', cafeteria: 'azulejo', industria: 'concreto_pulido', construccion: 'concreto_pulido', proteccion: 'concreto_pulido',
+    laboral: 'madera', empresa: 'alfombra', biblioteca: 'madera', riesgo: 'concreto_pulido' };
+  const texturizar = () => { if (cfg.piso !== false) Realismo.texturizar(THREE, scene, { piso: cfg.piso || PISO[area] || 'concreto_pulido', muro: 'yeso' }); };
+  const realismo = () => { Realismo.aplicar(THREE, renderer, scene, { sol, hemi, radio: cfg.radioSombra || 8, sombras: cfg.sombras }); [300, 2500].forEach(ms => setTimeout(texturizar, ms)); };
+  if (window.Realismo) realismo(); else { const s = document.createElement('script'); s.src = new URL('realismo.js', BASE_MOTOR).href; s.onload = realismo; document.head.appendChild(s); }
 
   const M = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: .6, metalness: .05, ...extra });
   const caja = (w, h, d, c, x, y, z, padre = scene) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M(c)); m.position.set(x, y, z); padre.add(m); return m; };
@@ -137,7 +151,7 @@ function crearMundo(THREE, OrbitControls, cfg) {
   function marcador() { $('cPts').textContent = Math.max(0, S.pts) + ' pts'; $('cPaso').textContent = `Paso ${Math.min(nPaso + 1, pasos.length)}/${pasos.length}`; }
   setInterval(() => { if (S.t0) { const s = Math.floor((Date.now() - S.t0) / 1000); $('cTiempo').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; } }, 1000);
   function botones(lista) { const a = $('acciones'); a.innerHTML = ''; lista.forEach(([txt, fn, cls]) => { const b = document.createElement('button'); b.className = cls || 'prim'; b.textContent = txt; b.onclick = fn; a.appendChild(b); }); }
-  function mostrar() { paso = pasos[nPaso]; marcador(); $('pNum').textContent = `PASO ${nPaso + 1} DE ${pasos.length}`; $('pTit').textContent = paso.titulo; $('pTxt').innerHTML = paso.texto;
+  function mostrar() { paso = pasos[nPaso]; marcador(); $('panel').classList.remove('mini'); $('bMin').textContent = '▾'; $('pNum').textContent = `PASO ${nPaso + 1} DE ${pasos.length}`; $('pTit').textContent = paso.titulo; $('pTxt').innerHTML = paso.texto;
     $('pFuente').textContent = paso.fuente ? 'Fuente: ' + paso.fuente : ''; botones([]); resaltar([]); paso.iniciar && paso.iniciar(); }
   function siguiente() { nPaso++; if (nPaso >= pasos.length) return reporte(); setTimeout(mostrar, 450); }
   function tocar(o) { if (paso && paso.tocar) paso.tocar(o); }
@@ -169,8 +183,9 @@ function crearMundo(THREE, OrbitControls, cfg) {
      <p><b>${S.nombre}</b> · ${cfg.titulo}${S.caso ? ' · ' + S.caso : ''}<br>Puntaje: <b>${S.pts}/${max} (${pct}%)</b> · Errores críticos: <b>${S.criticos}</b> · Tiempo: ${Math.floor(s / 60)} min ${s % 60} s<br>
      Criterio: ${crit.pct}% o más${crit.sinCriticos ? ' y sin errores críticos' : ''}.</p><p class="ficticio" id="estReg">Enviando a la persona instructora…</p>
      ${S.errores.length ? '<table><tr><th>Paso</th><th>Qué pasó</th><th>Fuente</th></tr>' + S.errores.map(e => `<tr><td>${e.paso}</td><td>${e.critico ? '⛔ ' : ''}${e.txt}</td><td>${e.f || ''}</td></tr>`).join('') + '</table>' : '<p>Sin errores. 👏</p>'}
-     <br><button class="prim" onclick="location.reload()">Siguiente participante</button> <button class="sec" onclick="print()">Imprimir / PDF</button> <button class="sec" id="bGrupo">Resultados del grupo</button> <button class="sec" id="bVolver2">⬅ Regresar al campus</button>`;
+     <br><button class="prim" onclick="location.reload()">Siguiente participante</button> <button class="sec" onclick="print()">Imprimir / PDF</button> <button class="prim" id="bEnviar" style="background:#25D366">📤 Enviar resultados</button> <button class="sec" id="bGrupo">Resultados del grupo</button> <button class="sec" id="bVolver2">⬅ Regresar al campus</button>`;
     $('bVolver2').onclick = () => alCampus();
+    if (window.EnviarRes) EnviarRes.ofrecer(reg); $('bEnviar').onclick = () => window.EnviarRes ? (EnviarRes.ofrecer(reg), EnviarRes.abrir()) : alert(Object.entries(reg).map(([k, v]) => k + ': ' + v).join(' · '));
     $('modal').style.display = 'flex'; $('bGrupo').onclick = grupo;
     const ok = await registrar(reg);
     $('estReg').textContent = ok ? '✅ Resultado registrado en la computadora de la persona instructora.' : 'Resultado guardado en este dispositivo (sin conexión al aula). Puedes imprimirlo o guardarlo como PDF.';
@@ -206,9 +221,16 @@ function crearMundo(THREE, OrbitControls, cfg) {
     toast, bien, mal, botones, pregunta, aviso, siguiente, inicio, qa, tocar, $, estado: () => S };
   // Modo inmersivo (WebXR) opcional: cfg.xr = { inicio:[x,z], piso, entorno } (ver motor/xr.js). Se puede llamar
   // también después con api.activarXR({...}) cuando el piso y el entorno ya existen.
-  api.activarXR = (opc) => { const go = () => { api.xr = MotorXR.activar(api, opc || {}); };
+  api.activarXR = (opc) => { api._xrPedido = true; const go = () => { api.xr = MotorXR.activar(api, opc || {}); };
     if (window.MotorXR) go(); else { const s = document.createElement('script'); s.src = new URL('xr.js', BASE_MOTOR).href; s.onload = go; document.head.appendChild(s); } };
+  if (/[?&]qa/.test(location.search)) window.__mundo = api;   // pruebas
   if (cfg.xr) api.activarXR(cfg.xr);
+  // Sub-mundos sin configuración propia de VR (07/10/2026): se activa solo. Piso = el plano horizontal más grande (para
+  // teletransportarse); la persona aparece entre la cámara inicial y el punto al que mira. cfg.xr = false lo desactiva.
+  else if (cfg.xr === undefined) setTimeout(() => { if (api.xr || api._xrPedido) return; let piso = null, mayor = 0; scene.updateMatrixWorld(true);
+    scene.traverse(m => { const p = m.geometry && m.geometry.parameters; if (!m.isMesh || !p || m.geometry.type !== 'PlaneGeometry' || Math.abs(Math.abs(m.rotation.x) - Math.PI / 2) > 0.01) return;
+      const s = new THREE.Vector3(); m.getWorldScale(s); const a = p.width * s.x * p.height * s.y; if (a > mayor && m.getWorldPosition(new THREE.Vector3()).y < 0.3) { mayor = a; piso = m; } });
+    const [c, t] = VISTAS[0]; api.activarXR({ inicio: [(c[0] + t[0]) / 2, (c[2] + t[2]) / 2], piso, entorno: piso ? [piso] : [] }); }, 1500);
   return api;
 }
 
