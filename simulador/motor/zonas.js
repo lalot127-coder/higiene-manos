@@ -1,5 +1,5 @@
 // Zonas de trabajo alejadas del campus, dentro del mismo mundo (módulo ES): mina a cielo abierto, mina subterránea,
-// obra en construcción, aserradero, ferrocarril y campo agrícola. El relieve (tajo, cerro, estructuras) se dibuja con
+// obra en construcción, aserradero, ferrocarril, campo agrícola y patio de prácticas (hidrocarburos). El relieve (tajo, cerro, estructuras) se dibuja con
 // geometría propia desde el inicio; los modelos 3D de cada zona (kit .glb) se cargan SOLO cuando el avatar se acerca o
 // se teletransporta (carga diferida). Cada zona tiene: caminos desde el campus, marcadores numerados tocables con
 // información, señales NOM-026 y una caseta de acceso caminable con las puertas de sus normas (próximamente/pendiente).
@@ -44,6 +44,14 @@ export const DEF_ZONAS = [
   { id: 'agricola', nombre: 'Campo agrícola', icono: '🚜', color: 0x2E7D32, kit: 'agricola', centro: [72, 74], entrada: [52, 56], caseta: [46, 62, -2.3], salida: 30, piso: 'tierra',
     desc: 'Cultivo, maquinaria agrícola y bodega', senales: ['guantes', 'respiratoria'],
     modulos: [{ titulo: 'Actividades agrícolas', icono: '🌽', nom: NOM.g03, estado: 'pendiente', color: 'amarillo', senal: 'prec_general' }] },
+  { id: 'practicas', nombre: 'Prácticas', icono: '🛢️', color: 0x2E9E4F, kit: null, centro: [-6, 134], entrada: [-6, 104], caseta: [-14, 110, Math.PI], salida: 352, piso: 'concreto',
+    desc: 'Patio de prácticas: estación de servicio, galera de gas LP y ductos (nombres genéricos)', senales: ['no_fumar', 'no_llama', 'extintor'],
+    modulos: [{ titulo: 'Estación de servicio (gasolina)', icono: '⛽', nom: 'NOM-005-ASEA-2016 · GRE 128', tipo: '3d', url: 'mundos/practicas/hidrocarburos/index.html?e=gasolinera', color: 'rojo', senal: 'no_fumar' },
+      { titulo: 'Galera de gas LP (cilindros)', icono: '🔥', nom: 'NOM-011-ASEA-2019 · GRE 115', tipo: '3d', url: 'mundos/practicas/hidrocarburos/index.html?e=galera', color: 'rojo', senal: 'no_llama' },
+      { titulo: 'Ducto de gas natural', icono: '💨', nom: 'NOM-020-ASEA-2024 · GRE 115', tipo: '3d', url: 'mundos/practicas/hidrocarburos/index.html?e=ducto_gn', color: 'amarillo', senal: 'inflamable' },
+      { titulo: 'Ducto de petróleo crudo', icono: '🛢️', nom: 'NOM-009-ASEA-2017 · GRE 128', tipo: '3d', url: 'mundos/practicas/hidrocarburos/index.html?e=ducto_crudo', color: 'amarillo', senal: 'inflamable' },
+      { titulo: 'Ducto de gasolina (poliducto)', icono: '⛓️', nom: 'NOM-009-ASEA-2017 · GRE 128', tipo: '3d', url: 'mundos/practicas/hidrocarburos/index.html?e=ducto_gasolina', color: 'amarillo', senal: 'inflamable' },
+      { titulo: 'Análisis de riesgo de las prácticas', icono: '🔎', nom: 'GRE 2024 · matriz de riesgo', tipo: '3d', url: 'mundos/riesgo/analisis/index.html?e=practicas', puerta: 'riesgo/analisis', color: 'amarillo', senal: 'prec_general' }] },
 ];
 // Marcadores numerados (como en un recorrido de inspección). Textos generales; el detalle normativo se verifica al crear cada curso.
 const PINES = {
@@ -69,6 +77,11 @@ const PINES = {
   ferrocarril: [
     [-6, -114, 'Andén', 'Mantenerse detrás de la franja amarilla hasta que el tren se detenga.'],
     [20, -120, 'Vía', 'No cruzar ni caminar sobre la vía fuera de los pasos autorizados (NOM-016-STPS-2001, operación y mantenimiento de ferrocarriles).'] ],
+  practicas: [
+    [-8, 124.5, 'Estación de servicio', 'Gasolina: UN1203, clase 3, Guía 128 de la GRE 2024. Diseño, construcción, operación y mantenimiento: NOM-005-ASEA-2016.'],
+    [3, 123.5, 'Galera de gas LP', 'Gas LP: UN1075, Guía 115 de la GRE 2024. Bodegas de gas LP en recipientes portátiles y transportables: NOM-011-ASEA-2019.'],
+    [-6, 136.6, 'Ductos', 'Las tuberías con fluidos peligrosos se identifican en amarillo (NOM-026-STPS-2008). Integridad de ductos: NOM-009-ASEA-2017; gas natural por ductos terrestres: NOM-020-ASEA-2024.'],
+    [12.5, 134, 'Manga de viento', 'Ante una fuga o derrame, la GRE 2024 indica mantenerse viento arriba, cuesta arriba y/o aguas arriba.'] ],
   agricola: [[60, 66, 'Maquinaria agrícola', 'Tractor en operación: mantener distancia y no viajar en el implemento.'], [76, 80, 'Cultivo', 'Aplicación de agroquímicos con equipo de protección (NOM-003-STPS-2023).']],
 };
 
@@ -190,6 +203,108 @@ export function construirZonas(ctx) {
   { const parcela = new THREE.Mesh(new THREE.PlaneGeometry(34, 24), new THREE.MeshStandardMaterial({ color: 0x8C6A45, map: tierra, roughness: 1 })); parcela.rotation.x = -Math.PI / 2; parcela.position.set(gx + 4, .008, gz + 6); parcela.userData.piso = true; escena.add(parcela); pisos.push(parcela);
     nav.bloquearRect(gx + 4, gz + 6, 34, 24); nav.liberarRect(gx + 4, gz - 6.5, 34, 1.4); }
 
+  // ---- PRÁCTICAS: patio con estación de servicio, galera de gas LP y ductos (geometría propia; el simulador va en la caseta)
+  const PR = ZONAS[6], [qx, qz] = PR.def.centro;
+  { parche(qx, qz, 22, 0xBFC3C7, concreto);
+    // Todo el patio en un grupo con coordenadas locales (x, z respecto al centro). Geometría propia, sin marcas.
+    const G = new THREE.Group(); G.position.set(qx, 0, qz); escena.add(G);
+    const MC = {}; const Mt = (c, r = .8, m = 0) => MC[c + '_' + r + '_' + m] || (MC[c + '_' + r + '_' + m] = new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m }));
+    const cj = (w, h, d, c, x, y, z, r, m, p = G) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), Mt(c, r, m)); o.position.set(x, y, z); p.add(o); return o; };
+    const cl = (rad, h, c, x, y, z, r, m, p = G, rt, seg = 20) => { const o = new THREE.Mesh(new THREE.CylinderGeometry(rt ?? rad, rad, h, seg), Mt(c, r, m)); o.position.set(x, y, z); p.add(o); return o; };
+    const brillo = (w, h, x, y, z, rx, c = 0xFFFFFF, p = G) => { const o = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: c })); o.position.set(x, y, z); o.rotation.x = rx; p.add(o); return o; };
+    const VID = new THREE.MeshStandardMaterial({ color: 0x6D97B3, roughness: .08, metalness: .7, transparent: true, opacity: .85 });
+    const canvasTex = (w, h, dibuja, rx, ry) => { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; dibuja(cv.getContext('2d'), w, h); const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); t.anisotropy = 4; return t; };
+    const VERDE = 0x2E9E4F, BLANCO = 0xF4F6F7, METAL = 0x8A939A, AMAR = 0xF2C230;
+
+    // ---- estación de servicio (local -9, -6): losa blanca con faldón verde, luminarias, columnas, islas y dispensarios
+    const E = new THREE.Group(); E.position.set(-9, 0, -6); G.add(E);
+    cj(10, .38, 6.4, BLANCO, 0, 4.95, 0, .6, 0, E);
+    [[0, 3.22, 10.15, .08], [0, -3.22, 10.15, .08]].forEach(([x, z, w, d]) => cj(w, .62, d, VERDE, x, 4.95, z, .45, 0, E));
+    [-5.05, 5.05].forEach(x => cj(.08, .62, 6.5, VERDE, x, 4.95, 0, .45, 0, E));
+    for (let x = -3.6; x <= 3.6; x += 2.4) [-1.5, 1.5].forEach(z => brillo(1, .45, x, 4.75, z, Math.PI / 2, 0xFFFFFF, E));
+    [[-3.4, -1.9], [3.4, -1.9], [-3.4, 1.9], [3.4, 1.9]].forEach(([x, z]) => { cj(.36, 4.6, .36, 0xE9ECEE, x, 2.3, z, .5, .1, E); cj(.44, .55, .44, VERDE, x, .28, z, .5, 0, E); });
+    const surt = (x, z) => { const s = new THREE.Group(); s.position.set(x, .22, z); E.add(s);
+      cj(.85, .28, .55, 0x7D8790, 0, .14, 0, .6, .4, s); cj(.74, 1.2, .48, 0xF2F4F6, 0, .88, 0, .3, .15, s); cj(.8, .3, .54, VERDE, 0, 1.63, 0, .45, 0, s);
+      [-1, 1].forEach(l => { brillo(.48, .26, 0, 1.18, l * .242, l > 0 ? 0 : Math.PI, 0x174A6B, s).rotation.set(0, l > 0 ? 0 : Math.PI, 0);
+        [0x2FBF71, 0xE5484D, 0x2B2B2B].forEach((c, i) => { cj(.13, .2, .06, 0x1A1A1A, (i - 1) * .22, .66, l * .27, .5, .3, s); cj(.15, .05, .01, c, (i - 1) * .22, .9, l * .245, .5, 0, s); });
+        const mg = new THREE.Mesh(new THREE.TorusGeometry(.3, .02, 6, 24, Math.PI * .95), Mt(0x151515, .55)); mg.position.set(.28 * l, 1.02, l * .26); mg.rotation.set(0, Math.PI / 2, -Math.PI / 2); s.add(mg); }); };
+    [-1.4, 1.4].forEach(z => { cj(6.4, .22, 1.15, 0xD6D8DA, 0, .11, z, .9, 0, E); [-3.6, 3.6].forEach(x => { cl(.1, 1.05, AMAR, x, .53, z, .5, .2, E); [.35, .72].forEach(y => cl(.105, .1, 0x1A1A1A, x, y, z, .6, 0, E)); });
+      [-1.6, 1.6].forEach(x => surt(x, z)); });
+    // bocatomas de tanques subterráneos y coladera con rejilla
+    cj(3.8, .04, 1.1, 0x9EA3A7, 3.2, .02, 4.6, .95, 0, E); [[2, 0x2FBF71], [3.2, 0xE5484D], [4.4, 0x2B2B2B]].forEach(([x, c]) => { cl(.32, .05, 0x5D646A, x, .05, 4.6, .4, .7, E); cl(.25, .03, c, x, .08, 4.6, .5, .2, E); });
+    cj(1.2, .03, .55, 0x3B3F43, -4.2, .02, 4.4, .6, .5, E); for (let i = -4; i <= 4; i++) cj(.04, .02, .48, 0x1C1E20, -4.2 + i * .12, .04, 4.4, .5, .7, E);
+    // tienda detrás de la techumbre (entre la estación y los ductos)
+    cj(6.5, 3, 2.6, 0xECE6D6, 0, 1.5, 6.3, .85, 0, E); cj(6.8, .28, 2.9, VERDE, 0, 3.12, 6.3, .45, 0, E); cj(6.8, .05, 2.9, 0xFFFFFF, 0, 3.29, 6.3, .4, 0, E);
+    const vt = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 1.6), VID); vt.position.set(-1, 1.45, 4.99); vt.rotation.y = Math.PI; E.add(vt);
+    const pt = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2.2), VID); pt.position.set(2.2, 1.1, 4.99); pt.rotation.y = Math.PI; E.add(pt);
+    nav.bloquearRect(qx - 9, qz - 6, 7, 4); nav.bloquearRect(qx - 9, qz + .3, 7, 3);
+    // autotanque estacionado (genérico) frente a la estación
+    const A = new THREE.Group(); A.position.set(-10, 0, -12.5); G.add(A);
+    cj(8.4, .22, 1, 0x26292C, 0, .78, 0, .7, .5, A); cj(1.75, 1.55, 2.25, 0xE9ECEF, -3.45, 1.45, 0, .3, .35, A); cj(1.45, .6, 2.15, 0xE9ECEF, -3.3, 2.5, 0, .3, .35, A);
+    const pb = new THREE.Mesh(new THREE.PlaneGeometry(2, .85), VID); pb.position.set(-4.34, 2.05, 0); pb.rotation.y = -Math.PI / 2; A.add(pb);
+    cj(.16, .32, 2.3, 0xA8B0B7, -4.42, .78, 0, .25, .85, A);
+    const tq = cl(1.05, 5.3, 0xE8EDF1, .55, 1.95, 0, .18, .75, A, undefined, 28); tq.rotation.z = Math.PI / 2;
+    [-2.1, 3.2].forEach(x => { const t = new THREE.Mesh(new THREE.SphereGeometry(1.05, 24, 12), Mt(0xE8EDF1, .18, .75)); t.position.set(x, 1.95, 0); t.scale.set(.35, 1, 1); A.add(t); });
+    cj(1.6, .55, .02, 0xFF9800, .55, 1.85, 1.07, .5, 0, A);
+    [-3.4, -1, 1.6, 2.8].forEach(x => [-1, 1].forEach(l => { const r = cl(.48, .32, 0x1D1D1D, x, .48, l * 1.12, .85, 0, A); r.rotation.x = Math.PI / 2; const h = cl(.24, .02, 0xB9C0C6, x, .48, l * 1.29, .3, .85, A); h.rotation.x = Math.PI / 2; }));
+    nav.bloquearRect(qx - 10, qz - 12.5, 9, 2.6);
+
+    // ---- galera de gas LP (local 9, -6): plataforma, techo de lámina, malla ciclónica y cilindros
+    const L = new THREE.Group(); L.position.set(9, 0, -6); G.add(L);
+    cj(8.4, .18, 5.4, 0xBFC2C5, 0, .09, 0, .9, 0, L);
+    const lam = canvasTex(64, 8, (g, w, h) => { for (let x = 0; x < w; x++) { const v = 165 + Math.round(45 * Math.sin(x / w * Math.PI * 8)); g.fillStyle = `rgb(${v},${v + 6},${v + 12})`; g.fillRect(x, 0, 1, h); } }, 8, 1);
+    const techoL = new THREE.Mesh(new THREE.BoxGeometry(8.6, .08, 5.6), new THREE.MeshStandardMaterial({ map: lam, roughness: .45, metalness: .6 })); techoL.position.set(0, 3.9, 0); techoL.rotation.x = .05; L.add(techoL);
+    [[-3.9, -2.4], [3.9, -2.4], [-3.9, 2.4], [3.9, 2.4], [0, -2.4], [0, 2.4]].forEach(([x, z]) => cj(.2, 3.8, .2, 0x5F666C, x, 1.9, z, .45, .7, L));
+    const mallaTex = canvasTex(128, 128, (g, w, h) => { g.strokeStyle = '#c3c9ce'; g.lineWidth = 5; for (let i = -w; i <= w * 2; i += 32) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i + h, h); g.stroke(); g.beginPath(); g.moveTo(i, h); g.lineTo(i + h, 0); g.stroke(); } }, 1, 1);
+    const malla = (w, x, z, ry) => { const t = mallaTex.clone(); t.needsUpdate = true; t.repeat.set(Math.round(w * 3), 5);
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, 1.8), new THREE.MeshStandardMaterial({ map: t, transparent: true, alphaTest: .4, side: THREE.DoubleSide, metalness: .6, roughness: .5 })); m.position.set(x, 1.08, z); m.rotation.y = ry; m.userData.sinSombra = true; L.add(m); };
+    malla(7.8, 0, -2.55, 0); malla(4.9, -4.05, 0, Math.PI / 2); malla(4.9, 4.05, 0, Math.PI / 2);
+    const gasLP = (x, z) => { const c = new THREE.Group(); c.position.set(x, .18, z); L.add(c);
+      cl(.165, .14, METAL, 0, .07, 0, .5, .6, c); cl(.18, .95, 0xDFE3E6, 0, .62, 0, .38, .35, c, undefined, 16);
+      const d = new THREE.Mesh(new THREE.SphereGeometry(.18, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), Mt(0xDFE3E6, .38, .35)); d.position.y = 1.09; d.scale.y = .55; c.add(d);
+      const cu = new THREE.Mesh(new THREE.CylinderGeometry(.115, .115, .17, 14, 1, true), new THREE.MeshStandardMaterial({ color: 0x9AA0A6, roughness: .45, metalness: .6, side: THREE.DoubleSide })); cu.position.y = 1.26; c.add(cu);
+      cl(.03, .09, 0xC9A227, 0, 1.2, 0, .35, .8, c); };
+    for (let i = 0; i < 8; i++) for (let k = 0; k < 2; k++) gasLP(-2.6 + i * .6, -1.6 + k * .6);
+    for (let i = 0; i < 4; i++) gasLP(.4 + i * .6, .8);
+    const lg = ctx.cartel('GALERA DE GAS LP', 3.4, .5, '#F2C230', '#111', .6); lg.position.set(0, 2.7, -2.75); lg.rotation.y = Math.PI; L.add(lg);
+    nav.bloquearRect(qx + 9, qz - 6, 8.6, 5.6);
+    // extintores identificados en rojo (NOM-026)
+    const extintor = (x, z, ry) => { const e = new THREE.Group(); e.position.set(x, 0, z); e.rotation.y = ry; G.add(e);
+      cl(.11, .6, 0xC62828, 0, .36, 0, .35, .2, e); const t = new THREE.Mesh(new THREE.SphereGeometry(.11, 12, 6), Mt(0xC62828, .35, .2)); t.position.y = .66; t.scale.y = .5; e.add(t);
+      cl(.035, 1.8, METAL, .32, .9, 0, .4, .7, e); const s = ctx.cartel('EXTINTOR', .4, .4, '#C62828', '#fff', .22); s.position.set(.32, 1.6, .04); e.add(s); obst(qx + x, qz + z, .3); };
+    extintor(-14.6, -8.6, Math.PI); extintor(4.2, -9.2, Math.PI);
+
+    // ---- tres ductos en amarillo (NOM-026): bridas, silletas, válvula con volante, nombre del fluido y flechas
+    [[6, 'GAS NATURAL'], [8.5, 'PETRÓLEO CRUDO'], [11, 'GASOLINA']].forEach(([dz, fluido]) => {
+      const t = cl(.32, 26, AMAR, 0, .9, dz, .38, .25, G, undefined, 24); t.rotation.z = Math.PI / 2;
+      for (let x = -10; x <= 10; x += 5) { const b = cl(.39, .1, 0xD9AB1F, x, .9, dz, .4, .4); b.rotation.z = Math.PI / 2; }
+      for (let x = -12; x <= 12; x += 4) { cj(.6, .3, .7, 0xB9BCBE, x, .15, dz, .95); cj(.1, .3, .45, 0x6F777E, x, .43, dz, .5, .7); }
+      const v = new THREE.Group(); v.position.set(-4, .9, dz); G.add(v); cj(.5, .78, .7, 0xD4A21E, 0, 0, 0, .45, .4, v); cl(.045, .6, 0x5A6168, 0, .69, 0, .4, .7, v);
+      const vol = new THREE.Mesh(new THREE.TorusGeometry(.28, .035, 8, 24), Mt(0xC0392B, .5, .3)); vol.position.y = 1.02; vol.rotation.x = Math.PI / 2; v.add(vol);
+      [0, Math.PI / 2].forEach(a => { const r = cj(.56, .03, .03, 0xC0392B, 0, 1.02, 0, .5, .3, v); r.rotation.y = a; });
+      [-8, 6].forEach(x => { const c = ctx.cartel(fluido + '  →', 2.2, .36, '#F2C230', '#111', .62); c.position.set(x, .9, dz - .335); c.rotation.y = Math.PI; G.add(c); });
+      for (let x = -11; x <= 11; x += 5.5) { const f = new THREE.Mesh(new THREE.ConeGeometry(.11, .28, 10), Mt(0x111111, .6)); f.position.set(x, 1.32, dz); f.rotation.z = -Math.PI / 2; G.add(f); } });
+    [-14.5, 14.5].forEach(x => { cl(.06, 1.5, AMAR, x, .75, 4.6, .5); cj(.7, .38, .04, AMAR, x, 1.45, 4.55, .5); const c = ctx.cartel('DUCTO', .66, .3, '#F2C230', '#111', .6); c.position.set(x, 1.45, 4.52); c.rotation.y = Math.PI; G.add(c); });
+    nav.bloquearRect(qx, qz + 8.5, 27, 6.5);
+    // ---- manga de viento con franjas y aro
+    cl(.25, .12, 0x9AA2A8, 16, .06, 2, .8); cl(.05, 4.1, 0x9AA2A8, 16, 2.05, 2, .4, .7);
+    const MG = new THREE.Group(); MG.position.set(16, 3.8, 2); G.add(MG); PR.manga = MG;
+    const aro = new THREE.Mesh(new THREE.TorusGeometry(.27, .018, 6, 24), Mt(0x9AA2A8, .4, .7)); aro.rotation.y = Math.PI / 2; aro.position.x = .06; MG.add(aro);
+    for (let i = 0; i < 5; i++) { const r0 = .26 - i * .032, s = new THREE.Mesh(new THREE.CylinderGeometry(r0 - .032, r0, .28, 16, 1, true), new THREE.MeshStandardMaterial({ color: i % 2 ? 0xFFFFFF : 0xFF6A13, roughness: .85, side: THREE.DoubleSide }));
+      s.position.set(.2 + i * .28, -i * .02, 0); s.rotation.z = -Math.PI / 2; MG.add(s); }
+    obst(qx + 16, qz + 2, .4);
+    // ---- postes de luz y árboles alrededor del patio
+    [[-20, -10], [20, -10], [-20, 14], [20, 14]].forEach(([x, z]) => { cl(.07, 6, METAL, x, 3, z, .4, .7); const b = cj(.14, .08, 1.3, METAL, x, 5.95, z + (z < 0 ? .6 : -.6), .4, .7); brillo(.4, .22, x, 5.9, z + (z < 0 ? 1.15 : -1.15), Math.PI / 2, 0xFFF4D6); obst(qx + x, qz + z, .3); });
+    for (let k = 0; k < 14; k++) { const a = .35 + k / 14 * Math.PI * 1.55 + Math.PI * .22, r = 25 + (k % 3) * 2.2, x = Math.sin(a) * r, z = Math.cos(a) * r; if (z < -14 && Math.abs(x) < 12) continue;
+      const tr = new THREE.Group(); tr.position.set(x, 0, z); tr.scale.setScalar(.85 + (k % 4) * .1); G.add(tr); cl(.16, 2.2, 0x6B4A2F, 0, 1.1, 0, .95, 0, tr);
+      [[0, 2.9, 0, 1.35, 0x4F7D3A], [.35, 3.8, .2, .95, 0x5E9046]].forEach(([dx, y, dz, rr, c]) => { const m = new THREE.Mesh(new THREE.IcosahedronGeometry(rr, 0), new THREE.MeshStandardMaterial({ color: c, roughness: .95, flatShading: true })); m.position.set(dx, y, dz); tr.add(m); });
+      obst(qx + x, qz + z, .8); nav.bloquearCirculo(qx + x, qz + z, .7); }
+    // letrero de acceso con postes (de frente al campus)
+    const lt = new THREE.Group(); lt.position.set(qx, 0, qz - 15); lt.rotation.y = Math.PI; escena.add(lt);
+    [-3.7, 3.7].forEach(x => cl(.08, 3.2, METAL, x, 1.6, 0, .4, .7, lt)); cj(8.2, .86, .08, 0x5D666E, 0, 2.8, -.05, .5, .6, lt);
+    const letrero = ctx.cartel('PRÁCTICAS · HIDROCARBUROS', 8, .7, '#ffffff', '#2E9E4F', .55); letrero.position.set(0, 2.8, .01); lt.add(letrero);
+    obst(qx - 3.7, qz - 15, .3); obst(qx + 3.7, qz - 15, .3); }
+
   // ================= contenido con modelos (carga diferida por zona)
   const CARGA = {
     async mina_abierta(z) { const p = [];
@@ -238,6 +353,7 @@ export function construirZonas(ctx) {
       for (const n of piezas) { const o = await kit.pieza(z.kit, n); const w = new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3()); o.rotation.y = w.z > w.x ? Math.PI / 2 : 0; const L = Math.max(w.x, w.z); o.position.x = x - L / 2; tren.add(o); x -= L + .3; }
       tren.position.set(-150, .3, fz); z.grupo.add(tren); z.anim.push({ o: tren, tipo: 'tren', v: 7, x: -150, pausa: 0 });
       await Promise.all(p); },
+    async practicas(z) { },   // por ahora solo geometría propia; kit .glb pendiente (ver CREDITOS)
     async agricola(z) { const p = [];
       for (let i = 0; i < 9; i++) for (let k = 0; k < 6; k++) p.push(poner(z, i < 5 ? 'maiz' : 'trigo', gx - 11 + i * 3.6, gz + k * 3.2, 0));
       p.push(poner(z, 'bodega', gx + 26, gz - 2, -Math.PI / 2), poner(z, 'tambo', gx + 20, gz - 8, 0), poner(z, 'tambo', gx + 21, gz - 8.3, 0));
@@ -272,6 +388,7 @@ export function construirZonas(ctx) {
     if (rev && pos) { a.bip -= dt; const dist = Math.hypot(pos.x - a.o.position.x, pos.z - a.o.position.z); if (a.bip <= 0 && dist < 45) { a.bip = .6; bip(dist); } }
   }
   function actualizar(dt, pos) {
+    if (PR.manga) PR.manga.rotation.y = Math.sin(performance.now() / 1300) * .12;   // la manga de viento se mece
     ZONAS.forEach(z => { if (z.estado === 'sin cargar' && pos && Math.hypot(pos.x - z.entrada.x, pos.z - z.entrada.z) < 40) cargar(z.id);
       z.anim.forEach(a => {
         if (a.tipo === 'rampa') camionRampa(a, dt, pos);

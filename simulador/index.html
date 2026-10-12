@@ -138,6 +138,12 @@ const AREAS = [
       { titulo: 'Trabajos en alturas', icono: '🪜', tipo: 'sala', url: 'mundos/modulos/index.html?m=alturas', nom: 'NOM-009-STPS-2011', color: 'amarillo', senal: 'caida' },
       { titulo: 'Alturas 6: Escalera y plataforma de elevación', icono: '🛗', tipo: '3d', url: 'mundos/industria/alturas_escalera_plataforma/index.html', nom: 'NOM-009-STPS-2011', color: 'azul', senal: 'caida' },
       { titulo: 'Alturas 7: Autorización por escrito', icono: '📝', tipo: '3d', url: 'mundos/industria/alturas_autorizacion/index.html', nom: 'NOM-009-STPS-2011', color: 'azul', senal: 'informacion' },
+      { titulo: 'Enfermería 1: Consultorio de la planta', icono: '🩺', tipo: '3d', url: 'mundos/industria/consultorio_planta/index.html', nom: 'LFT 504 · RFSST 49-50', color: 'verde', senal: 'primeros' },
+      { titulo: 'Enfermería 2: Normas de salud STPS', icono: '🏭', tipo: '3d', url: 'mundos/industria/normas_salud/index.html', nom: '10 NOM de salud STPS', color: 'azul', senal: 'informacion' },
+      { titulo: '¿Qué NOM de salud aplica?', icono: '🧭', tipo: 'juego', url: '../03_cursos/2026-11-19_enfermeria_industrial_ut_oriental/05_recursos_digitales/juego_ei_que_nom.html' },
+      { titulo: 'Memorama de vigilancia de la salud', icono: '🧩', tipo: 'juego', url: '../03_cursos/2026-11-19_enfermeria_industrial_ut_oriental/05_recursos_digitales/juego_ei_memorama_vigilancia.html' },
+      { titulo: 'Enfermería industrial: ¿mito o realidad?', icono: '💬', tipo: 'juego', url: '../03_cursos/2026-11-19_enfermeria_industrial_ut_oriental/05_recursos_digitales/juego_ei_mito_realidad.html' },
+      { titulo: 'Maratón de enfermería industrial', icono: '🏁', tipo: 'juego', url: '../03_cursos/2026-11-19_enfermeria_industrial_ut_oriental/05_recursos_digitales/juego_ei_maraton.html' },
       { titulo: 'Espacios confinados', icono: '🕳️', tipo: 'sala', url: 'mundos/modulos/index.html?m=espacios-confinados', nom: 'NOM-033-STPS-2015', color: 'amarillo', senal: 'prec_general' },
       { titulo: 'Seguridad eléctrica', icono: '⚡', tipo: 'sala', url: 'mundos/modulos/index.html?m=seguridad-electrica', nom: 'NOM-029-STPS-2011', color: 'amarillo', senal: 'electrico' },
       { titulo: 'Bloqueo y etiquetado (LOTO)', icono: '🔒', tipo: 'sala', url: 'mundos/modulos/index.html?m=loto', nom: 'NOM-004-STPS-1999 · NOM-029-STPS-2011', color: 'azul', senal: 'guantes' },
@@ -188,6 +194,7 @@ const AREAS = [
       { titulo: 'Oficina de RH: auditoría del checador', icono: '⏱️', tipo: '3d', url: 'mundos/empresa/rh_checador/index.html' },
       { titulo: 'Mesa de ayuda: preguntas sobre horarios', icono: '❓', tipo: '3d', url: 'mundos/empresa/horarios_qa/index.html' },
       { titulo: '¿Cumple o no cumple?', icono: '🎮', tipo: 'juego', url: '../03_cursos/BASE_jornada_40_horas_2h/05_recursos_digitales/juego_cumple_o_no.html' },
+      { titulo: 'Aula: Nueva Jornada Laboral (curso narrado)', icono: '🎓', tipo: '3d', url: 'mundos/empresa/aula_jornada40/index.html' },
       { titulo: 'Edificios, locales e instalaciones', icono: '🏢', tipo: '3d', estado: 'pendiente', nom: 'NOM-001-STPS', color: 'amarillo' },
       { titulo: 'Equipo de protección personal', icono: '🦺', tipo: '3d', estado: 'pendiente', nom: 'NOM-017-STPS-2024', color: 'azul', senal: 'casco' },
       { titulo: 'Comisión de seguridad e higiene', icono: '👥', tipo: '3d', estado: 'pendiente', nom: 'NOM-019-STPS-2011', color: 'verde' },
@@ -495,7 +502,7 @@ $('#bSalirEdif').onclick = () => salirEdificio();
 $('#bAtras').onclick = atras; $('#bReiniciar').onclick = reiniciar;
 $('#bInfo').onclick = abrirInfo;
 $('#bAyuda').onclick = () => modal(`<h2>❔ Cómo moverte</h2><p>• Toca el piso para caminar (el avatar sigue los caminos y rodea obstáculos); toca un edificio para ir y <b>entrar caminando</b>; adentro, toca una puerta.<br>• Toca una <b>silla</b> para sentarte y una <b>señal</b> para pararte frente a ella.<br>• En computadora: flechas o W A S D; arrastra para girar la vista y usa la rueda para acercar.<br>
-  • <b>🗺️ Mapa</b>: viaja (teletransporte) a cualquier edificio o zona: mina a cielo abierto, mina subterránea, obra, aserradero, ferrocarril y campo agrícola.<br>
+  • <b>🗺️ Mapa</b>: viaja (teletransporte) a cualquier edificio o zona: mina a cielo abierto, mina subterránea, obra, aserradero, ferrocarril, campo agrícola y prácticas (hidrocarburos).<br>
   • <b>⬅ Atrás</b> regresa al lugar anterior (o sale del edificio). <b>↺ Inicio</b> te lleva a la entrada. <b>🚪 Salir</b> vuelve a la pantalla de inicio.<br>• <b>🥽 VR</b> (visor Meta Quest): apunta al piso y aprieta el gatillo para teletransportarte; apunta a puertas y objetos para tocarlos; joystick para girar.<br>
   • Sigue las flechas verdes del piso: llevan al <b>punto de reunión</b>.<br>• <b>🔗 Compartir</b> genera el enlace y el QR de este edificio o del campus.</p>`);
 $('#bComp').onclick = () => dentro ? compartirEdif() : Compartir.abrir(Compartir.url('index.html'), 'Campus de Simulación SST');
