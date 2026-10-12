@@ -137,8 +137,10 @@ DIB.montacargas = precaucion((g, W) => { g.fillRect(W * 0.34, W * 0.56, W * 0.22
 DIB.no_agua = prohibicion((g, W) => { g.fillStyle = NEGRO; g.save(); g.translate(W * 0.4, W * 0.36); g.rotate(0.6); g.beginPath(); g.roundRect(-W * 0.08, -W * 0.06, W * 0.16, W * 0.12, W * 0.02); g.fill(); g.restore();
   for (let i = 0; i < 4; i++) { g.beginPath(); g.arc(W * (0.48 + i * 0.025), W * (0.46 + i * 0.05), W * 0.016, 0, 7); g.fill(); } flama(g, W * 0.6, W * 0.66, W / 520, NEGRO); });
 
+// variante con la flecha hacia la izquierda (misma señal, otra dirección; el texto no se invierte)
+DIB.ruta_izq = (g, W, H) => { rect(g, W, H, VERDE); flecha(g, W * 0.82, H * 0.4, W * 0.22, H * 0.4, H * 0.13); g.fillStyle = BLANCO; g.font = `900 ${H * 0.16}px Arial`; g.textAlign = 'center'; g.fillText('1', W * 0.12, H * 0.56); aviso(g, 'RUTA DE EVACUACIÓN', W, H); };
 function canvas(id, px = 256) {
-  const s = POR_ID[id]; const k = (s && s.ancho) || 1; const cv = document.createElement('canvas'); cv.width = Math.round(px * k); cv.height = px;
+  const s = POR_ID[id] || POR_ID[id.replace(/_izq$/, '')]; const k = (s && s.ancho) || 1; const cv = document.createElement('canvas'); cv.width = Math.round(px * k); cv.height = px;
   const g = cv.getContext('2d'); if (!g.roundRect) g.roundRect = function (x, y, w, h) { this.rect(x, y, w, h); };
   (DIB[id] || DIB.prec_general)(g, cv.width, cv.height); return cv;
 }

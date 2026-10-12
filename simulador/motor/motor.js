@@ -124,12 +124,12 @@ function crearMundo(THREE, OrbitControls, cfg) {
     for (let i = tweens.length - 1; i >= 0; i--) { const tw = tweens[i]; const k = Math.min(1, (ahora - tw.t0) / tw.ms); const e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
       tw.v.lerpVectors(tw.de, tw.a, e); if (k >= 1) { tweens.splice(i, 1); tw.res(); } }
     const pulso = (Math.sin(reloj.getElapsedTime() * 5) + 1) / 2;
-    objetivos.forEach(o => { o.material.emissive && o.material.emissive.setRGB(0, 0.22 * pulso, 0.32 * pulso); o.scale.setScalar(1 + 0.12 * pulso); });
+    objetivos.forEach(o => { o.material && o.material.emissive && o.material.emissive.setRGB(0, 0.22 * pulso, 0.32 * pulso); o.scale.setScalar(1 + 0.12 * pulso); });
     cuadro.forEach(f => f(reloj.getElapsedTime()));
     controls.update(); renderer.render(scene, camera);
   });
   addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
-  function resaltar(lista) { objetivos.forEach(o => { o.material.emissive && o.material.emissive.setRGB(0, 0, 0); o.scale.setScalar(1); }); objetivos = lista.filter(Boolean); }
+  function resaltar(lista) { objetivos.forEach(o => { o.material && o.material.emissive && o.material.emissive.setRGB(0, 0, 0); o.scale.setScalar(1); }); objetivos = lista.filter(Boolean); }
   function irVista(i) { vista = i % VISTAS.length; mover(camera.position, new THREE.Vector3(...VISTAS[vista][0]), 700); mover(controls.target, new THREE.Vector3(...VISTAS[vista][1]), 700); }
   $('bVista').onclick = () => irVista(vista + 1);
   const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let abajo = null;
